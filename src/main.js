@@ -4,6 +4,8 @@ import App from './App.vue'
 import { routes } from './routes.js'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createStore } from 'vuex'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
 const app = createApp(App)
 
@@ -20,13 +22,13 @@ const store = createStore({
     }
   },
   mutations: {
-    setToken(token) {
-      this.token = token
+    setToken(state, token) {
+      state.token = token
     }
   }
 })
 
-
+app.use(VueAxios, axios)
 app.use(store)
 app.use(router)
 app.mount('#app')

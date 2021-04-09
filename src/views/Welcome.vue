@@ -1,7 +1,3 @@
-<script>
-
-</script>
-
 <template>
   <main>
     <section class="min-h-screen flex items-stretch text-white ">
@@ -46,9 +42,9 @@
                     <div class="pb-1 pt-1">
                         <input class="block w-full p-4 text-lg rounded-sm bg-black" type="password" name="password" id="password" placeholder="Password">
                     </div>
-        
+
                     <div class="px-4 pb-2 pt-4">
-                        <button class="uppercase block w-full p-4 text-lg rounded-full bg-indigo-500 hover:bg-indigo-600 focus:outline-none">Connect</button>
+                        <button class="uppercase block w-full p-4 text-lg rounded-full bg-indigo-500 hover:bg-indigo-600 focus:outline-none" @click.prevent="connect()">Connect</button>
                     </div>
 
                     <div class="p-4 text-center right-0 left-0 flex justify-center space-x-4 mt-16 lg:hidden ">
@@ -66,3 +62,12 @@
     </section>
   </main>
 </template>
+<script>
+  export default {
+    methods:{
+      connect(){
+        this.$store.commit("setToken", "123")
+      }
+    }
+  }
+</script>
