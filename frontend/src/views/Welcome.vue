@@ -46,10 +46,10 @@
                     </div>
                     <p class="text-gray-100 pb-1 pt-3">Log in with your username and password</p>
                     <div class="pb-2 pt-1">
-                        <input type="text" name="username" id="username" placeholder="Username" class="block w-full p-4 text-lg rounded-sm bg-black">
+                        <input type="text" name="username" id="username" placeholder="Username" class="block w-full p-4 text-lg rounded-sm bg-black" v-model="username">
                     </div>
                     <div class="pb-1 pt-1">
-                        <input class="block w-full p-4 text-lg rounded-sm bg-black" type="password" name="password" id="password" placeholder="Password">
+                        <input class="block w-full p-4 text-lg rounded-sm bg-black" type="password" name="password" id="password" placeholder="Password" v-model="password">
                     </div>
 
                     <div class="px-4 pb-2 pt-4">
@@ -79,6 +79,8 @@ export default {
   data() {
     return {
         url: "",
+        username: "",
+        password: "",
         connecting: false,
         error: "",
 
@@ -88,58 +90,26 @@ export default {
       connect(){
         let regex = /^(https|http)(\:\/\/)([a-zA-Z0-9\.]+)(\:)([0-9]{2,5})$/
         this.error=""
+        this.connecting = false
         if (regex.test(this.url)){
             this.connecting=true
-            console.log(this.url+"/identity/v3/auth/tokens")
-            axios.post(this.url+"/identity/v3/auth/tokens",{
-    "auth": {
-        "identity": {
-            "methods": [
-                "password"
-            ],
-            "password": {
-                "user": {
-                    "name": "demo",
-                    "domain": {
-                        "name": "Default"
-                    },
-                    "password": "devstack"
-                }
-            }
-        },
-        "scope": {
-            "project": {
-                "id" : "86aa241222dd4eb1aac4d1f6ee74c32a",
-                "domain": {
-                    "id": "default"
-                },
-                "name": "demo"
-            }
-        }
-    }
-},{timeout:5000})
+            axios.post('http://localhost:3000/api/token', {
+                "server_address": this.url,
+                "username": this.username,
+                "password": this.password
+            })
             .then((response)=>{
-                console.log(response)
                 this.connecting=false
-                this.$store.commit("setToken",response.headers["x-subject-token"])
-                console.log(response.headers["x-subject-token"])
+                this.$store.commit("setToken",response.data.token)
             })
             .catch((error)=>{
                 this.connecting=false
-                console.log(error)
-                if (error.response!=undefined){
-                    this.error=error.response.data.error.code + " | " + error.response.data.error.message
-                }else{
-                    this.error = "Unable to connect to server :("
-                }
-
+                this.error=error.response.data.message
             })
 
         }else{
-            this.error="Invalid address :("
+          this.error="Invalid address :( Format: http/https://ip_or_name:port"
         }
-
-
       }
   }
 };
