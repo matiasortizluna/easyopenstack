@@ -20,8 +20,8 @@ const store = createStore({
     }
   },
   mutations: {
-    setToken(token) {
-      this.token = token
+    setToken(state, token) {
+      state.token = token
     }
   }
 })
