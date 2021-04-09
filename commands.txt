@@ -1,0 +1,15 @@
+I had got the same CORS error while working on a Vue.js project. You can resolve this either by building a proxy server or another way would be to disable the security settings of your browser (eg, CHROME) for accessing cross origin apis (this is temporary solution & not the best way to solve the issue). Both these solutions had worked for me. The later solution does not require any mock server or a proxy server to be build. Both these solutions can be resolved at the front end.
+You can disable the chrome security settings for accessing apis out of the origin by typing the below command on the terminal:
+
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --user-data-dir="/tmp/chrome_dev_session" --disable-web-security
+
+After running the above command on your terminal, a new chrome window with security settings disabled will open up. Now, run your program (npm run serve / npm run dev) again and this time you will not get any CORS error and would be able to GET request using axios.
+Hope this helps!
+
+
+
+CORS issue can be simply resolved by following this:
+Create a new shortcut of Google Chrome(update browser installation path accordingly) with following value:
+
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="D:\chrome\temp"
+

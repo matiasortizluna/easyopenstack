@@ -28,23 +28,34 @@
                 <h1 class="my-6">
                         <img src="/src/assests/images/logo_white.png" alt="" class="w-auto h-12 sm:h-12 inline-flex">
                 </h1>
+                <div v-show="connecting" class="mb-3 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                            <strong class="font-bold">Trying to connect ... </strong>
+                            <span class="block sm:inline">Wait please :)</span>
+                </div>
+                <div v-show="error" class="mb-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <strong class="font-bold">Failed! -> </strong>
+                            <span class="block sm:inline">{{error}}</span>
+                </div>
                 <p class="text-gray-100">
                     Select your OpenStack Server
                 </p>
                 <form action="" class="sm:w-2/3 w-full px-4 lg:px-1 mx-auto">
                     <div class="pb-1 pt-4">
-                        <input type="text" name="ip_server" id="ip_server" placeholder="IP Address" class="block w-full p-4 text-lg rounded-sm bg-black">
+                        <input type="text" name="ip_server" id="ip_server" placeholder="IP Address" class="block w-full p-4 text-lg rounded-sm bg-black"
+                            v-model="url">
                     </div>
                     <p class="text-gray-100 pb-1 pt-3">Log in with your username and password</p>
                     <div class="pb-2 pt-1">
-                        <input type="username" name="username" id="username" placeholder="Username" class="block w-full p-4 text-lg rounded-sm bg-black">
+                        <input type="text" name="username" id="username" placeholder="Username" class="block w-full p-4 text-lg rounded-sm bg-black">
                     </div>
                     <div class="pb-1 pt-1">
                         <input class="block w-full p-4 text-lg rounded-sm bg-black" type="password" name="password" id="password" placeholder="Password">
                     </div>
 
                     <div class="px-4 pb-2 pt-4">
-                        <button class="uppercase block w-full p-4 text-lg rounded-full bg-indigo-500 hover:bg-indigo-600 focus:outline-none" @click.prevent="connect()">Connect</button>
+                        <button class="uppercase block w-full p-4 text-lg rounded-full bg-indigo-500 hover:bg-indigo-600 focus:outline-none"
+                        @click.prevent="connect">Connect</button>
+
                     </div>
 
                     <div class="p-4 text-center right-0 left-0 flex justify-center space-x-4 mt-16 lg:hidden ">
@@ -63,11 +74,73 @@
   </main>
 </template>
 <script>
-  export default {
-    methods:{
+//import axios from 'axios';
+export default {
+  data() {
+    return {
+        url: "",
+        connecting: false,
+        error: "",
+
+    };
+  },
+  methods: {
       connect(){
-        this.$store.commit("setToken", "123")
-      }
+        let regex = /^(https|http)(\:\/\/)([a-zA-Z0-9\.]+)(\:)([0-9]{2,5})$/
+        this.error=""
+        if (regex.test(this.url)){
+            this.connecting=true
+            console.log(this.url+"/identity/v3/auth/tokens")
+            axios.post(this.url+"/identity/v3/auth/tokens",{
+    "auth": {
+        "identity": {
+            "methods": [
+                "password"
+            ],
+            "password": {
+                "user": {
+                    "name": "demo",
+                    "domain": {
+                        "name": "Default"
+                    },
+                    "password": "devstack"
+                }
+            }
+        },
+        "scope": {
+            "project": {
+                "id" : "86aa241222dd4eb1aac4d1f6ee74c32a",
+                "domain": {
+                    "id": "default"
+                },
+                "name": "demo"
+            }
+        }
     }
+},{timeout:5000})
+            .then((response)=>{
+                console.log(response)
+                this.connecting=false
+                this.$store.commit("setToken",response.headers["x-subject-token"])
+                console.log(response.headers["x-subject-token"])
+            })
+            .catch((error)=>{
+                this.connecting=false
+                console.log(error)
+                if (error.response!=undefined){
+                    this.error=error.response.data.error.code + " | " + error.response.data.error.message
+                }else{
+                    this.error = "Unable to connect to server :("
+                }
+
+            })
+
+        }else{
+            this.error="Invalid address :("
+        }
+
+
+      }
   }
+};
 </script>
