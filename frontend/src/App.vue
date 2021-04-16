@@ -8,20 +8,20 @@
   </main>
 </template>
 <script>
-  import NavbarComponent from "./components/Navbar.vue"
-  import WelcomeView from './views/Welcome.vue'
-  import HomeComponent from "./views/Home.vue"
+import NavbarComponent from "./components/Navbar.vue";
+import WelcomeView from "./views/Welcome.vue";
+import HomeComponent from "./views/Home.vue";
 
-  export default {
-    components:{
-      "navbar": NavbarComponent,
-      "welcome": WelcomeView,
-      "home": HomeComponent
+export default {
+  components: {
+    navbar: NavbarComponent,
+    welcome: WelcomeView,
+    home: HomeComponent,
+  },
+  computed: {
+    token() {
+      return this.$store.state.authToken;
     },
-    computed:{
-      token(){
-        return this.$store.state.token
-      }
-    }
-  }
+  },
+};
 </script>

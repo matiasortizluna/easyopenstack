@@ -16,21 +16,26 @@ const router = createRouter({
 
 // Create a new store instance.
 const store = createStore({
-  state () {
+  state() {
     return {
-      token: null,
       authToken: localStorage.getItem('authToken') || null,
+      selectedProject: localStorage.getItem('selectedProject')
     }
   },
   mutations: {
     setToken(state, token) {
-      state.token = token
       localStorage.setItem('authToken', token)
     },
-    removeToken(state){
-      state.token=null,
+    removeToken(state) {
       localStorage.removeItem('authToken')
       localStorage.clear()
+    },
+    setSelectedProject(state, project) {
+      //localStorage.setItem('selectedProject', project)
+      localStorage.setItem('selectedProject', 'demo')
+    },
+    removeSelectedProject(state) {
+      localStorage.removeItem('selectedProject')
     }
   }
 })
