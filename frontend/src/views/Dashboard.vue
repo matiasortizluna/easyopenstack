@@ -16,7 +16,7 @@
         Projects
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="#">Action</a>
+        <a class="dropdown-item" href="#">po</a>
         <a class="dropdown-item" href="#">Another action</a>
         <a class="dropdown-item" href="#">Something else here</a>
       </div>
@@ -145,15 +145,28 @@ export default {
   data() {
     return {
       selectedProject: this.$store.state.selectedProject,
-      projects: [
-        { nome: "Projeto 1", id: 1 },
-        { nome: "Projeto 2", id: 2 },
-        { nome: "Projeto 3", id: 3 },
-      ],
+      projects: [],
     };
   },
   methods: {
     selectProject() {},
+  },
+  mounted() {
+    axios
+      .get("http://localhost:3000/api/projects", {
+        headers: {
+          "X-Token": response.data.token,
+          "X-Server-Address": this.url,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        //this.projects=response
+        //this.$store.commit("setSelectedProject", response.data.projectId);
+      })
+      .catch((error) => {
+        this.error = error.response.data.message;
+      });
   },
 };
 </script>
