@@ -7,6 +7,7 @@ import { createStore } from 'vuex'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
+
 const app = createApp(App)
 
 const router = createRouter({

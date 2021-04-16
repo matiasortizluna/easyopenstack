@@ -4,29 +4,24 @@
       <h3 class="text-gray-700 text-3xl font-medium">Dashboard</h3>
     </div>
 
-    <template>
-      <v-container fluid>
-        <v-row align="center">
-          <v-col cols="6">
-            <v-subheader> Custom items </v-subheader>
-          </v-col>
+    <div class="dropdown">
+      <button
+        class="btn btn-secondary dropdown-toggle"
+        type="button"
+        id="dropdownMenuButton"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        Projects
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="#">Action</a>
+        <a class="dropdown-item" href="#">Another action</a>
+        <a class="dropdown-item" href="#">Something else here</a>
+      </div>
+    </div>
 
-          <v-col cols="6">
-            <v-select
-              v-model="select"
-              :hint="`${select.state}, ${select.abbr}`"
-              :items="items"
-              item-text="state"
-              item-value="abbr"
-              label="Select"
-              persistent-hint
-              return-object
-              single-line
-            ></v-select>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
     <div>
       <div class="mt-4">
         <div class="flex flex-wrap -mx-6">
@@ -154,14 +149,6 @@ export default {
         { nome: "Projeto 1", id: 1 },
         { nome: "Projeto 2", id: 2 },
         { nome: "Projeto 3", id: 3 },
-      ],
-      select: { state: "Florida", abbr: "FL" },
-      items: [
-        { state: "Florida", abbr: "FL" },
-        { state: "Georgia", abbr: "GA" },
-        { state: "Nebraska", abbr: "NE" },
-        { state: "California", abbr: "CA" },
-        { state: "New York", abbr: "NY" },
       ],
     };
   },
