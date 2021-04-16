@@ -20,3 +20,4 @@ const server = app.listen(3000, function () {
 let importedFunctions = require('./functions.js')
 //get token
 app.post('/api/token', importedFunctions.getFirstScopedToken)
+app.get('/api/projects', importedFunctions.getProjects)

@@ -60,3 +60,13 @@ module.exports.getFirstScopedToken = (req, res, next) => {
         res.status(err.response.data.error.code).send({message: err.response.data.error.message})
     })
 }
+module.exports.getProjects = (req, res, next) => {
+  let data = req.body
+  axios.get(data.server_address+'/identity/v3/auth/projects', {
+    headers: {
+      'X-Auth-Token': data.token
+    }
+  })
+  .then((resp) => res.send(resp.data))
+  .catch((err) => res.status(err.response.data.error.code).send({message: err.response.data.error.message}))
+}
