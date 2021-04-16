@@ -47,7 +47,7 @@ module.exports.getFirstScopedToken = (req, res, next) => {
             }
         })
         .then((resp) => {
-          res.send({token: resp.headers['x-subject-token']})
+          res.status(404).send({token: resp.headers['x-subject-token']})
         })
         .catch((err) => res.status(err.response.data.error.code).send({message: err.response.data.error.message}))
       })
