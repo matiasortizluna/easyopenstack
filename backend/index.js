@@ -1,4 +1,3 @@
-var axios = require('axios')
 const express = require('express')
 
 const app = express();
@@ -17,30 +16,7 @@ const server = app.listen(3000, function () {
     let port = server.address().port
     // Starting the Server at the port 3000
 })
+//Import all custom functions
+let importedFunctions = require('./functions.js')
 //get token
-app.post('/api/token', (req, res, next) => {
-  let data = req.body
-  axios.post(data.server_address+'/identity/v3/auth/tokens', {
-    "auth": {
-      "identity": {
-        "methods": ["password"],
-        "password": {
-          "user": {
-            "name": data.username,
-            "domain": { "id": "default" },
-            "password": data.password
-          }
-        }
-      }
-    }
-  })
-    .then((resp) => {
-      res.send({token:resp.headers['x-subject-token']})
-    })
-    .catch((err) => {
-      if(err.response==undefined)
-        res.status(400).send({message:"Unable to connect to the server"})
-      else
-        res.status(err.response.data.error.code).send({message: err.response.data.error.message})
-    })
-})
+app.post('/api/token', importedFunctions.getFirstScopedToken)
