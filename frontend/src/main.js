@@ -19,17 +19,18 @@ const store = createStore({
   state () {
     return {
       token: null,
-      authToken: sessionStorage.getItem('authToken') || null,
+      authToken: localStorage.getItem('authToken') || null,
     }
   },
   mutations: {
     setToken(state, token) {
       state.token = token
-      sessionStorage.setItem('authToken', token)
+      localStorage.setItem('authToken', token)
     },
     removeToken(state){
       state.token=null,
-      sessionStorage.removeItem('authToken')
+      localStorage.removeItem('authToken')
+      localStorage.clear()
     }
   }
 })

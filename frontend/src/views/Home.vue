@@ -37,22 +37,23 @@
                                 src="https://images.unsplash.com/photo-1528892952291-009c663ce843?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=296&amp;q=80"
                                 alt="Your avatar">
                         </button>
-    
-                        <div v-show="!dropdownOpen" @click.prevent="menuUser" class="fixed inset-0 h-full w-full z-10"
-                            style="display: none;"></div>
-    
+
+                        <div @click.prevent="menuUser" class="fixed inset-0 h-full w-full z-10"
+                        style="display: none;"></div>
+
                         <div v-show="dropdownOpen"
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-10"
-                            style="display: none;">
-                            <a href="#"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Profile</a>
-                            <a href="#"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Products</a>
-                            <button @click.prevent="logout">
-                            <a href="#"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Logout</a>
-                            </button>
+                        class="absolute right-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-10"
+                        style="display: none;">
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Profile</a>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Products</a>
+                        <button @click.prevent="logout">
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Logout</a>
+                        </button>
                         </div>
+
                     </div>
                 </div>
             </header>
@@ -69,15 +70,19 @@
 <script>
 import Navbar from '../components/Navbar.vue'
 import DashboardComponent from "./Dashboard.vue"
+import DeployComponent from './Deploy.vue'
+import imgUrl from '../assets/images/logo_complete.png'
 
   export default {
     components:{
       "dashboard": DashboardComponent,
-        Navbar
+        Navbar,
+        "deploy": DeployComponent
     },
     data() {
         return {
         dropdownOpen: false,    
+        logoUrl: imgUrl
         }
     },
     methods: {
