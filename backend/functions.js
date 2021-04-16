@@ -25,7 +25,7 @@ module.exports.getFirstScopedToken = (req, res, next) => {
       })
       .then((resp) => {
         if(!resp.data.projects.length){
-          res.send({message: "There are no projects associated with this user."})
+          res.status(404).send({message: "There are no projects associated with this user."})
           return
         }
         let firstProjectId = resp.data.projects[0].id
@@ -47,7 +47,7 @@ module.exports.getFirstScopedToken = (req, res, next) => {
             }
         })
         .then((resp) => {
-          res.status(404).send({token: resp.headers['x-subject-token']})
+          res.send({token: resp.headers['x-subject-token'], projectId: resp.data.token.project.id})
         })
         .catch((err) => res.status(err.response.data.error.code).send({message: err.response.data.error.message}))
       })
