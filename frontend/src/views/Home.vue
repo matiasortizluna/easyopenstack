@@ -77,7 +77,7 @@
               >
                 <img
                   class="h-full w-full object-cover"
-                  src="https://images.unsplash.com/photo-1528892952291-009c663ce843?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=296&amp;q=80"
+                  src="logoUrl"
                   alt="Your avatar"
                 />
               </button>

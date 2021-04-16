@@ -175,6 +175,8 @@ export default {
           .then((response) => {
             this.connecting = false;
             this.$store.commit("setToken", response.data.token);
+            this.$store.commit("setURL", this.url);
+            this.$store.commit("setSelectedProject", response.data.projectId);
           })
           .catch((error) => {
             this.connecting = false;

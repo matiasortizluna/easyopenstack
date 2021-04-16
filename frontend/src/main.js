@@ -20,7 +20,8 @@ const store = createStore({
   state() {
     return {
       authToken: localStorage.getItem('authToken') || null,
-      selectedProject: localStorage.getItem('selectedProject')
+      selectedProject: localStorage.getItem('selectedProject'),
+      url: localStorage.getItem('url')
     }
   },
   mutations: {
@@ -31,9 +32,15 @@ const store = createStore({
       localStorage.removeItem('authToken')
       localStorage.clear()
     },
+    setURL(state, url) {
+      localStorage.setItem('url', url)
+    },
+    removeURL(state) {
+      localStorage.removeItem('url')
+    },
     setSelectedProject(state, project) {
-      //localStorage.setItem('selectedProject', project)
-      localStorage.setItem('selectedProject', 'demo')
+      localStorage.setItem('selectedProject', project)
+      //localStorage.setItem('selectedProject', 'demo')
     },
     removeSelectedProject(state) {
       localStorage.removeItem('selectedProject')
