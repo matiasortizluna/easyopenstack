@@ -83,8 +83,24 @@ module.exports.getInstances = (req, res, next) => {
     .catch((err) => console.log(err))
 }
 module.exports.getVolumes = (req, res, next) => {
-
-
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/volume/v3/' + data['x-project-id'] + '/volumes', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => console.log(err))
 
 }
+module.exports.getImages = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2/images', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => console.log(err))
 
+}

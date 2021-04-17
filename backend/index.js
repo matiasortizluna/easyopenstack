@@ -7,7 +7,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Token, X-Server-Address")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Token, X-Server-Address, x-project-id")
   next()
 })
 
@@ -23,3 +23,4 @@ app.post('/api/token', importedFunctions.getFirstScopedToken)
 app.get('/api/projects', importedFunctions.getProjects)
 app.get('/api/instances', importedFunctions.getInstances)
 app.get('/api/volumes', importedFunctions.getVolumes)
+app.get('/api/images', importedFunctions.getImages)

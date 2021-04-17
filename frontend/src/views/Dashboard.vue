@@ -52,7 +52,9 @@
                 </div>
 
                 <div class="mx-5">
-                  <h4 class="text-2xl font-semibold text-gray-700">8,282</h4>
+                  <h4 class="text-2xl font-semibold text-gray-700">
+                    {{ numberVolumes }}
+                  </h4>
                   <div class="text-gray-500">Volumes</div>
                 </div>
               </div>
@@ -68,7 +70,9 @@
                   <img v-bind:src="computerPNG" />
                 </div>
                 <div class="mx-5">
-                  <h4 class="text-2xl font-semibold text-gray-700">8,282</h4>
+                  <h4 class="text-2xl font-semibold text-gray-700">
+                    {{ numberImages }}
+                  </h4>
                   <div class="text-gray-500">Images</div>
                 </div>
               </div>
@@ -137,6 +141,8 @@ export default {
       projects: [],
       computerPNG: computer,
       numberInstances: 0,
+      numberVolumes: 0,
+      numberImages: 0,
     };
   },
   methods: {
@@ -174,6 +180,32 @@ export default {
             console.log(error);
             this.error = error.response.data.message;
           });
+
+        axios
+          .get("http://localhost:3000/api/volumes", {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.$store.state.url,
+              "x-project-id": this.$store.state.selectedProject,
+            },
+          })
+          .then((response) => {
+            this.numberVolumes = response.data.volumes.length;
+          });
+      })
+      .catch((error) => {
+        this.error = error.response.data.message;
+      });
+
+    axios
+      .get("http://localhost:3000/api/images", {
+        headers: {
+          "X-Token": this.$store.state.authToken,
+          "X-Server-Address": this.$store.state.url,
+        },
+      })
+      .then((response) => {
+        this.numberImages = response.data.images.length;
       })
       .catch((error) => {
         this.error = error.response.data.message;
