@@ -30,7 +30,6 @@ const store = createStore({
     },
     removeToken(state) {
       localStorage.removeItem('authToken')
-      localStorage.clear()
     },
     setURL(state, url) {
       localStorage.setItem('url', url)
@@ -44,6 +43,12 @@ const store = createStore({
     },
     removeSelectedProject(state) {
       localStorage.removeItem('selectedProject')
+    },
+    logout(state) {
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('url')
+      localStorage.removeItem('selectedProject')
+      localStorage.clear()
     }
   }
 })

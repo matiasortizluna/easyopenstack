@@ -70,5 +70,21 @@ module.exports.getProjects = (req, res, next) => {
     .then((resp) => res.send(resp.data))
     .catch((err) => console.log(err))
 }
-
 //res.status(err.response.data.error.code).send({message: err.response.data.error.message})
+module.exports.getInstances = (req, res, next) => {
+
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2.1/servers', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => console.log(err))
+}
+module.exports.getVolumes = (req, res, next) => {
+
+
+
+}
+

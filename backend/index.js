@@ -21,3 +21,5 @@ let importedFunctions = require('./functions.js')
 //get token
 app.post('/api/token', importedFunctions.getFirstScopedToken)
 app.get('/api/projects', importedFunctions.getProjects)
+app.get('/api/instances', importedFunctions.getInstances)
+app.get('/api/volumes', importedFunctions.getVolumes)
