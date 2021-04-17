@@ -48,7 +48,7 @@
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
                 <div class="p-3 rounded-full bg-yellow-600 bg-opacity-75">
-                  <img v-bind:src="computerPNG" />
+                  <img v-bind:src="databasePNG" />
                 </div>
 
                 <div class="mx-5">
@@ -67,7 +67,7 @@
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
                 <div class="p-3 rounded-full bg-blue-600 bg-opacity-75">
-                  <img v-bind:src="computerPNG" />
+                  <img v-bind:src="cdPNG" />
                 </div>
                 <div class="mx-5">
                   <h4 class="text-2xl font-semibold text-gray-700">
@@ -134,12 +134,16 @@
 </template>
 <script>
 import computer from "../assets/images/computer.png";
+import database from "../assets/images/database.png";
+import cd from "../assets/images/cd.png";
 export default {
   data() {
     return {
       selectedProject: this.$store.state.selectedProject,
       projects: [],
       computerPNG: computer,
+      databasePNG: database,
+      cdPNG: cd,
       numberInstances: 0,
       numberVolumes: 0,
       numberImages: 0,
