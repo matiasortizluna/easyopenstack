@@ -112,18 +112,13 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response);
-          this.$store.commit(
-            "setSelectedProject",
-            response.data.token.projectId
-          );
+          this.$store.commit("setSelectedProject", response.data.projectId);
           this.$store.commit("setToken", response.data.token);
-          //console.log(response.data);
           this.getProjectInfo();
         })
         .catch((error) => {
-          console.log(response);
-          this.error = error.response.data.message;
+          console.log(error);
+          //this.error = error.response.data.message;
         });
     },
     getProjectInfo() {
@@ -135,14 +130,13 @@ export default {
           },
         })
         .then((response) => {
-          //console.log(response.data.servers.length);
           this.numberInstances = response.data.servers.length;
         })
         .catch((error) => {
           console.log(error);
           this.error = error.response.data.message;
         });
-
+      console.log(this.$store.state.selectedProject.id);
       axios
         .get("http://localhost:3000/api/volumes", {
           headers: {
@@ -152,7 +146,12 @@ export default {
           },
         })
         .then((response) => {
+          console.log(response);
           this.numberVolumes = response.data.volumes.length;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.error = error.response.data.message;
         });
       axios
         .get("http://localhost:3000/api/images", {
@@ -183,7 +182,7 @@ export default {
         this.getProjectInfo();
       })
       .catch((error) => {
-        this.error = error.response.data.message;
+        //this.error = error.response.data.message;
       });
   },
 };
