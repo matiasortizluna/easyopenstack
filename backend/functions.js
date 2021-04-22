@@ -62,27 +62,31 @@ module.exports.getFirstScopedToken = (req, res, next) => {
 }
 module.exports.changeScopedToken = (req, res, next) => {
   let data = req.headers
-  axios.post(data['X-Server-Address'] + '/identity/v3/auth/tokens', {
+  axios.post(data['x-server-address'] + '/identity/v3/auth/tokens', {
     "auth": {
       "identity": {
         "methods": [
           "token"
         ],
         "token": {
-          "id": data['X-Old-Token']
+          "id": data['x-old-token']
         }
       },
       "scope": {
         "project": {
-          "id": data['X-New-Project-Id']
+          "id": data['x-new-project-id']
         }
       }
     }
   })
     .then((resp) => {
+      //console.log(resp)
       res.send({ token: resp.headers['x-subject-token'], projectId: resp.data.token.project.id })
     })
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+    .catch((err) => {
+      //console.log(err)
+      res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
 }
 module.exports.getProjects = (req, res, next) => {
   let data = req.headers
@@ -114,7 +118,10 @@ module.exports.getVolumes = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+    .catch((err) => { 
+      console.log(err.response)
+      res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
 
 }
 module.exports.getImages = (req, res, next) => {
