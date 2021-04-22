@@ -22,7 +22,7 @@
               class="w-12 h-12 rounded-full overflow-hidden border-2 dark:border-white border-gray-900"
             >
               <img
-                src="/src/assests/images/fabio.jpeg"
+                src="/src/assets/images/fabio.jpeg"
                 alt=""
                 class="w-full h-full object-cover"
               />
@@ -33,7 +33,7 @@
               class="w-12 h-12 rounded-full overflow-hidden border-2 dark:border-white border-gray-900"
             >
               <img
-                src="/src/assests/images/matias.png"
+                src="/src/assets/images/matias.png"
                 alt=""
                 class="w-full h-full object-cover"
               />
@@ -53,7 +53,7 @@
         <div class="w-full pxy-6 z-20 px-3">
           <h1 class="my-6">
             <img
-              src="/src/assests/images/logo_white.png"
+              src="/src/assets/images/logo_white.png"
               alt=""
               class="w-auto h-12 sm:h-12 inline-flex"
             />
@@ -124,7 +124,7 @@
             >
               <a href="#">
                 <img
-                  src="/src/assests/images/fabio.jpeg"
+                  src="/src/assets/images/fabio.jpeg"
                   alt=""
                   class="rounded object-cover"
                   width="50"
@@ -133,7 +133,7 @@
               </a>
               <a href="#">
                 <img
-                  src="/src/assests/images/matias.png"
+                  src="/src/assets/images/matias.png"
                   alt=""
                   class="rounded object-cover"
                   width="57"

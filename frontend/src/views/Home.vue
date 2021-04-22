@@ -102,7 +102,7 @@
 import Navbar from "../components/Navbar.vue";
 import DashboardComponent from "./Dashboard.vue";
 import DeployComponent from "./Deploy.vue";
-import imgUrl from "../assets/images/logo_complete.png";
+import imgUrl from "../assets/images/logo_complete_white.png";
 import personPNG from "../assets/images/person.png";
 
 export default {

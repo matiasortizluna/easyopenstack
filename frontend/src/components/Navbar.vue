@@ -22,7 +22,7 @@
               </path>
           </svg>
 
-          <span class="mx-3">Deploy</span>
+          <span class="mx-3">Deplosy</span>
       </a>
 
       <a class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
@@ -51,7 +51,7 @@
   </nav>
 </template>
 <script>
-  import imgUrl from '../assets/images/logo_complete.png'
+  import imgUrl from '../assets/images/logo_complete_white.png'
   export default {
     data(){
       return {
