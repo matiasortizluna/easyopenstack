@@ -47,6 +47,7 @@ module.exports.getFirstScopedToken = (req, res, next) => {
             }
           })
             .then((resp) => {
+              
               res.send({ token: resp.headers['x-subject-token'], projectId: resp.data.token.project.id })
             })
             .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
@@ -80,7 +81,6 @@ module.exports.changeScopedToken = (req, res, next) => {
     }
   })
     .then((resp) => {
-      //console.log(resp)
       res.send({ token: resp.headers['x-subject-token'], projectId: resp.data.token.project.id })
     })
     .catch((err) => {
@@ -96,7 +96,7 @@ module.exports.getProjects = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => console.log(err))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
 //res.status(err.response.data.error.code).send({message: err.response.data.error.message})
 module.exports.getInstances = (req, res, next) => {
@@ -108,7 +108,7 @@ module.exports.getInstances = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => console.log(err))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
 module.exports.getVolumes = (req, res, next) => {
   let data = req.headers
@@ -119,8 +119,7 @@ module.exports.getVolumes = (req, res, next) => {
   })
     .then((resp) => res.send(resp.data))
     .catch((err) => { 
-      console.log(err.response)
-      res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+      res.status(err.response.data.badRequest.code).send({ message: err.response.data.badRequest.message })
     })
 
 }
@@ -132,6 +131,6 @@ module.exports.getImages = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => console.log(err))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 
 }

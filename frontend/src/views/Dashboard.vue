@@ -13,9 +13,7 @@
         <option
           v-for="project in projects"
           v-bind:key="project.id"
-          v-bind:selected="
-            this.$store.state.selectProject == project.id ? true : false
-          "
+          :selected="project.id == selectedProjectId"
           v-bind:value="project.id"
         >
           {{ project.name }}
@@ -115,13 +113,12 @@ export default {
           },
         })
         .then((response) => {
-          this.$store.commit("setSelectedProject", response.data.projectId);
-          this.$store.commit("setToken", response.data.token);
-          this.getProjectInfo();
+            this.$store.commit("setSelectedProject", response.data.projectId)
+            this.$store.commit("setToken", response.data.token)
+            this.getProjectInfo()
         })
         .catch((error) => {
-          console.log(error);
-          //this.error = error.response.data.message;
+          this.error = error.response.data.message;
         });
     },
     getProjectInfo() {
@@ -136,16 +133,14 @@ export default {
           this.numberInstances = response.data.servers.length;
         })
         .catch((error) => {
-          console.log(error);
           this.error = error.response.data.message;
         });
-      console.log(this.$store.state.selectedProject.id);
       axios
         .get("http://localhost:3000/api/volumes", {
           headers: {
             "X-Token": this.$store.state.authToken,
             "X-Server-Address": this.$store.state.url,
-            "x-project-id": this.$store.state.selectedProject.id,
+            "x-project-id": this.$store.state.selectedProject,
           },
         })
         .then((response) => {
@@ -181,13 +176,17 @@ export default {
       })
       .then((response) => {
         this.projects = response.data.projects;
-        this.$store.commit("setSelectedProject", response.data.projects[0]);
         this.getProjectInfo();
       })
       .catch((error) => {
         this.error = error.response.data.message;
       });
   },
+  computed:{
+    selectedProjectId(){
+      return this.$store.state.selectedProject
+    }
+  }
 };
 </script>
 
