@@ -181,6 +181,8 @@ export default {
           .catch((error) => {
             this.connecting = false;
             this.error = error.response.data.message;
+            if(error.response.status == 401)
+              this.error += " (Check your credentials.)"
           });
       } else {
         this.error = "Invalid address :( Format: http/https://ip_or_name:port";

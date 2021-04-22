@@ -19,36 +19,41 @@ const router = createRouter({
 const store = createStore({
   state() {
     return {
-      authToken: localStorage.getItem('authToken') || null,
-      selectedProject: localStorage.getItem('selectedProject'),
-      url: localStorage.getItem('url')
+      authToken: sessionStorage.getItem('authToken') || null,
+      selectedProject: sessionStorage.getItem('selectedProject'),
+      url: sessionStorage.getItem('url')
     }
   },
   mutations: {
     setToken(state, token) {
-      localStorage.setItem('authToken', token)
+      sessionStorage.setItem('authToken', token)
+      state.authToken = token
     },
     removeToken(state) {
-      localStorage.removeItem('authToken')
+      sessionStorage.removeItem('authToken')
+      state.authToken = null
     },
     setURL(state, url) {
-      localStorage.setItem('url', url)
+      sessionStorage.setItem('url', url)
+      state.url = url
     },
     removeURL(state) {
-      localStorage.removeItem('url')
+      sessionStorage.removeItem('url')
+      state.url = null
     },
     setSelectedProject(state, project) {
-      localStorage.setItem('selectedProject', project)
-      //localStorage.setItem('selectedProject', 'demo')
+      sessionStorage.setItem('selectedProject', project)
+      state.selectedProject = project
     },
     removeSelectedProject(state) {
-      localStorage.removeItem('selectedProject')
+      sessionStorage.removeItem('selectedProject')
+      state.selectedProject = null
     },
     logout(state) {
-      localStorage.removeItem('authToken')
-      localStorage.removeItem('url')
-      localStorage.removeItem('selectedProject')
-      localStorage.clear()
+      state.authToken = null
+      state.url = null
+      state.selectedProject = null
+      sessionStorage.clear()
     }
   }
 })
