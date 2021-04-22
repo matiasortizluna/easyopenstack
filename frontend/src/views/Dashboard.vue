@@ -24,7 +24,7 @@
       <div class="mt-4">
         <div class="flex flex-wrap -mx-6">
           <div class="w-full px-6 w-1/3 h-12">
-            <button>
+            <button @click.prevent="changeNavBarItem('virtualmachines')">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -36,14 +36,14 @@
                   <h4 class="text-2xl font-semibold text-gray-700">
                     {{ numberInstances }}
                   </h4>
-                  <div class="text-gray-600">Instances</div>
+                  <div class="text-gray-600">Virtual Machines</div>
                 </div>
               </div>
             </button>
           </div>
 
           <div class="w-full px-6 w-1/3 h-12">
-            <button>
+            <button @click.prevent="changeNavBarItem('volumes')">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -62,7 +62,7 @@
           </div>
 
           <div class="w-full px-6 w-1/3 h-12">
-            <button>
+            <button @click.prevent="changeNavBarItem('images')">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -101,6 +101,9 @@ export default {
     };
   },
   methods: {
+    changeNavBarItem(option) {
+      this.$store.commit("setNavBarItem", option);
+    },
     changeProject(event) {
       let newProjectId = event.target.value;
       axios
