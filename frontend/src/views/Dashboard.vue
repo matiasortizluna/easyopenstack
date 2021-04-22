@@ -127,7 +127,6 @@ export default {
           },
         })
         .then((response) => {
-          //console.log(response.data.servers.length);
           this.numberInstances = response.data.servers.length;
         })
         .catch((error) => {
@@ -142,7 +141,12 @@ export default {
           },
         })
         .then((response) => {
+          console.log(response);
           this.numberVolumes = response.data.volumes.length;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.error = error.response.data.message;
         });
       axios
         .get("http://localhost:3000/api/images", {
