@@ -29,7 +29,7 @@
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
                 <div class="p-3">
-                  <img v-bind:src="computerPNG" width="50"/>
+                  <img v-bind:src="computerPNG" width="50" />
                 </div>
 
                 <div class="mx-5">
@@ -48,7 +48,7 @@
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
                 <div class="p-3">
-                  <img v-bind:src="databasePNG" width="67"/>
+                  <img v-bind:src="databasePNG" width="67" />
                 </div>
 
                 <div class="mx-5">
@@ -67,7 +67,7 @@
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
                 <div class="p-3">
-                  <img v-bind:src="cdPNG" width="65"/>
+                  <img v-bind:src="cdPNG" width="65" />
                 </div>
                 <div class="mx-5">
                   <h4 class="text-2xl font-semibold text-gray-700">
@@ -102,13 +102,13 @@ export default {
   },
   methods: {
     changeProject(event) {
-      let newProjectId = event.target.value
-      console.log(this.$store.state.url)
-      axios.get("http://localhost:3000/api/token/changeScope", {
-        headers: {
+      let newProjectId = event.target.value;
+      axios
+        .get("http://localhost:3000/api/token/changeScope", {
+          headers: {
             "X-Old-Token": this.$store.state.authToken,
             "X-Server-Address": this.$store.state.url,
-            "X-New-Project-Id": newProjectId
+            "X-New-Project-Id": newProjectId,
           },
         })
         .then((response) => {
@@ -117,9 +117,9 @@ export default {
             this.getProjectInfo()
         })
         .catch((error) => {
+          console.log(response);
           this.error = error.response.data.message;
-        })
-      
+        });
     },
     getProjectInfo() {
       axios
@@ -180,7 +180,6 @@ export default {
       .catch((error) => {
         this.error = error.response.data.message;
       });
-
   },
 };
 </script>
