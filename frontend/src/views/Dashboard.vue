@@ -102,10 +102,66 @@ export default {
   },
   methods: {
     changeProject(event) {
-      console.log(event.target.value);
+      let newProjectId = event.target.value
+      axios.get("http://localhost:3000/api/token/changeScope", {
+        headers: {
+            "X-Old-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "X-New-Project-Id": newProjectId
+          },
+        })
+        .then((response) => {
+            this.$store.commit("setSelectedProject", response.data.token.projectId)
+            this.$store.commit("setToken", response.data.token)
+            console.log(response.data)
+            this.getProjectInfo()
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+        })
+      
     },
     getProjectInfo() {
-      axios.get("");
+      axios
+        .get("http://localhost:3000/api/instances", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+          },
+        })
+        .then((response) => {
+          //console.log(response.data.servers.length);
+          this.numberInstances = response.data.servers.length;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.error = error.response.data.message;
+        });
+
+      axios
+        .get("http://localhost:3000/api/volumes", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "x-project-id": this.$store.state.selectedProject.id,
+          },
+        })
+        .then((response) => {
+          this.numberVolumes = response.data.volumes.length;
+        });
+      axios
+        .get("http://localhost:3000/api/images", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+          },
+        })
+        .then((response) => {
+          this.numberImages = response.data.images.length;
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+        });
     },
   },
   mounted() {
@@ -119,52 +175,12 @@ export default {
       .then((response) => {
         this.projects = response.data.projects;
         this.$store.commit("setSelectedProject", response.data.projects[0]);
-
-        axios
-          .get("http://localhost:3000/api/instances", {
-            headers: {
-              "X-Token": this.$store.state.authToken,
-              "X-Server-Address": this.$store.state.url,
-            },
-          })
-          .then((response) => {
-            //console.log(response.data.servers.length);
-            this.numberInstances = response.data.servers.length;
-          })
-          .catch((error) => {
-            console.log(error);
-            this.error = error.response.data.message;
-          });
-
-        axios
-          .get("http://localhost:3000/api/volumes", {
-            headers: {
-              "X-Token": this.$store.state.authToken,
-              "X-Server-Address": this.$store.state.url,
-              "x-project-id": this.$store.state.selectedProject,
-            },
-          })
-          .then((response) => {
-            this.numberVolumes = response.data.volumes.length;
-          });
+        this.getProjectInfo();
       })
       .catch((error) => {
         this.error = error.response.data.message;
       });
 
-    axios
-      .get("http://localhost:3000/api/images", {
-        headers: {
-          "X-Token": this.$store.state.authToken,
-          "X-Server-Address": this.$store.state.url,
-        },
-      })
-      .then((response) => {
-        this.numberImages = response.data.images.length;
-      })
-      .catch((error) => {
-        this.error = error.response.data.message;
-      });
   },
 };
 </script>
