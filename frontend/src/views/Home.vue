@@ -92,8 +92,8 @@
             </div>
           </div>
         </header>
-
-        <dashboard></dashboard>
+        <dashboard v-show="navbarItem == 'dashboard'"></dashboard>
+        <deploy v-show="navbarItem == 'deploy'"></deploy>
       </div>
     </div>
   </div>
@@ -126,6 +126,11 @@ export default {
     logout() {
       this.$store.commit("logout");
       console.log("Log out");
+    },
+  },
+  computed: {
+    navbarItem() {
+      return this.$store.state.navbarItem;
     },
   },
 };

@@ -182,7 +182,7 @@ export default {
         this.getProjectInfo();
       })
       .catch((error) => {
-        //this.error = error.response.data.message;
+        this.error = error.response.data.message;
       });
   },
 };

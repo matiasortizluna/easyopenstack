@@ -21,10 +21,14 @@ const store = createStore({
     return {
       authToken: sessionStorage.getItem('authToken') || null,
       selectedProject: sessionStorage.getItem('selectedProject'),
-      url: sessionStorage.getItem('url')
+      url: sessionStorage.getItem('url'),
+      navbarItem: 'dashboard'
     }
   },
   mutations: {
+    setNavBarItem(state, option) {
+      state.navbarItem = option
+    },
     setToken(state, token) {
       sessionStorage.setItem('authToken', token)
       state.authToken = token
