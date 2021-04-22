@@ -23,13 +23,13 @@
       </select>
       <div class="mt-4">
         <div class="flex flex-wrap -mx-6">
-          <div class="w-full px-6 sm:w-1/2 xl:w-1/3">
+          <div class="w-full px-6 w-1/3 h-12">
             <button>
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
-                <div class="p-3 rounded-full bg-green-600 bg-opacity-75">
-                  <img v-bind:src="computerPNG" />
+                <div class="p-3">
+                  <img v-bind:src="computerPNG" width="50"/>
                 </div>
 
                 <div class="mx-5">
@@ -42,13 +42,13 @@
             </button>
           </div>
 
-          <div class="w-full px-6 sm:w-1/2 xl:w-1/3">
+          <div class="w-full px-6 w-1/3 h-12">
             <button>
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
-                <div class="p-3 rounded-full bg-yellow-600 bg-opacity-75">
-                  <img v-bind:src="databasePNG" />
+                <div class="p-3">
+                  <img v-bind:src="databasePNG" width="67"/>
                 </div>
 
                 <div class="mx-5">
@@ -61,13 +61,13 @@
             </button>
           </div>
 
-          <div class="w-full px-6 sm:w-1/2 xl:w-1/3">
+          <div class="w-full px-6 w-1/3 h-12">
             <button>
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
-                <div class="p-3 rounded-full bg-blue-600 bg-opacity-75">
-                  <img v-bind:src="cdPNG" />
+                <div class="p-3">
+                  <img v-bind:src="cdPNG" width="65"/>
                 </div>
                 <div class="mx-5">
                   <h4 class="text-2xl font-semibold text-gray-700">
@@ -77,55 +77,6 @@
                 </div>
               </div>
             </button>
-          </div>
-        </div>
-
-        <br />
-
-        <div class="flex flex-wrap -mx-6">
-          <div class="w-full px-6 sm:w-1/2 xl:w-1/3">
-            <div
-              class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
-            >
-              <div class="p-3 rounded-full bg-indigo-600 bg-opacity-75">
-                <img v-bind:src="computerPNG" />
-              </div>
-
-              <div class="mx-5">
-                <h4 class="text-2xl font-semibold text-gray-700">8,282</h4>
-                <div class="text-gray-500">New Users</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="w-full px-6 sm:w-1/2 xl:w-1/3">
-            <div
-              class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
-            >
-              <div class="p-3 rounded-full bg-indigo-600 bg-opacity-75">
-                <img v-bind:src="computerPNG" />
-              </div>
-
-              <div class="mx-5">
-                <h4 class="text-2xl font-semibold text-gray-700">8,282</h4>
-                <div class="text-gray-500">New Users</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="w-full px-6 sm:w-1/2 xl:w-1/3">
-            <div
-              class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
-            >
-              <div class="p-3 rounded-full bg-indigo-600 bg-opacity-75">
-                <img v-bind:src="computerPNG" />
-              </div>
-
-              <div class="mx-5">
-                <h4 class="text-2xl font-semibold text-gray-700">8,282</h4>
-                <div class="text-gray-500">New Users</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

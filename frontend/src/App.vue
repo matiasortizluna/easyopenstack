@@ -20,7 +20,6 @@ export default {
   },
   computed: {
     token() {
-      console.log(this.$store.state.authToken)
       return this.$store.state.authToken
     },
   },
