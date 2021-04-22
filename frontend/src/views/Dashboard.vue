@@ -103,6 +103,7 @@ export default {
   methods: {
     changeProject(event) {
       let newProjectId = event.target.value
+      console.log(this.$store.state.url)
       axios.get("http://localhost:3000/api/token/changeScope", {
         headers: {
             "X-Old-Token": this.$store.state.authToken,
@@ -113,7 +114,6 @@ export default {
         .then((response) => {
             this.$store.commit("setSelectedProject", response.data.token.projectId)
             this.$store.commit("setToken", response.data.token)
-            console.log(response.data)
             this.getProjectInfo()
         })
         .catch((error) => {
