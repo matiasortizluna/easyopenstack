@@ -22,7 +22,6 @@
       <div class="mt-4">
         <div class="flex flex-wrap -mx-6">
           <div class="w-full px-6 w-1/3 h-12">
-            <button @click.prevent="changeNavBarItem('virtualmachines')">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -37,11 +36,9 @@
                   <div class="text-gray-600">Virtual Machines</div>
                 </div>
               </div>
-            </button>
           </div>
 
           <div class="w-full px-6 w-1/3 h-12">
-            <button @click.prevent="changeNavBarItem('volumes')">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -56,11 +53,9 @@
                   <div class="text-gray-500">Volumes</div>
                 </div>
               </div>
-            </button>
           </div>
 
           <div class="w-full px-6 w-1/3 h-12">
-            <button @click.prevent="changeNavBarItem('images')">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -74,7 +69,6 @@
                   <div class="text-gray-500">Images</div>
                 </div>
               </div>
-            </button>
           </div>
         </div>
       </div>
@@ -99,9 +93,6 @@ export default {
     };
   },
   methods: {
-    changeNavBarItem(option) {
-      this.$store.commit("setNavBarItem", option);
-    },
     changeProject(event) {
       let newProjectId = event.target.value;
       axios
@@ -131,7 +122,6 @@ export default {
         })
         .then((response) => {
           this.numberInstances = response.data.servers.length;
-          this.$store.commit("setVirtualMachines", response.data.servers);
         })
         .catch((error) => {
           this.error = error.response.data.message;
@@ -146,7 +136,6 @@ export default {
         })
         .then((response) => {
           this.numberVolumes = response.data.volumes.length;
-          this.$store.commit("setVolumes", response.data.volumes);
         })
         .catch((error) => {
           this.error = error.response.data.message;
@@ -160,7 +149,6 @@ export default {
         })
         .then((response) => {
           this.numberImages = response.data.images.length;
-          this.$store.commit("setImages", response.data.images);
         })
         .catch((error) => {
           this.error = error.response.data.message;
@@ -190,6 +178,5 @@ export default {
   },
 };
 </script>
-
 <style>
 </style>

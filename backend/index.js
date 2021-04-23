@@ -26,3 +26,5 @@ app.get('/api/instances', importedFunctions.getInstances)
 app.get('/api/instances/detail', importedFunctions.getInstancesDetail)
 app.get('/api/volumes', importedFunctions.getVolumes)
 app.get('/api/images', importedFunctions.getImages)
+app.get('/api/flavor/:flavorId', importedFunctions.getFlavor)
+

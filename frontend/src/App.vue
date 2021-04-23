@@ -120,7 +120,8 @@ export default {
       person: personPNG,
     }
   },
-  menuUser() {
+  methods: {
+    menuUser() {
       this.dropdownOpen = !this.dropdownOpen;
       console.log(this.dropdownOpen);
     },
@@ -128,6 +129,7 @@ export default {
       this.$store.commit("logout");
       console.log("Log out");
     },
+  },
   computed: {
     token() {
       return this.$store.state.authToken

@@ -145,3 +145,14 @@ module.exports.getImages = (req, res, next) => {
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 
 }
+
+module.exports.getFlavor = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2.1/flavors/'+req.params.flavorId, {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
