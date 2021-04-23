@@ -5,12 +5,21 @@
       <br />
 
       <div class="mt-4">
-        <div v-if="errorMessage" class="alert alert-danger text-center" role="alert">
-          {{errorMessage}}
+        <div
+          v-if="errorMessage"
+          class="alert alert-danger text-center"
+          role="alert"
+        >
+          {{ errorMessage }}
         </div>
-        <div v-else-if="message" class="alert alert-primary text-center" role="alert">
-          {{message}}
+        <div
+          v-else-if="message"
+          class="alert alert-primary text-center"
+          role="alert"
+        >
+          {{ message }}
         </div>
+<<<<<<< Updated upstream
         <div class="row">
           <div class="col-md-3" v-for="machine in machines" :key="machine.id">
             <div class="card" style="width: 18rem;">
@@ -24,6 +33,43 @@
                 <p></p>
                 <p v-for="ip in machine.addresses.private" :key="ip" :class="ip['OS-EXT-IPS:type'] != 'floating' ? 'text-gray-700' : 'text-red-700 font-weight-bold'">{{ ip.addr }}</p>
                 <div class="text-black-800">Status: {{ machine.status }}</div>
+=======
+        <div class="flex flex-wrap -mx-6">
+          <div
+            v-for="machine in machines"
+            :key="machine.id"
+            class="w-full px-6 w-1/3 h-12"
+          >
+            <div
+              class="flex items-center px-5 py-5 shadow-sm rounded-md bg-white"
+            >
+              <img v-bind:src="serverPNG" width="60" />
+
+              <div class="mx-6">
+                <h4 class="text-xl font-semibold text-gray-700">
+                  Name: {{ machine.name }}
+                </h4>
+                <p class="mt-2 text-gray-700">
+                  Image: {{ machine.image ? machine.image : "Not defined." }}
+                </p>
+                <p
+                  class="text-gray-700"
+                  v-show="
+                    machine.flavor.name
+                      ? machine.flavor.name
+                      : getFlavor(machine)
+                  "
+                >
+                  Flavor: {{ machine.flavor.name }}
+                </p>
+                <p class="text-gray-700">
+                  Created at: {{ formatDate(machine.created) }}
+                </p>
+                <p class="text-gray-700">
+                  Updated at: {{ formatDate(machine.updated) }}
+                </p>
+                <div class="text-gray-500">Status: {{ machine.status }}</div>
+>>>>>>> Stashed changes
               </div>
             </div>
           </div>
@@ -41,20 +87,22 @@ export default {
       serverPNG: server,
       machines: [],
       errorMessage: "",
-      message: "Loading..."
+      message: "Loading...",
     };
   },
   methods: {
     getFlavor(machine) {
-      axios.get("http://localhost:3000/api/flavor/"+machine.flavor.id, {
-        headers: {
-          "x-token": this.$store.state.authToken,
-          "x-server-address": this.$store.state.url
-        }
-      })
-      .then((response) => machine.flavor.name = response.data.flavor.name)
-      .catch((error) => machine.flavor.name = "Error while getting flavor name")
-      
+      axios
+        .get("http://localhost:3000/api/flavor/" + machine.flavor.id, {
+          headers: {
+            "x-token": this.$store.state.authToken,
+            "x-server-address": this.$store.state.url,
+          },
+        })
+        .then((response) => (machine.flavor.name = response.data.flavor.name))
+        .catch(
+          (error) => (machine.flavor.name = "Error while getting flavor name")
+        );
     },
     getInfoMachines() {
       axios
@@ -66,20 +114,23 @@ export default {
         })
         .then((response) => {
           this.machines = response.data.servers.reverse();
-          this.message = this.machines.length == 0 ? "There are no Virtual Machines created." : ""
+          this.message =
+            this.machines.length == 0
+              ? "There are no Virtual Machines created."
+              : "";
         })
         .catch((error) => {
           this.error = error.response.data.message;
-          console.log(error)
+          console.log(error);
         });
     },
-    formatDate(date){
-      let dateObject = new Date(date)
-      return dateObject.toLocaleString()
-    }
+    formatDate(date) {
+      let dateObject = new Date(date);
+      return dateObject.toLocaleString();
+    },
   },
   mounted() {
-   this.getInfoMachines()
+    this.getInfoMachines();
   },
 };
 </script>
