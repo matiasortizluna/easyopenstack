@@ -21,7 +21,7 @@
       </select>
       <div class="mt-4">
         <div class="flex flex-wrap -mx-6">
-          <div class="w-full px-6 w-1/3 h-12">
+          <router-link to="/vm" class="w-full px-6 w-1/3 h-12">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -36,9 +36,8 @@
                   <div class="text-gray-600">Virtual Machines</div>
                 </div>
               </div>
-          </div>
-
-          <div class="w-full px-6 w-1/3 h-12">
+          </router-link>
+          <router-link to="/volumes" class="w-full px-6 w-1/3 h-12">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -53,9 +52,9 @@
                   <div class="text-gray-500">Volumes</div>
                 </div>
               </div>
-          </div>
+          </router-link>
 
-          <div class="w-full px-6 w-1/3 h-12">
+          <router-link to="/images" class="w-full px-6 w-1/3 h-12">
               <div
                 class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
               >
@@ -69,7 +68,7 @@
                   <div class="text-gray-500">Images</div>
                 </div>
               </div>
-          </div>
+          </router-link>
         </div>
       </div>
     </div>
