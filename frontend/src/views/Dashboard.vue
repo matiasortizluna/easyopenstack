@@ -113,9 +113,9 @@ export default {
           },
         })
         .then((response) => {
-            this.$store.commit("setSelectedProject", response.data.projectId)
-            this.$store.commit("setToken", response.data.token)
-            this.getProjectInfo()
+          this.$store.commit("setSelectedProject", response.data.projectId);
+          this.$store.commit("setToken", response.data.token);
+          this.getProjectInfo();
         })
         .catch((error) => {
           this.error = error.response.data.message;
@@ -182,11 +182,11 @@ export default {
         this.error = error.response.data.message;
       });
   },
-  computed:{
-    selectedProjectId(){
-      return this.$store.state.selectedProject
-    }
-  }
+  computed: {
+    selectedProjectId() {
+      return this.$store.state.selectedProject;
+    },
+  },
 };
 </script>
 
