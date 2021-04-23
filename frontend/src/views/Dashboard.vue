@@ -22,52 +22,52 @@
       <div class="mt-4">
         <div class="flex flex-wrap -mx-6">
           <router-link to="/vm" class="w-full px-6 w-1/3 h-12">
-              <div
-                class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
-              >
-                <div class="p-3">
-                  <img v-bind:src="computerPNG" width="50" />
-                </div>
-
-                <div class="mx-5">
-                  <h4 class="text-2xl font-semibold text-gray-700">
-                    {{ numberInstances }}
-                  </h4>
-                  <div class="text-gray-600">Virtual Machines</div>
-                </div>
+            <div
+              class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
+            >
+              <div class="p-3">
+                <img v-bind:src="computerPNG" width="50" />
               </div>
+
+              <div class="mx-5">
+                <h4 class="text-2xl font-semibold text-gray-700">
+                  {{ numberInstances }}
+                </h4>
+                <div class="text-gray-600">Virtual Machines</div>
+              </div>
+            </div>
           </router-link>
           <router-link to="/volumes" class="w-full px-6 w-1/3 h-12">
-              <div
-                class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
-              >
-                <div class="p-3">
-                  <img v-bind:src="databasePNG" width="67" />
-                </div>
-
-                <div class="mx-5">
-                  <h4 class="text-2xl font-semibold text-gray-700">
-                    {{ numberVolumes }}
-                  </h4>
-                  <div class="text-gray-500">Volumes</div>
-                </div>
+            <div
+              class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
+            >
+              <div class="p-3">
+                <img v-bind:src="databasePNG" width="67" />
               </div>
+
+              <div class="mx-5">
+                <h4 class="text-2xl font-semibold text-gray-700">
+                  {{ numberVolumes }}
+                </h4>
+                <div class="text-gray-500">Volumes</div>
+              </div>
+            </div>
           </router-link>
 
           <router-link to="/images" class="w-full px-6 w-1/3 h-12">
-              <div
-                class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
-              >
-                <div class="p-3">
-                  <img v-bind:src="cdPNG" width="65" />
-                </div>
-                <div class="mx-5">
-                  <h4 class="text-2xl font-semibold text-gray-700">
-                    {{ numberImages }}
-                  </h4>
-                  <div class="text-gray-500">Images</div>
-                </div>
+            <div
+              class="flex items-center px-5 py-6 shadow-sm rounded-md bg-white"
+            >
+              <div class="p-3">
+                <img v-bind:src="cdPNG" width="65" />
               </div>
+              <div class="mx-5">
+                <h4 class="text-2xl font-semibold text-gray-700">
+                  {{ numberImages }}
+                </h4>
+                <div class="text-gray-500">Images</div>
+              </div>
+            </div>
           </router-link>
         </div>
       </div>
@@ -106,6 +106,10 @@ export default {
         })
         .then((response) => {
           this.$store.commit("setSelectedProject", response.data.projectId);
+          this.$store.commit(
+            "setSelectedProjectName",
+            response.data.projectName
+          );
           this.$store.commit("setToken", response.data.token);
           this.getProjectInfo();
         })

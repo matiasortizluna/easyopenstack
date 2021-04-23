@@ -23,6 +23,7 @@ const store = createStore({
       authToken: sessionStorage.getItem('authToken') || null,
       selectedProject: sessionStorage.getItem('selectedProject'),
       url: sessionStorage.getItem('url'),
+      selectedProjectName: '',
     }
   },
   mutations: {
@@ -50,10 +51,17 @@ const store = createStore({
       sessionStorage.removeItem('selectedProject')
       state.selectedProject = null
     },
+    setSelectedProjectName(state, project) {
+      state.selectedProjectName = project
+    },
+    removeSelectedProjectName(state) {
+      state.selectedProjectName = ''
+    },
     logout(state) {
       state.authToken = null
       state.url = null
       state.selectedProject = null
+      state.selectedProject = ''
       sessionStorage.clear()
     }
   }
