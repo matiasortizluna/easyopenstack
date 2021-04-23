@@ -77,9 +77,6 @@ export default {
     };
   },
   methods: {
-    changeNavBarItem(option) {
-      this.$store.commit("setNavBarItem", option);
-    },
     getInfoMachine(option) {
       console.log(this.machines);
     },
@@ -94,7 +91,6 @@ export default {
         .then((response) => {
           console.log(response);
           this.machines = response.data.servers;
-          //this.$store.commit("setVirtualMachines", response.data.servers);
         })
         .catch((error) => {
           this.error = error.response.data.message;

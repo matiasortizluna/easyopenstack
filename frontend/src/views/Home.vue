@@ -22,6 +22,7 @@
         <navbar></navbar>
       </div>
       <div class="flex-1 flex flex-col overflow-hidden">
+        
         <header
           class="flex justify-between items-center py-4 px-6 bg-white border-b-4 border-indigo-600"
         >
@@ -92,28 +93,14 @@
             </div>
           </div>
         </header>
-        <dashboard v-show="navbarItem == 'dashboard'"></dashboard>
-        <deploy v-show="navbarItem == 'deploy'"></deploy>
-        <images v-show="navbarItem == 'images'"></images>
-        <connect v-show="navbarItem == 'connect'"></connect>
-        <virtualmachines
-          v-show="navbarItem == 'virtualmachines'"
-        ></virtualmachines>
-        <volumes v-show="navbarItem == 'volumes'"></volumes>
-        <newservice v-show="navbarItem == 'newservice'"></newservice>
+        
       </div>
     </div>
   </div>
 </template>
 <script>
 import Navbar from "../components/Navbar.vue";
-import DashboardComponent from "./Dashboard.vue";
-import DeployComponent from "./Deploy.vue";
-import ImagesComponent from "./Images.vue";
-import ConnectComponent from "./Connect.vue";
-import VirtualMachinesComponent from "./VirtualMachines.vue";
-import VolumesComponent from "./Volumes.vue";
-import NewServiceComponent from "./NewService.vue";
+
 import imgUrl from "../assets/images/logo_complete_white.png";
 import personPNG from "../assets/images/person.png";
 
