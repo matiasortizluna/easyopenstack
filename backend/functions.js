@@ -136,7 +136,7 @@ module.exports.getVolumes = (req, res, next) => {
 }
 module.exports.getImages = (req, res, next) => {
   let data = req.headers
-  axios.get(data['x-server-address'] + '/compute/v2/images', {
+  axios.get(data['x-server-address'] + '/image/v2/images', {
     headers: {
       'X-Auth-Token': data['x-token']
     }
@@ -165,5 +165,5 @@ module.exports.getVolumesWithDetail = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => console.log(err)/*res.status(err.response.data.error.code).send({ message: err.response.data.error.message })*/)
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
