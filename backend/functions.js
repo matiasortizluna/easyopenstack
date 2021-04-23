@@ -165,5 +165,5 @@ module.exports.getVolumesWithDetail = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+    .catch((err) => console.log(err)/*res.status(err.response.data.error.code).send({ message: err.response.data.error.message })*/)
 }
