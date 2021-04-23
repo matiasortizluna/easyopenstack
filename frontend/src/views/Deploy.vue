@@ -6,59 +6,48 @@
       <br />
 
       <div class="mt-4">
-        <div class="flex flex-wrap -mx-6">
-          <div class="w-full px-6 w-1/3 h-12">
-            <button data-toggle="modal" data-target="#exampleModalCenter">
-              <div
-                class="flex items-center px-5 py-5 shadow-sm rounded-md bg-white"
-              >
-                <img v-bind:src="windowsPNG" width="60" />
-
-                <div class="mx-6">
-                  <h4 class="text-xl font-semibold text-gray-700">Windows</h4>
-                  <p class="py-2 text-gray-700">Windows 10</p>
-                  <div class="text-gray-500">1 GB RAM</div>
-                  <div class="text-gray-500">25 GB SSD</div>
+        <div
+          v-if="errorMessage"
+          class="alert alert-danger text-center"
+          role="alert"
+        >
+          {{ errorMessage }}
+        </div>
+        <div
+          v-else-if="message"
+          class="alert alert-primary text-center"
+          role="alert"
+        >
+          {{ message }}
+        </div>
+        <div class="row">
+          <div class="col-md-3" v-for="image in images" :key="image.id">
+            <div class="card" style="width: 18rem">
+              <div class="card-body" @click="showModal(image)">
+                <img
+                  class="rounded mx-auto d-block w-20"
+                  :src="image.img == undefined ? cdPNG : image.img"
+                />
+                <h5 class="card-title text-center font-weight-bold">
+                  {{ image.name }}
+                </h5>
+                <p class="mt-2 text-gray-700">
+                  Format: {{ image.disk_format }}
+                </p>
+                <p class="text-gray-700">
+                  Size: {{ image.size * 0.00000095367432 }}
+                </p>
+                <p class="text-gray-700">
+                  Created at: {{ formatDate(image.created_at) }}
+                </p>
+                <p class="text-gray-700">
+                  Updated at: {{ formatDate(image.updated_at) }}
+                </p>
+                <div class="text-black-800 font-weight-bold">
+                  Status: {{ image.status }}
                 </div>
               </div>
-            </button>
-          </div>
-
-          <div
-            class="w-full px-6 w-1/3 h-12"
-            data-toggle="modal"
-            data-target="#exampleModalCenter"
-          >
-            <button>
-              <div
-                class="flex items-center px-5 py-5 shadow-sm rounded-md bg-white"
-              >
-                <img v-bind:src="cirrosPNG" width="60" />
-                <div class="mx-6">
-                  <h4 class="text-xl font-semibold text-gray-700">Cirros</h4>
-                  <p class="py-2 text-gray-700">Cirros 4.04</p>
-                  <div class="text-gray-500">1 GB RAM</div>
-                  <div class="text-gray-500">25 GB SSD</div>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div class="w-full px-6 w-1/3 h-12">
-            <button data-toggle="modal" data-target="#exampleModalCenter">
-              <div
-                class="flex items-center px-5 py-5 shadow-sm rounded-md bg-white"
-              >
-                <img v-bind:src="linuxPNG" width="50" />
-
-                <div class="mx-6">
-                  <h4 class="text-xl font-bold text-gray-1000">Ubuntu</h4>
-                  <p class="py-2 text-gray-700">UbuntuServer18.04</p>
-                  <div class="text-gray-500">1 GB RAM</div>
-                  <div class="text-gray-500">25 GB SSD</div>
-                </div>
-              </div>
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -66,11 +55,12 @@
       <!-- Modal -->
       <div
         class="modal fade"
-        id="exampleModalCenter"
+        id="modalCreate"
         tabindex="-1"
         role="dialog"
         aria-labelledby="exampleModalCenterTitle"
         aria-hidden="true"
+        ref="modalCreate"
       >
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
@@ -141,7 +131,7 @@
                         class="form-control"
                         id="exampleInputImage"
                         aria-describedby="imageHelp"
-                        placeholder="windows10.04"
+                        v-bind:placeholder="machineCreating.image_file"
                         disabled
                       />
                       <small id="emailHelp" class="form-text text-muted"
@@ -298,15 +288,86 @@ import server from "../assets/images/server.png";
 import windows from "../assets/images/windows.png";
 import linux from "../assets/images/linux.png";
 import cirros from "../assets/images/cirros.png";
+import cd from "../assets/images/cd.png";
 export default {
   data() {
     return {
       serverPNG: server,
-      windowsPNG: windows,
-      linuxPNG: linux,
-      cirrosPNG: cirros,
       selectedProjectName: "",
+      cdPNG: cd,
+      machineCreating: {
+        project: this.$store.state.selectedProjectName,
+        name: "",
+        description: "",
+        image_file: "",
+      },
+      images: [
+        {
+          created_at: "2021-04-08T15:11:30Z",
+          disk_format: "iso",
+          name: "Windows Server 2019",
+          size: 990904320,
+          status: "active",
+          updated_at: "2021-04-08T15:11:42Z",
+          img: windows,
+        },
+        {
+          created_at: "2021-04-08T15:11:30Z",
+          disk_format: "iso",
+          name: "Cirros",
+          size: 990904320,
+          status: "active",
+          updated_at: "2021-04-08T15:11:42Z",
+          img: cirros,
+        },
+        {
+          created_at: "2021-04-08T15:11:30Z",
+          disk_format: "iso",
+          name: "Ubuntu Server 18.04",
+          size: 990904320,
+          status: "active",
+          updated_at: "2021-04-08T15:11:42Z",
+          img: linux,
+        },
+      ],
+      errorMessage: "",
+      message: "Loading...",
     };
+  },
+  methods: {
+    showModal(image) {
+      console.log(image);
+      this.machineCreating.image_file = image.name;
+      $("#modalCreate").modal("show");
+    },
+    getInfoImages() {
+      axios
+        .get("http://localhost:3000/api/images", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "X-Project-Id": this.$store.state.selectedProject,
+          },
+        })
+        .then((response) => {
+          response.data.images.forEach((element) => {
+            this.images.push(element);
+          });
+          this.message =
+            this.images.length == 0 ? "There are no Images created." : "";
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+          console.log(error);
+        });
+    },
+    formatDate(date) {
+      let dateObject = new Date(date);
+      return dateObject.toLocaleString();
+    },
+  },
+  mounted() {
+    this.getInfoImages();
   },
   computed: {
     selectedProjectName() {

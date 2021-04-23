@@ -97,7 +97,6 @@ module.exports.getProjects = (req, res, next) => {
     .then((resp) => res.send(resp.data))
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
-//res.status(err.response.data.error.code).send({message: err.response.data.error.message})
 module.exports.getInstances = (req, res, next) => {
 
   let data = req.headers
@@ -144,7 +143,6 @@ module.exports.getImages = (req, res, next) => {
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 
 }
-
 module.exports.getFlavor = (req, res, next) => {
   let data = req.headers
   axios.get(data['x-server-address'] + '/compute/v2.1/flavors/' + req.params.flavorId, {
@@ -155,10 +153,41 @@ module.exports.getFlavor = (req, res, next) => {
     .then((resp) => res.send(resp.data))
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
-
-module.exports.getVolumesWithDetail = (req, res, next) => {
+module.exports.getProjects = (req, res, next) => {
   let data = req.headers
-  axios.get(data['x-server-address'] + '/volume/v3/'+data['x-project-id']+"/volumes/detail", {
+  axios.get(data['x-server-address'] + '/identity/v3/auth/projects', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
+
+module.exports.getFlavorsDetail = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2.1/flavors/detail', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
+
+module.exports.getKeyPairs = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2.1/os-keypairs', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
+module.exports.getSecurityGroups = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2.1/os-security-groups', {
     headers: {
       'X-Auth-Token': data['x-token']
     }

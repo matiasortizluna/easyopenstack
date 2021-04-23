@@ -24,10 +24,13 @@ app.get('/api/token/changeScope', importedFunctions.changeScopedToken)
 app.get('/api/projects', importedFunctions.getProjects)
 app.get('/api/instances', importedFunctions.getInstances)
 app.get('/api/instances/detail', importedFunctions.getInstancesDetail)
+app.get('/api/flavors/detail', importedFunctions.getFlavorsDetail)
 app.get('/api/volumes', importedFunctions.getVolumes)
 app.get('/api/images', importedFunctions.getImages)
 app.get('/api/flavor/:flavorId', importedFunctions.getFlavor)
 app.get('/api/volumes/detail', importedFunctions.getVolumesWithDetail)
 app.get('/api/images', importedFunctions.getImages)
+app.get('/api/keypairs', importedFunctions.getKeyPairs)
+
 
 
