@@ -19,36 +19,14 @@
         >
           {{ message }}
         </div>
-<<<<<<< Updated upstream
         <div class="row">
           <div class="col-md-3" v-for="machine in machines" :key="machine.id">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20" :src="serverPNG" >
-                <h5 class="card-title text-center font-weight-bold"> {{ machine.name }}</h5>
-                <p class="mt-2 text-gray-700">Image: {{ machine.image ? machine.image : "Not defined." }}</p>
-                <p class="text-gray-700" v-show="machine.flavor.name ? machine.flavor.name : getFlavor(machine)">Flavor: {{ machine.flavor.name }}</p>
-                <p class="text-gray-700">Created at: {{ formatDate(machine.created) }}</p>
-                <p class="text-gray-700">Updated at: {{ formatDate(machine.updated) }}</p>
-                <p></p>
-                <p v-for="ip in machine.addresses.private" :key="ip" :class="ip['OS-EXT-IPS:type'] != 'floating' ? 'text-gray-700' : 'text-red-700 font-weight-bold'">{{ ip.addr }}</p>
-                <div class="text-black-800">Status: {{ machine.status }}</div>
-=======
-        <div class="flex flex-wrap -mx-6">
-          <div
-            v-for="machine in machines"
-            :key="machine.id"
-            class="w-full px-6 w-1/3 h-12"
-          >
-            <div
-              class="flex items-center px-5 py-5 shadow-sm rounded-md bg-white"
-            >
-              <img v-bind:src="serverPNG" width="60" />
-
-              <div class="mx-6">
-                <h4 class="text-xl font-semibold text-gray-700">
-                  Name: {{ machine.name }}
-                </h4>
+                <img class="rounded mx-auto d-block w-20" :src="serverPNG" />
+                <h5 class="card-title text-center font-weight-bold">
+                  {{ machine.name }}
+                </h5>
                 <p class="mt-2 text-gray-700">
                   Image: {{ machine.image ? machine.image : "Not defined." }}
                 </p>
@@ -68,8 +46,19 @@
                 <p class="text-gray-700">
                   Updated at: {{ formatDate(machine.updated) }}
                 </p>
-                <div class="text-gray-500">Status: {{ machine.status }}</div>
->>>>>>> Stashed changes
+                <p></p>
+                <p
+                  v-for="ip in machine.addresses.private"
+                  :key="ip"
+                  :class="
+                    ip['OS-EXT-IPS:type'] != 'floating'
+                      ? 'text-gray-700'
+                      : 'text-red-700 font-weight-bold'
+                  "
+                >
+                  {{ ip.addr }}
+                </p>
+                <div class="text-black-800">Status: {{ machine.status }}</div>
               </div>
             </div>
           </div>
