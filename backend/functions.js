@@ -156,3 +156,14 @@ module.exports.getFlavor = (req, res, next) => {
     .then((resp) => res.send(resp.data))
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
+
+module.exports.getVolumesWithDetail = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/volume/v3/'+data['x-project-id']+"/volumes/detail", {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}

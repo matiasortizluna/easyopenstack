@@ -86,14 +86,16 @@ export default {
       computerPNG: computer,
       databasePNG: database,
       cdPNG: cd,
-      numberInstances: 0,
-      numberVolumes: 0,
-      numberImages: 0,
+      numberInstances: "...",
+      numberVolumes: "...",
+      numberImages: "...",
     };
   },
   methods: {
     changeProject(event) {
       let newProjectId = event.target.value;
+      this.numberInstances = this.numberVolumes = this.numberImages = "..."
+
       axios
         .get("http://localhost:3000/api/token/changeScope", {
           headers: {
