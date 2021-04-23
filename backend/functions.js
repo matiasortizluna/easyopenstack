@@ -47,7 +47,7 @@ module.exports.getFirstScopedToken = (req, res, next) => {
             }
           })
             .then((resp) => {
-              
+
               res.send({ token: resp.headers['x-subject-token'], projectId: resp.data.token.project.id })
             })
             .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
@@ -110,15 +110,26 @@ module.exports.getInstances = (req, res, next) => {
     .then((resp) => res.send(resp.data))
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
+module.exports.getInstancesDetail = (req, res, next) => {
+
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2.1/servers/detail', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => { res.send(resp.data) })
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
 module.exports.getVolumes = (req, res, next) => {
   let data = req.headers
-  axios.get(data['x-server-address'] + '/volume/v3/'+data['x-project-id']+'/volumes', {
+  axios.get(data['x-server-address'] + '/volume/v3/' + data['x-project-id'] + '/volumes', {
     headers: {
       'X-Auth-Token': data['x-token']
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => { 
+    .catch((err) => {
       res.status(err.response.data.badRequest.code).send({ message: err.response.data.badRequest.message })
     })
 
