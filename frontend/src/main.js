@@ -22,10 +22,31 @@ const store = createStore({
       authToken: sessionStorage.getItem('authToken') || null,
       selectedProject: sessionStorage.getItem('selectedProject'),
       url: sessionStorage.getItem('url'),
-      navbarItem: 'dashboard'
+      navbarItem: 'dashboard',
+      virtualMachines: [],
+      volumes: [],
+      images: [],
     }
   },
   mutations: {
+    setVirtualMachines(state, payload) {
+      state.virtualMachines = payload
+    },
+    removeVirtualMachines(state) {
+      state.virtualMachines = []
+    },
+    setVolumes(state, payload) {
+      state.volumes = payload
+    },
+    removeVolumes(state) {
+      state.volumes = []
+    },
+    setImages(state, payload) {
+      state.images = payload
+    },
+    removeImages(state) {
+      state.images = []
+    },
     setNavBarItem(state, option) {
       state.navbarItem = option
     },
@@ -57,6 +78,9 @@ const store = createStore({
       state.authToken = null
       state.url = null
       state.selectedProject = null
+      state.virtualMachines = []
+      state.volumes = []
+      state.images = []
       sessionStorage.clear()
     }
   }

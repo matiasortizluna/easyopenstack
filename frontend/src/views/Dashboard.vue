@@ -123,7 +123,7 @@ export default {
     },
     getProjectInfo() {
       axios
-        .get("http://localhost:3000/api/instances", {
+        .get("http://localhost:3000/api/instances/detail", {
           headers: {
             "X-Token": this.$store.state.authToken,
             "X-Server-Address": this.$store.state.url,
@@ -131,6 +131,7 @@ export default {
         })
         .then((response) => {
           this.numberInstances = response.data.servers.length;
+          this.$store.commit("setVirtualMachines", response.data.servers);
         })
         .catch((error) => {
           this.error = error.response.data.message;
@@ -144,11 +145,10 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response);
           this.numberVolumes = response.data.volumes.length;
+          this.$store.commit("setVolumes", response.data.volumes);
         })
         .catch((error) => {
-          console.log(error);
           this.error = error.response.data.message;
         });
       axios
@@ -160,6 +160,7 @@ export default {
         })
         .then((response) => {
           this.numberImages = response.data.images.length;
+          this.$store.commit("setImages", response.data.images);
         })
         .catch((error) => {
           this.error = error.response.data.message;

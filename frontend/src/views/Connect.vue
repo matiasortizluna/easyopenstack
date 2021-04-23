@@ -15,7 +15,6 @@ export default {
       computerPNG: computer,
     };
   },
-
   methods: {
     changeNavBarItem(option) {
       this.$store.commit("setNavBarItem", option);
