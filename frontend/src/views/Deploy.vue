@@ -104,6 +104,7 @@
                         id="exampleInputName"
                         aria-describedby="nameHelp"
                         placeholder="Tony Stark's Machine"
+                        v-bind:value="this.machineCreating.name"
                       />
                       <small id="emailHelp" class="form-text text-muted"
                         >Name associated to this machine</small
@@ -120,6 +121,7 @@
                     id="exampleFormControlTextarea1"
                     rows="2"
                     placeholder="Write ..."
+                    v-bind:value="this.machineCreating.description"
                   ></textarea>
                 </div>
                 <div class="form-group">
@@ -133,6 +135,7 @@
                         aria-describedby="imageHelp"
                         v-bind:placeholder="machineCreating.image_file"
                         disabled
+                        v-bind:value="this.machineCreating.image_file"
                       />
                       <small id="emailHelp" class="form-text text-muted"
                         >Image associated to this machine</small
@@ -145,10 +148,13 @@
                         class="form-select"
                         aria-label="Default select example"
                       >
-                        <option value="new" selected>m1.nano</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option
+                          v-for="flavor in flavors"
+                          v-bind:key="flavor.name"
+                          v-bind:value="flavor.id"
+                        >
+                          {{ flavor.name }}
+                        </option>
                       </select>
                       <small id="emailHelp" class="form-text text-muted"
                         >Flavor associated to this machine</small
@@ -165,10 +171,13 @@
                         class="form-select"
                         aria-label="Default select example"
                       >
-                        <option value="new" selected>New</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option
+                          v-for="volume in volumes"
+                          v-bind:key="volume.name"
+                          v-bind:value="volume.id"
+                        >
+                          {{ volume.name == "" ? volume.id : volume.name }}
+                        </option>
                       </select>
                       <small id="emailHelp" class="form-text text-muted"
                         >Storage associated to this machine</small
@@ -182,10 +191,13 @@
                         class="form-select"
                         aria-label="Default select example"
                       >
-                        <option value="new" selected>New</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option
+                          v-for="keyPair in keyPairs"
+                          v-bind:key="keyPair.name"
+                          v-bind:value="keyPair.id"
+                        >
+                          {{ keyPair.name == "" ? keyPair.id : keyPair.name }}
+                        </option>
                       </select>
                       <small id="emailHelp" class="form-text text-muted"
                         >Key Pair associated to this machine</small
@@ -275,7 +287,13 @@
               >
                 Close
               </button>
-              <button type="submit" class="btn btn-primary">Deploy</button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                @click="deployMachine()"
+              >
+                Deploy
+              </button>
             </div>
           </div>
         </div>
@@ -295,11 +313,22 @@ export default {
       serverPNG: server,
       selectedProjectName: "",
       cdPNG: cd,
+      flavors: [],
+      volumes: [],
+      images: [],
+      securityGroups: [],
+      keyPairs: [],
+      networks: [],
       machineCreating: {
         project: this.$store.state.selectedProjectName,
         name: "",
         description: "",
         image_file: "",
+        favor: "",
+        storage: [],
+        key_pair: "",
+        networks: [],
+        security_groups: [],
       },
       images: [
         {
@@ -336,9 +365,112 @@ export default {
   },
   methods: {
     showModal(image) {
-      console.log(image);
+      //console.log(image);
+      this.getForDeploy();
       this.machineCreating.image_file = image.name;
       $("#modalCreate").modal("show");
+    },
+    getFlavors() {
+      axios
+        .get("http://localhost:3000/api/flavors/detail", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+          },
+        })
+        .then((response) => {
+          this.flavors = response.data.flavors;
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+        });
+    },
+    getVolumes() {
+      axios
+        .get("http://localhost:3000/api/volumes/detail", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "X-Project-Id": this.$store.state.selectedProject,
+          },
+        })
+        .then((response) => {
+          this.volumes = response.data.volumes.reverse();
+          this.message =
+            this.volumes.length == 0 ? "There are no Volumes created." : "";
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+          console.log(error);
+        });
+    },
+    getSecurityGroups() {
+      axios
+        .get("http://localhost:3000/api/security-groups", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address":
+              this.$store.state.ip_address[0] + this.$store.state.ip_address[1],
+            "X-Server-Port": this.$store.state.ip_address[2],
+          },
+        })
+        .then((response) => {
+          this.securityGroups = response.data["security-groups"];
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+        });
+    },
+    getKeyPairs() {
+      axios
+        .get("http://localhost:3000/api/keypairs", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address":
+              this.$store.state.ip_address[0] + this.$store.state.ip_address[1],
+            "X-Server-Port": this.$store.state.ip_address[2],
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.keyPairs = response.data["keyPairs"];
+        })
+        .catch((error) => {
+          console.log(error);
+          this.error = error.response.data.message;
+        });
+    },
+    getNetworks() {
+      axios
+        .get("http://localhost:3000/api/networks", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address":
+              this.$store.state.ip_address[0] + this.$store.state.ip_address[1],
+            "X-Server-Port": this.$store.state.ip_address[2],
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          //this.networks = response.data["networks"];
+        })
+        .catch((error) => {
+          console.log(error);
+          this.error = error.response.data.message;
+        });
+    },
+    getForDeploy() {
+      this.getFlavors();
+      this.getVolumes();
+      this.getSecurityGroups();
+      this.getKeyPairs();
+      this.getNetworks();
+      console.log(this.volumes);
+      console.log(this.flavors);
+      console.log(this.images);
+      //console.log(this.securityGroups);
+      //console.log(this.keyPairs);
+      //console.log(this.networks);
     },
     getInfoImages() {
       axios
@@ -364,6 +496,11 @@ export default {
     formatDate(date) {
       let dateObject = new Date(date);
       return dateObject.toLocaleString();
+    },
+    deployMachine() {
+      console.log("Machine Born");
+
+      console.log(this.machineCreating);
     },
   },
   mounted() {

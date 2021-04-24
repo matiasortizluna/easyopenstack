@@ -8,7 +8,6 @@ import { createStore } from 'vuex'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
-
 const app = createApp(App)
 
 const router = createRouter({
@@ -24,6 +23,7 @@ const store = createStore({
       selectedProject: sessionStorage.getItem('selectedProject'),
       url: sessionStorage.getItem('url'),
       selectedProjectName: '',
+      ip_address: '',
     }
   },
   mutations: {
@@ -34,6 +34,12 @@ const store = createStore({
     removeToken(state) {
       sessionStorage.removeItem('authToken')
       state.authToken = null
+    },
+    setIP(state, ip) {
+      state.ip_address = ip;
+    },
+    removeIP(state, ip) {
+      state.ip_address = '';
     },
     setURL(state, url) {
       sessionStorage.setItem('url', url)
