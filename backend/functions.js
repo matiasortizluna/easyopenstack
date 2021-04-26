@@ -83,8 +83,10 @@ module.exports.changeScopedToken = (req, res, next) => {
       res.send({ token: resp.headers['x-subject-token'], projectId: resp.data.token.project.id, projectName: resp.data.token.project.name })
     })
     .catch((err) => {
-      //console.log(err)
-      res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
     })
 }
 module.exports.getProjects = (req, res, next) => {
@@ -95,9 +97,15 @@ module.exports.getProjects = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
 }
-//res.status(err.response.data.error.code).send({message: err.response.data.error.message})
+
 module.exports.getInstances = (req, res, next) => {
 
   let data = req.headers
@@ -107,7 +115,13 @@ module.exports.getInstances = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
 }
 module.exports.getInstancesDetail = (req, res, next) => {
 
@@ -118,7 +132,13 @@ module.exports.getInstancesDetail = (req, res, next) => {
     }
   })
     .then((resp) => { res.send(resp.data) })
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
 }
 module.exports.getVolumes = (req, res, next) => {
   let data = req.headers
@@ -127,11 +147,42 @@ module.exports.getVolumes = (req, res, next) => {
       'X-Auth-Token': data['x-token']
     }
   })
+    .then((resp) => { res.send(resp.data); console.log(resp.data) })
+
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
+}
+module.exports.getVolumesWithDetail = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/volume/v3/' + data['x-project-id'] + '/volumes/detail', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
+}
+module.exports.getSecurityGroups = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + ':9696' + '/v2/security-groups', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
     .then((resp) => res.send(resp.data))
     .catch((err) => {
-      res.status(err.response.data.badRequest.code).send({ message: err.response.data.badRequest.message })
+      res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
     })
-
 }
 module.exports.getImages = (req, res, next) => {
   let data = req.headers
@@ -141,10 +192,14 @@ module.exports.getImages = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.status).send({ message: err.response.statusText }))
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+      res.status(err.response.status).send({ message: err.response.statusText })
+    })
 
 }
-
 module.exports.getFlavor = (req, res, next) => {
   let data = req.headers
   axios.get(data['x-server-address'] + '/compute/v2.1/flavors/' + req.params.flavorId, {
@@ -156,9 +211,30 @@ module.exports.getFlavor = (req, res, next) => {
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
 }
 
-module.exports.getVolumesWithDetail = (req, res, next) => {
+module.exports.getFlavorsDetail = (req, res, next) => {
   let data = req.headers
-  axios.get(data['x-server-address'] + '/volume/v3/'+data['x-project-id']+"/volumes/detail", {
+  axios.get(data['x-server-address'] + '/compute/v2.1/flavors/detail', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
+module.exports.getKeyPairs = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + ':9696' + '/v2/os-keypairs', {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
+
+module.exports.getNetworks = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + ':9696' + '/v2/networks', {
     headers: {
       'X-Auth-Token': data['x-token']
     }

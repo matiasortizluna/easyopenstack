@@ -21,7 +21,7 @@
         </div>
         <div class="row">
           <div class="col-md-3" v-for="machine in machines" :key="machine.id">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 18rem">
               <div class="card-body">
                 <img class="rounded mx-auto d-block w-20" :src="serverPNG" >
                 <h5 class="card-title text-center font-weight-bold"> {{ machine.name }}</h5>

@@ -157,6 +157,7 @@ export default {
       password: "",
       connecting: false,
       error: "",
+      ip_address: "",
     };
   },
   methods: {
@@ -174,15 +175,17 @@ export default {
           })
           .then((response) => {
             this.connecting = false;
+            this.ip_address = this.url.split(":");
             this.$store.commit("setToken", response.data.token);
             this.$store.commit("setURL", this.url);
+            this.$store.commit("setIP", this.ip_address);
             this.$store.commit("setSelectedProject", response.data.projectId);
           })
           .catch((error) => {
             this.connecting = false;
             this.error = error.response.data.message;
-            if(error.response.status == 401)
-              this.error += " (Check your credentials.)"
+            if (error.response.status == 401)
+              this.error += " (Check your credentials.)";
           });
       } else {
         this.error = "Invalid address :( Format: http/https://ip_or_name:port";
