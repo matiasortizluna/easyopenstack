@@ -147,7 +147,7 @@ module.exports.getVolumes = (req, res, next) => {
       'X-Auth-Token': data['x-token']
     }
   })
-    .then((resp) => { res.send(resp.data); console.log(resp.data) })
+    .then((resp) => { res.send(resp.data) })
 
     .catch((err) => {
       if (err.response == undefined)
@@ -241,4 +241,57 @@ module.exports.getNetworks = (req, res, next) => {
   })
     .then((resp) => res.send(resp.data))
     .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+}
+
+module.exports.addImage = (req, res, next) => {
+  let headers = req.headers
+  let data = req.body
+  axios.post(headers['x-server-address'] + '/image/v2/images', {
+      "container_format": "bare",
+      "disk_format": data.diskFormat,
+      "name": data.imageName,
+      "min_disk": parseInt(data.minDisk),
+      "min_ram": parseInt(data.minRam),
+    }, {
+      headers: {
+        'X-Auth-Token': headers['x-token']
+      }
+    })
+    .then((resp) => {
+      axios.post(headers['x-server-address'] + '/image/v2/images/'+resp.data.id+'/import', {
+        "method": {
+            "name": "web-download",
+            "uri": data.imageURI
+        },
+        "all_stores": true,
+        "all_stores_must_succeed": true
+      }, {
+        headers: {
+          'X-Auth-Token': headers['x-token']
+        }
+      })
+      .then((resp) => {
+        res.send(resp.data)
+      })
+      .catch((err) => {
+        axios.delete(headers['x-server-address'] + '/image/v2/images/'+resp.data.id, {
+          headers: {
+            'X-Auth-Token': headers['x-token']
+          }})
+        if (err.response == undefined){
+          res.status(400).send({ message: "ERRO ON NODE" })
+        }
+        else{
+          res.status(err.response.status).send({ message: err.response.statusText })
+        }
+      })
+    })
+    .catch((err) => {
+      if (err.response == undefined){
+        res.status(400).send({ message: "ERRO ON NODE" })
+      }
+      else{
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
 }
