@@ -12,7 +12,7 @@
           {{message}}
         </div>
         <div class="row">
-          <div class="col-md-3" v-for="image in images" :key="image.id">
+          <div class="col-md-3 mb-3" v-for="image in images" :key="image.id">
             <div class="card" style="width: 18rem;">
               <div class="card-body">
                 <img class="rounded mx-auto d-block w-20" :src="cdPNG" >
@@ -105,7 +105,6 @@ export default {
           headers: {
             "X-Token": this.$store.state.authToken,
             "X-Server-Address": this.$store.state.url,
-            "X-Project-Id": this.$store.state.selectedProject
           },
         })
         .then((response) => {

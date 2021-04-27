@@ -295,3 +295,29 @@ module.exports.addImage = (req, res, next) => {
       }
     })
 }
+module.exports.addVolume = (req, res, next) => {
+  let headers = req.headers
+  let data = req.body
+  axios.post(headers['x-server-address'] + '/volume/v3/' + headers['x-project-id'] + '/volumes', {
+        "volume": {
+            "size": data.volumeSize,
+            "multiattach": false,
+            "name": data.volumeName,
+            "imageRef": data.volumeSource,
+            "description": data.volumeDescription,
+            "volume_type": "lvmdriver-1"
+        }
+    } ,{
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.status).send({ message: err.response.statusText })
+    })
+}
