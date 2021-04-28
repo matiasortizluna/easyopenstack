@@ -104,7 +104,7 @@
                         id="exampleInputName"
                         aria-describedby="nameHelp"
                         placeholder="Tony Stark's Machine"
-                        v-bind:value="this.machineCreating.name"
+                        v-model="this.machineCreating.name"
                       />
                       <small id="emailHelp" class="form-text text-muted"
                         >Name associated to this machine</small
@@ -121,7 +121,7 @@
                     id="exampleFormControlTextarea1"
                     rows="2"
                     placeholder="Write ..."
-                    v-bind:value="this.machineCreating.description"
+                    v-model="this.machineCreating.description"
                   ></textarea>
                 </div>
                 <div class="form-group">
@@ -135,7 +135,7 @@
                         aria-describedby="imageHelp"
                         v-bind:placeholder="machineCreating.image_file"
                         disabled
-                        v-bind:value="this.machineCreating.image_file"
+                        v-model="this.machineCreating.image_file"
                       />
                       <small id="emailHelp" class="form-text text-muted"
                         >Image associated to this machine</small
@@ -147,6 +147,7 @@
                       <select
                         class="form-select"
                         aria-label="Default select example"
+                        v-model="this.machineCreating.flavor"
                       >
                         <option
                           v-for="flavor in flavors"
@@ -170,6 +171,7 @@
                       <select
                         class="form-select"
                         aria-label="Default select example"
+                        v-model="this.machineCreating.storage"
                       >
                         <option
                           v-for="volume in volumes"
@@ -190,6 +192,7 @@
                       <select
                         class="form-select"
                         aria-label="Default select example"
+                        v-model="this.machineCreating.key_pair"
                       >
                         <option
                           v-for="keyPair in keyPairs"
@@ -324,7 +327,7 @@ export default {
         name: "",
         description: "",
         image_file: "",
-        favor: "",
+        flavor: "",
         storage: [],
         key_pair: "",
         networks: [],
@@ -365,10 +368,11 @@ export default {
   },
   methods: {
     showModal(image) {
-      //console.log(image);
       this.getForDeploy();
       this.machineCreating.image_file = image.name;
-      $("#modalCreate").modal("show");
+      setTimeout(() => {
+        $("#modalCreate").modal("show");
+      }, 1000);
     },
     getFlavors() {
       axios
@@ -385,7 +389,7 @@ export default {
           this.error = error.response.data.message;
         });
     },
-    getVolumes() {
+    getInfoVolumes() {
       axios
         .get("http://localhost:3000/api/volumes/detail", {
           headers: {
@@ -461,16 +465,18 @@ export default {
     },
     getForDeploy() {
       this.getFlavors();
-      this.getVolumes();
+      this.getInfoVolumes();
       this.getSecurityGroups();
       this.getKeyPairs();
       this.getNetworks();
-      console.log(this.volumes);
-      console.log(this.flavors);
-      console.log(this.images);
-      //console.log(this.securityGroups);
-      //console.log(this.keyPairs);
-      //console.log(this.networks);
+      setTimeout(() => {
+        console.log(this.volumes);
+        console.log(this.flavors);
+        console.log(this.images);
+        console.log(this.securityGroups);
+        console.log(this.keyPairs);
+        console.log(this.networks);
+      }, 1000);
     },
     getInfoImages() {
       axios
@@ -499,8 +505,9 @@ export default {
     },
     deployMachine() {
       console.log("Machine Born");
-
-      console.log(this.machineCreating);
+      setTimeout(() => {
+        console.log(this.machineCreating);
+      }, 1000);
     },
   },
   mounted() {

@@ -196,7 +196,7 @@ module.exports.getImages = (req, res, next) => {
       if (err.response == undefined)
         res.status(400).send({ message: "ERRO ON NODE" })
       else
-      res.status(err.response.status).send({ message: err.response.statusText })
+        res.status(err.response.status).send({ message: err.response.statusText })
     })
 
 }
@@ -247,21 +247,21 @@ module.exports.addImage = (req, res, next) => {
   let headers = req.headers
   let data = req.body
   axios.post(headers['x-server-address'] + '/image/v2/images', {
-      "container_format": "bare",
-      "disk_format": data.diskFormat,
-      "name": data.imageName,
-      "min_disk": parseInt(data.minDisk),
-      "min_ram": parseInt(data.minRam),
-    }, {
-      headers: {
-        'X-Auth-Token': headers['x-token']
-      }
-    })
+    "container_format": "bare",
+    "disk_format": data.diskFormat,
+    "name": data.imageName,
+    "min_disk": parseInt(data.minDisk),
+    "min_ram": parseInt(data.minRam),
+  }, {
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
     .then((resp) => {
-      axios.post(headers['x-server-address'] + '/image/v2/images/'+resp.data.id+'/import', {
+      axios.post(headers['x-server-address'] + '/image/v2/images/' + resp.data.id + '/import', {
         "method": {
-            "name": "web-download",
-            "uri": data.imageURI
+          "name": "web-download",
+          "uri": data.imageURI
         },
         "all_stores": true,
         "all_stores_must_succeed": true
@@ -270,27 +270,28 @@ module.exports.addImage = (req, res, next) => {
           'X-Auth-Token': headers['x-token']
         }
       })
-      .then((resp) => {
-        res.send(resp.data)
-      })
-      .catch((err) => {
-        axios.delete(headers['x-server-address'] + '/image/v2/images/'+resp.data.id, {
-          headers: {
-            'X-Auth-Token': headers['x-token']
-          }})
-        if (err.response == undefined){
-          res.status(400).send({ message: "ERRO ON NODE" })
-        }
-        else{
-          res.status(err.response.status).send({ message: err.response.statusText })
-        }
-      })
+        .then((resp) => {
+          res.send(resp.data)
+        })
+        .catch((err) => {
+          axios.delete(headers['x-server-address'] + '/image/v2/images/' + resp.data.id, {
+            headers: {
+              'X-Auth-Token': headers['x-token']
+            }
+          })
+          if (err.response == undefined) {
+            res.status(400).send({ message: "ERRO ON NODE" })
+          }
+          else {
+            res.status(err.response.status).send({ message: err.response.statusText })
+          }
+        })
     })
     .catch((err) => {
-      if (err.response == undefined){
+      if (err.response == undefined) {
         res.status(400).send({ message: "ERRO ON NODE" })
       }
-      else{
+      else {
         res.status(err.response.status).send({ message: err.response.statusText })
       }
     })
@@ -299,15 +300,15 @@ module.exports.addVolume = (req, res, next) => {
   let headers = req.headers
   let data = req.body
   axios.post(headers['x-server-address'] + '/volume/v3/' + headers['x-project-id'] + '/volumes', {
-        "volume": {
-            "size": data.volumeSize,
-            "multiattach": false,
-            "name": data.volumeName,
-            "imageRef": data.volumeSource,
-            "description": data.volumeDescription,
-            "volume_type": "lvmdriver-1"
-        }
-    } ,{
+    "volume": {
+      "size": data.volumeSize,
+      "multiattach": false,
+      "name": data.volumeName,
+      "imageRef": data.volumeSource,
+      "description": data.volumeDescription,
+      "volume_type": "lvmdriver-1"
+    }
+  }, {
     headers: {
       'X-Auth-Token': headers['x-token']
     }
@@ -320,4 +321,21 @@ module.exports.addVolume = (req, res, next) => {
       else
         res.status(err.response.status).send({ message: err.response.statusText })
     })
+
+  module.exports.createMachine = (req, res, next) => {
+    let data = req.headers
+    axios.get(data['x-server-address'] + ':9696' + '/v2/networks', {
+      "server": {
+        "name": data['x-machine-name'],
+        "imageRef": data['x-iamge'],
+        "flavorRef": data['x-flavor'],
+        "networks": [{
+          "auto": ""
+          //"uuid": "61639df8-178f-40cf-b29f-79e0a35f7735"
+        }]
+      }
+    })
+      .then((resp) => res.send(resp.data))
+      .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+  }
 }
