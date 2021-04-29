@@ -389,3 +389,57 @@ module.exports.createMachine = (req, res, next) => {
       }
     })
 }
+
+//---------------------------------------------------------------- HEAT ----------------------------------------------------
+module.exports.getHeatStacks = (req, res, next) => {
+  let data = req.headers
+  axios.post(data['x-server-address']+"/compute/v2.1/os-keypairs", {
+      "keypair": {
+          "name": "heat_keypair"
+      }
+    },{
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => {
+      getStacks(data,res, resp.data.keypair.private_key)
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        //console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        if(err.response.status == 409){
+          getStacks(data,res)
+        }
+          
+      }
+    })
+}
+
+function getStacks(data, res, privKey = null){
+  axios.get(data['x-server-address']+"/heat-api/v1/"+data['x-project-id']+"/stacks", {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => {
+      //console.log(resp);
+      let stacks = resp.data
+      stacks.private_key = privKey
+      res.send(stacks);
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        //console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        //console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+//------------------------------------------- END HEAT -------------------------------------------------------

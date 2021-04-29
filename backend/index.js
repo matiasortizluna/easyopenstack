@@ -35,3 +35,6 @@ app.get('/api/networks', importedFunctions.getNetworks)
 app.post('/api/images', importedFunctions.addImage)
 app.post('/api/volumes', importedFunctions.addVolume)
 app.post('/api/instances', importedFunctions.createMachine)
+
+//HEAT
+app.get('/api/heat/stacks', importedFunctions.getHeatStacks)
