@@ -110,6 +110,7 @@ export default {
             "setSelectedProjectName",
             response.data.projectName
           );
+
           this.$store.commit("setToken", response.data.token);
           this.getProjectInfo();
         })

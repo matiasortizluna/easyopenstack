@@ -157,7 +157,6 @@ export default {
       password: "",
       connecting: false,
       error: "",
-      ip_address: "",
     };
   },
   methods: {
@@ -175,11 +174,13 @@ export default {
           })
           .then((response) => {
             this.connecting = false;
-            this.ip_address = this.url.split(":");
             this.$store.commit("setToken", response.data.token);
             this.$store.commit("setURL", this.url);
-            this.$store.commit("setIP", this.ip_address);
             this.$store.commit("setSelectedProject", response.data.projectId);
+            this.$store.commit(
+              "setSelectedProjectName",
+              response.data.projectName
+            );
           })
           .catch((error) => {
             this.connecting = false;

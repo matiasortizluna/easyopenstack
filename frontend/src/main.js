@@ -23,7 +23,7 @@ const store = createStore({
       selectedProject: sessionStorage.getItem('selectedProject'),
       url: sessionStorage.getItem('url'),
       selectedProjectName: '',
-      ip_address: '',
+      ip_address: sessionStorage.getItem('ip_address') || '',
     }
   },
   mutations: {
@@ -31,34 +31,36 @@ const store = createStore({
       sessionStorage.setItem('authToken', token)
       state.authToken = token
     },
-    removeToken(state) {
-      sessionStorage.removeItem('authToken')
-      state.authToken = null
-    },
     setIP(state, ip) {
+      sessionStorage.setItem('ip_address', ip)
       state.ip_address = ip;
-    },
-    removeIP(state, ip) {
-      state.ip_address = '';
     },
     setURL(state, url) {
       sessionStorage.setItem('url', url)
       state.url = url
     },
-    removeURL(state) {
-      sessionStorage.removeItem('url')
-      state.url = null
-    },
     setSelectedProject(state, project) {
       sessionStorage.setItem('selectedProject', project)
       state.selectedProject = project
     },
+    setSelectedProjectName(state, project) {
+      state.selectedProjectName = project
+    },
+    removeToken(state) {
+      sessionStorage.removeItem('authToken')
+      state.authToken = null
+    },
+    removeIP(state, ip) {
+      sessionStorage.removeItem('ip_address', ip)
+      state.ip_address = '';
+    },
+    removeURL(state) {
+      sessionStorage.removeItem('url')
+      state.url = null
+    },
     removeSelectedProject(state) {
       sessionStorage.removeItem('selectedProject')
       state.selectedProject = null
-    },
-    setSelectedProjectName(state, project) {
-      state.selectedProjectName = project
     },
     removeSelectedProjectName(state) {
       state.selectedProjectName = ''
@@ -66,8 +68,9 @@ const store = createStore({
     logout(state) {
       state.authToken = null
       state.url = null
-      state.selectedProject = null
       state.selectedProject = ''
+      state.selectedProjectName = ''
+      state.ip_address = ''
       sessionStorage.clear()
     }
   }

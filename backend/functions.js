@@ -275,26 +275,24 @@ module.exports.getKeyPairs = (req, res, next) => {
     })
 }
 module.exports.getNetworks = (req, res, next) => {
-  let data = req.headers['x-server-address']
-  console.log(data)
-  let url = data + ':9696' + '/v2.0/networks'
-  console.log(url)
+  console.log(req.headers)
+  let address = req.headers['x-server-address']
+  let url = address + ':9696' + '/v2.0/networks'
   axios.get(url, {
     headers: {
       'X-Auth-Token': req.headers['x-token']
     }
   })
     .then((resp) => {
-      //console.log(resp);
+      console.log(resp)
       res.send(resp.data);
     })
     .catch((err) => {
+      console.log(err)
       if (err.response == undefined) {
-        //console.log(err)
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
-        //console.log(err)
         res.status(err.response.status).send({ message: err.response.statusText })
       }
     })

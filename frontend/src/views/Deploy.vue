@@ -23,7 +23,7 @@
         <div class="row">
           <div class="col-md-3" v-for="image in images" :key="image.id">
             <div class="card" style="width: 18rem">
-              <div class="card-body" @click="showModal(image)">
+              <div class="card-body" @click="toggleModal(image)">
                 <img
                   class="rounded mx-auto d-block w-20"
                   :src="image.img == undefined ? cdPNG : image.img"
@@ -64,6 +64,20 @@
       >
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
+            <div
+              v-if="errorMessageModal"
+              class="alert alert-danger text-center"
+              role="alert"
+            >
+              {{ errorMessageModal }}
+            </div>
+            <div
+              v-else-if="messageModal"
+              class="alert alert-primary text-center"
+              role="alert"
+            >
+              {{ messageModal }}
+            </div>
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLongTitle">
                 A new machine will be born :)
@@ -88,8 +102,8 @@
                         class="form-control"
                         id="exampleInputEmail1"
                         aria-describedby="emailHelp"
-                        v-bind:placeholder="selectedProjectName"
-                        v-bind:value="selectedProjectName"
+                        v-bind:placeholder="machineCreating.project"
+                        v-bind:value="this.machineCreating.project"
                         disabled
                       />
                       <small id="emailHelp" class="form-text text-muted"
@@ -314,7 +328,6 @@ export default {
   data() {
     return {
       serverPNG: server,
-      selectedProjectName: "",
       cdPNG: cd,
       flavors: [],
       volumes: [],
@@ -322,8 +335,9 @@ export default {
       securityGroups: [],
       keyPairs: [],
       networks: [],
+      address: "",
       machineCreating: {
-        project: this.$store.state.selectedProjectName,
+        project: "",
         name: "",
         description: "",
         image_file: "",
@@ -364,14 +378,23 @@ export default {
       ],
       errorMessage: "",
       message: "Loading...",
+      errorMessageModal: "",
+      messageModal: "",
     };
   },
   methods: {
-    showModal(image) {
-      this.getForDeploy();
+    toggleModal(image) {
+      console.log(this.machineCreating.project);
       this.machineCreating.image_file = image;
+      this.message = "Waiting for verify information ... ";
       setTimeout(() => {
-        $("#modalCreate").modal("show");
+        this.getForDeploy();
+        if (this.errorMessage == "" && this.errorMessageModal == "") {
+          //this.messageModal = "";
+          //this.errorMessageModal = "";
+          //this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
+          $("#modalCreate").modal("toggle");
+        }
       }, 1000);
     },
     getFlavors() {
@@ -386,7 +409,8 @@ export default {
           this.flavors = response.data.flavors;
         })
         .catch((error) => {
-          this.error = error.response.data.message;
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Flavors";
         });
     },
     getInfoVolumes() {
@@ -404,8 +428,8 @@ export default {
             this.volumes.length == 0 ? "There are no Volumes created." : "";
         })
         .catch((error) => {
-          this.error = error.response.data.message;
-          console.log(error);
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Volumes";
         });
     },
     getSecurityGroups() {
@@ -422,7 +446,9 @@ export default {
           this.securityGroups = response.data["security-groups"];
         })
         .catch((error) => {
-          this.error = error.response.data.message;
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage =
+            "Error in Getting information about Security-Groups";
         });
     },
     getKeyPairs() {
@@ -436,48 +462,44 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response);
           this.keyPairs = response.data["keyPairs"];
         })
         .catch((error) => {
-          console.log(error);
-          this.error = error.response.data.message;
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Key Pairs";
         });
     },
     getNetworks() {
-      console.log(this.$store.state.ip_address);
       axios
         .get("http://localhost:3000/api/networks", {
           headers: {
             "X-Token": this.$store.state.authToken,
-            "X-Server-Address":
-              this.$store.state.ip_address[0] +
-              ":" +
-              this.$store.state.ip_address[1],
-            "X-Server-Port": this.$store.state.ip_address[2],
+            "X-Server-Address": this.address,
           },
         })
         .then((response) => {
           this.networks = response.data["networks"];
         })
         .catch((error) => {
-          console.log(error);
-          this.error = error.response.data.message;
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Networks";
         });
     },
     getForDeploy() {
       this.getFlavors();
       this.getInfoVolumes();
+      this.getNetworks();
       //this.getSecurityGroups();
       //this.getKeyPairs();
-      this.getNetworks();
       setTimeout(() => {
+        this.message = "";
         console.log(this.volumes);
         console.log(this.flavors);
         console.log(this.images);
         //console.log(this.securityGroups);
         //console.log(this.keyPairs);
         console.log(this.networks);
+        this.machineCreating.networks = this.networks;
       }, 1000);
     },
     getInfoImages() {
@@ -497,8 +519,8 @@ export default {
             this.images.length == 0 ? "There are no Images created." : "";
         })
         .catch((error) => {
-          this.error = error.response.data.message;
-          console.log(error);
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Images";
         });
     },
     formatDate(date) {
@@ -507,39 +529,62 @@ export default {
     },
     deployMachine() {
       this.machineCreating.networks = this.networks;
-      console.log(this.machineCreating.flavor);
-      axios
-        .post(
-          "http://localhost:3000/api/instances",
-          {
-            "X-Machine-Name": this.machineCreating.name,
-            "X-Image": this.machineCreating.image_file.id,
-            "X-Flavor": this.machineCreating.flavor,
-            "X-Networks": this.machineCreating.networks,
-          },
-          {
-            headers: {
-              "X-Token": this.$store.state.authToken,
-              "X-Server-Address": this.$store.state.url,
+
+      if (
+        this.machineCreating.name &&
+        this.machineCreating.image_file &&
+        this.machineCreating.flavor
+      ) {
+        this.errorMessageModal = "";
+        this.messageModal = "Creating machine ...";
+        axios
+          .post(
+            "http://localhost:3000/api/instances",
+            {
+              "X-Machine-Name": this.machineCreating.name,
+              "X-Image": this.machineCreating.image_file.id,
+              "X-Flavor": this.machineCreating.flavor,
+              "X-Networks": this.machineCreating.networks,
             },
-          }
-        )
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log(error);
-          this.error = error.response.data.message;
-        });
+            {
+              headers: {
+                "X-Token": this.$store.state.authToken,
+                "X-Server-Address": this.$store.state.url,
+              },
+            }
+          )
+          .then((response) => {
+            //this.messageModal = "Machine Created Sucessfully!";
+            this.machineCreating = {
+              project: "",
+              name: "",
+              description: "",
+              image_file: "",
+              flavor: "",
+              storage: [],
+              key_pair: "",
+              networks: [],
+              security_groups: [],
+            };
+            setTimeout(() => {
+              this.toggleModal();
+            }, 500);
+            this.message = "Machine Created Sucessfully!";
+          })
+          .catch((error) => {
+            this.errorMessageModal = error.response.data.message;
+            console.log(error);
+          });
+      } else {
+        this.errorMessageModal = "All fields are required!";
+      }
     },
   },
   mounted() {
     this.getInfoImages();
-  },
-  computed: {
-    selectedProjectName() {
-      return this.$store.state.selectedProjectName;
-    },
+    var ip_address = this.$store.state.url.split(":");
+    this.address = ip_address[0] + ":" + ip_address[1];
+    this.machineCreating.project = this.$store.state.selectedProjectName;
   },
 };
 </script>
