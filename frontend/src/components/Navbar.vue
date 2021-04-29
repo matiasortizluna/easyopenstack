@@ -28,7 +28,7 @@
           <i class="fas fa-fire-alt"></i>
           <span class="mx-3">Plugin - Heat</span>
         </router-link>
-        <router-link to="/connect" class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100">
+<!--         <router-link to="/connect" class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100">
           <svg
             class="h-6 w-6"
             xmlns="http://www.w3.org/2000/svg"
@@ -45,7 +45,7 @@
           </svg>
 
           <span class="mx-3">Connect</span>
-        </router-link>
+        </router-link> -->
   </nav>
 </template>
 <script>
