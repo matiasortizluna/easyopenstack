@@ -20,7 +20,28 @@
           {{ message }}
         </div>
         <div class="row">
-          
+          <table class="table table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+                <th scope="col">Status Message</th>
+                <th scope="col">Created At</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="stack in stacks" :key="stack.id">
+                <th scope="row">{{ stack.stack_name }}</th>
+                <td>{{  stack.description }}</td>
+                <td>{{  stack.stack_status }}</td>
+                <td>{{  stack.stack_status_reason }}</td>
+                <td>{{  formatDate(stack.creation_time) }}</td>
+                <td><button @click="deleteStack(stack)" class="btn btn-danger">Delete</button></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -71,7 +92,7 @@ import { saveAs } from 'file-saver'
 export default {
   data() {
     return {
-      stacks: null,
+      stacks: [],
       message: "Loading...",
       errorMessage: "",
       errorMessageModal: "",
@@ -115,7 +136,29 @@ export default {
     },
     createStack(){
 
-    }
+    },
+    deleteStack(stack){
+      axios.delete("http://localhost:3000/api/heat/stacks/"+stack.stack_name+"/"+stack.id, {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "X-Project-Id": this.$store.state.selectedProject
+          },
+        })
+      .then((resp) => {
+        this.errorMessage = ""
+        this.message = resp.data.message
+        this.getStacks()
+      })
+      .catch((err) => {
+        this.message=""
+        this.errorMessage = err.response.data.message
+      })
+    },
+    formatDate(date) {
+      let dateObject = new Date(date);
+      return dateObject.toLocaleString();
+    },
   },
   mounted(){
     this.getStacks()

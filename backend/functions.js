@@ -460,4 +460,27 @@ function getStacks(data, res, privKey = null){
       }
     })
 }
+
+module.exports.deleteStack = (req, res, next) => {
+  let data = req.headers
+  axios.delete(data['x-server-address']+"/heat-api/v1/"+data['x-project-id']+"/stacks/"+req.params.stackName+"/"+req.params.stackId, {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => {
+      //console.log(resp);
+      res.send({  message: "Stack '"+req.params.stackName+"' deleted successfuly!" });
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        //console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        //console.log(err)
+        res.status(err.response.status).send({ message: err.response.data.error })
+      }
+    })
+}
 //------------------------------------------- END HEAT -------------------------------------------------------

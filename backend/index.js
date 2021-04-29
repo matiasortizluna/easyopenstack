@@ -7,6 +7,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Methods", "*")
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Token, X-Server-Address, x-project-id, X-Old-Token, X-New-Project-Id, X-Server-Port, X-Machine-Name, X-Image, X-Flavor, X-Networks")
   next()
 })
@@ -39,3 +40,4 @@ app.post('/api/instances', importedFunctions.createMachine)
 
 //HEAT
 app.get('/api/heat/stacks', importedFunctions.getHeatStacks)
+app.delete('/api/heat/stacks/:stackName/:stackId', importedFunctions.deleteStack)
