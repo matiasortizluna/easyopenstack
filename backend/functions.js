@@ -124,14 +124,13 @@ module.exports.getInstances = (req, res, next) => {
     })
 }
 module.exports.getInstancesDetail = (req, res, next) => {
-
   let data = req.headers
   axios.get(data['x-server-address'] + '/compute/v2.1/servers/detail', {
     headers: {
       'X-Auth-Token': data['x-token']
     }
   })
-    .then((resp) => { res.send(resp.data) })
+    .then((resp) => { res.send(resp.data)})
 
     .catch((err) => {
       if (err.response == undefined)
@@ -197,6 +196,25 @@ module.exports.getImages = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.status).send({ message: err.response.statusText })
+    })
+
+}
+module.exports.getImage = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/image/v2/images/'+req.params.imageId, {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => {
+      res.send(resp.data)
+
+    })
     .catch((err) => {
       if (err.response == undefined)
         res.status(400).send({ message: "ERRO ON NODE" })

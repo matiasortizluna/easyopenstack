@@ -25,7 +25,7 @@
               <div class="card-body">
                 <img class="rounded mx-auto d-block w-20" :src="serverPNG" >
                 <h5 class="card-title text-center font-weight-bold"> {{ machine.name }}</h5>
-                <p class="mt-2 text-gray-700"><strong>Image: </strong>{{ machine.image ? machine.image : "Not defined." }}</p>
+                <p class="mt-2 text-gray-700" v-show="machine.image.name ? true : getImage(machine)"><strong>Image: </strong>{{ machine.image.name }}</p>
                 <p class="text-gray-700" v-show="machine.flavor.name ? machine.flavor.name : getFlavor(machine)"><strong>Flavor: </strong>{{ machine.flavor.name }}</p>
                 <p class="text-gray-700"><strong>Created at: </strong>{{ formatDate(machine.created) }}</p>
                 <p class="text-gray-700"><strong>Updated at: </strong>{{ formatDate(machine.updated) }}</p>
@@ -99,6 +99,23 @@ export default {
       let dateObject = new Date(date);
       return dateObject.toLocaleString();
     },
+    getImage(machine){
+      if(!machine.image.id){
+        machine.image = { name: "Not defined."}
+        return
+      }
+      axios
+        .get("http://localhost:3000/api/images/" + machine.image.id, {
+          headers: {
+            "x-token": this.$store.state.authToken,
+            "x-server-address": this.$store.state.url,
+          },
+        })
+        .then((response) => (machine.image.name = response.data.name))
+        .catch(
+          (error) => (machine.image.name = "Error while getting flavor name")
+        );
+    }
   },
   mounted() {
     this.getInfoMachines();
