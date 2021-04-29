@@ -94,7 +94,7 @@ export default {
   methods: {
     changeProject(event) {
       let newProjectId = event.target.value;
-      this.numberInstances = this.numberVolumes = this.numberImages = "..."
+      this.numberInstances = this.numberVolumes = this.numberImages = "...";
 
       axios
         .get("http://localhost:3000/api/token/changeScope", {

@@ -23,16 +23,59 @@
           <div class="col-md-3" v-for="machine in machines" :key="machine.id">
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20" :src="serverPNG" >
-                <h5 class="card-title text-center font-weight-bold"> {{ machine.name }}</h5>
-                <p class="mt-2 text-gray-700" v-show="machine.image.name ? true : getImage(machine)"><strong>Image: </strong>{{ machine.image.name }}</p>
-                <p class="text-gray-700" v-show="machine.flavor.name ? machine.flavor.name : getFlavor(machine)"><strong>Flavor: </strong>{{ machine.flavor.name }}</p>
-                <p class="text-gray-700"><strong>Created at: </strong>{{ formatDate(machine.created) }}</p>
-                <p class="text-gray-700"><strong>Updated at: </strong>{{ formatDate(machine.updated) }}</p>
+                <img class="rounded mx-auto d-block w-20" :src="serverPNG" />
+                <h5 class="card-title text-center font-weight-bold">
+                  {{ machine.name }}
+                </h5>
+                <p
+                  class="mt-2 text-gray-700"
+                  v-show="machine.image.name ? true : getImage(machine)"
+                >
+                  <strong>Image: </strong>{{ machine.image.name }}
+                </p>
+                <p
+                  class="text-gray-700"
+                  v-show="
+                    machine.flavor.name
+                      ? machine.flavor.name
+                      : getFlavor(machine)
+                  "
+                >
+                  <strong>Flavor: </strong>{{ machine.flavor.name }}
+                </p>
+                <p class="text-gray-700">
+                  <strong>Created at: </strong>{{ formatDate(machine.created) }}
+                </p>
+                <p class="text-gray-700">
+                  <strong>Updated at: </strong>{{ formatDate(machine.updated) }}
+                </p>
                 <p class="text-gray-700 font-weight-bold">IPs</p>
-                <p v-for="ip in machine.addresses.private" :key="ip" :class="ip['OS-EXT-IPS:type'] != 'floating' ? 'text-gray-700' : 'text-red-700 font-weight-bold'">{{ ip.addr }};</p>
-                <p class="text-gray-700"><strong>Power state: </strong>{{ powerStates[machine["OS-EXT-STS:power_state"]]}}</p>
-                <div class="text-black-800 font-weight-bold">Status: {{ machine.status }}</div>
+                <p
+                  v-for="ip in machine.addresses.private"
+                  :key="ip"
+                  :class="
+                    ip['OS-EXT-IPS:type'] != 'floating'
+                      ? 'text-gray-700'
+                      : 'text-red-700 font-weight-bold'
+                  "
+                >
+                  {{ ip.addr }};
+                </p>
+                <p class="text-gray-700">
+                  <strong>Power state: </strong
+                  >{{ powerStates[machine["OS-EXT-STS:power_state"]] }}
+                </p>
+                <div class="text-black-800 font-weight-bold">
+                  Status: {{ machine.status }}
+                </div>
+                <br />
+                <button
+                  type="submit"
+                  class="btn btn-danger"
+                  @click="deleteMachine(machine)"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           </div>
@@ -52,16 +95,43 @@ export default {
       errorMessage: "",
       message: "Loading...",
       powerStates: {
-        "0": "NOSTATE",
-        "1": "RUNNING",
-        "3": "PAUSED",
-        "4": "SHUTDOWN",
-        "6": "CRASHED",
-        "7": "SUSPENDED",
-      }
+        0: "NOSTATE",
+        1: "RUNNING",
+        3: "PAUSED",
+        4: "SHUTDOWN",
+        6: "CRASHED",
+        7: "SUSPENDED",
+      },
     };
   },
   methods: {
+    deleteMachine(machine) {
+      console.log(machine);
+      axios
+        .delete("http://localhost:3000/api/instances/" + machine.id, {
+          headers: {
+            "x-token": this.$store.state.authToken,
+            "x-server-address": this.$store.state.url,
+          },
+        })
+        .then((response) => {
+          //console.log("RESPONSE" + response);
+          let deletedMachine = machine;
+          let index = this.machines.indexOf(deletedMachine);
+          //console.log(index + this.machines);
+          if (index > -1) {
+            this.machines.splice(index, 1);
+            if (this.machines.length == 0) {
+              this.message = "There are no Virtual Machines created.";
+            }
+          }
+          //console.log(index + this.machines);
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+          console.log(error);
+        });
+    },
     getFlavor(machine) {
       axios
         .get("http://localhost:3000/api/flavor/" + machine.flavor.id, {
@@ -99,10 +169,10 @@ export default {
       let dateObject = new Date(date);
       return dateObject.toLocaleString();
     },
-    getImage(machine){
-      if(!machine.image.id){
-        machine.image = { name: "Not defined."}
-        return
+    getImage(machine) {
+      if (!machine.image.id) {
+        machine.image = { name: "Not defined." };
+        return;
       }
       axios
         .get("http://localhost:3000/api/images/" + machine.image.id, {
@@ -115,7 +185,7 @@ export default {
         .catch(
           (error) => (machine.image.name = "Error while getting flavor name")
         );
-    }
+    },
   },
   mounted() {
     this.getInfoMachines();

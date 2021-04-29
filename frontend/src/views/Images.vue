@@ -36,17 +36,27 @@
                   <strong>Format: </strong>{{ image.disk_format }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Size: </strong>{{ (image.size * 0.00000095367432).toFixed(1) }} Mb
+                  <strong>Size: </strong
+                  >{{ (image.size * 0.00000095367432).toFixed(1) }} Mb
                 </p>
                 <p class="text-gray-700">
-                  <strong>Created at: </strong>{{ formatDate(image.created_at) }}
+                  <strong>Created at: </strong
+                  >{{ formatDate(image.created_at) }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Updated at: </strong>{{ formatDate(image.updated_at) }}
+                  <strong>Updated at: </strong
+                  >{{ formatDate(image.updated_at) }}
                 </p>
                 <div class="text-black-800 font-weight-bold">
                   Status: {{ image.status }}
                 </div>
+                <button
+                  type="submit"
+                  class="btn btn-danger"
+                  @click="deleteImage(image)"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           </div>
@@ -179,9 +189,35 @@ export default {
       messageModal: "",
     };
   },
-
   methods: {
     //http://192.168.56.102/image/v2/images/c0817e7a-8458-4b91-9c5d-d6e31f0ede83/import
+    deleteImage(image) {
+      console.log(image);
+      axios
+        .delete("http://localhost:3000/api/images/" + image.id, {
+          headers: {
+            "x-token": this.$store.state.authToken,
+            "x-server-address": this.$store.state.url,
+          },
+        })
+        .then((response) => {
+          console.log("RESPONSE" + response);
+          let imageDeleted = image;
+          let index = this.images.indexOf(imageDeleted);
+          console.log(index + this.images);
+          if (index > -1) {
+            this.images.splice(index, 1);
+            if (this.images.length == 0) {
+              this.message = "There are no Images  created.";
+            }
+          }
+          console.log(index + this.images);
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+          console.log(error);
+        });
+    },
     getInfoImages() {
       axios
         .get("http://localhost:3000/api/images", {
