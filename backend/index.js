@@ -37,7 +37,9 @@ app.get('/api/networks', importedFunctions.getNetworks)
 app.post('/api/images', importedFunctions.addImage)
 app.post('/api/volumes', importedFunctions.addVolume)
 app.post('/api/instances', importedFunctions.createMachine)
-
+app.delete('/api/instances/:machineId', importedFunctions.deleteMachine)
+app.delete('/api/images/:imageId', importedFunctions.deleteImage)
+app.delete('/api/volumes/:volumeId', importedFunctions.deleteVolume)
 //HEAT
 app.get('/api/heat/stacks', importedFunctions.getHeatStacks)
 app.post('/api/heat/stacks', importedFunctions.createStack)

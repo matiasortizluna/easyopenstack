@@ -130,7 +130,7 @@ module.exports.getInstancesDetail = (req, res, next) => {
       'X-Auth-Token': data['x-token']
     }
   })
-    .then((resp) => { res.send(resp.data)})
+    .then((resp) => { res.send(resp.data) })
 
     .catch((err) => {
       if (err.response == undefined)
@@ -206,7 +206,7 @@ module.exports.getImages = (req, res, next) => {
 }
 module.exports.getImage = (req, res, next) => {
   let data = req.headers
-  axios.get(data['x-server-address'] + '/image/v2/images/'+req.params.imageId, {
+  axios.get(data['x-server-address'] + '/image/v2/images/' + req.params.imageId, {
     headers: {
       'X-Auth-Token': data['x-token']
     }
@@ -408,20 +408,83 @@ module.exports.createMachine = (req, res, next) => {
     })
 }
 
+module.exports.deleteMachine = (req, res, next) => {
+  let headers = req.headers
+  console.log(headers)
+  axios.delete(headers['x-server-address'] + '/compute/v2.1/servers/' + req.params.machineId, {
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
+    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .catch((err) => {
+      if (err.response == undefined) {
+        console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+
+module.exports.deleteImage = (req, res, next) => {
+  let headers = req.headers
+  console.log(headers)
+  axios.delete(headers['x-server-address'] + '/image/v2/images/' + req.params.imageId, {
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
+    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .catch((err) => {
+      if (err.response == undefined) {
+        console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+
+module.exports.deleteVolume = (req, res, next) => {
+  let headers = req.headers
+  console.log(headers)
+  axios.delete(headers['x-server-address'] + '/volume/v3/' + headers['x-project-id'] + '/volumes/' + req.params.volumeId, {
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
+    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .catch((err) => {
+      if (err.response == undefined) {
+        console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+
 //---------------------------------------------------------------- HEAT ----------------------------------------------------
 module.exports.getHeatStacks = (req, res, next) => {
   let data = req.headers
-  axios.post(data['x-server-address']+"/compute/v2.1/os-keypairs", {
-      "keypair": {
-          "name": "heat_keypair"
-      }
-    },{
+  axios.post(data['x-server-address'] + "/compute/v2.1/os-keypairs", {
+    "keypair": {
+      "name": "heat_keypair"
+    }
+  }, {
     headers: {
       'X-Auth-Token': data['x-token']
     }
   })
     .then((resp) => {
-      getStacks(data,res, resp.data.keypair.private_key)
+      getStacks(data, res, resp.data.keypair.private_key)
     })
     .catch((err) => {
       if (err.response == undefined) {
@@ -429,16 +492,16 @@ module.exports.getHeatStacks = (req, res, next) => {
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
-        if(err.response.status == 409){
-          getStacks(data,res)
+        if (err.response.status == 409) {
+          getStacks(data, res)
         }
-          
+
       }
     })
 }
 
-function getStacks(data, res, privKey = null){
-  axios.get(data['x-server-address']+"/heat-api/v1/"+data['x-project-id']+"/stacks", {
+function getStacks(data, res, privKey = null) {
+  axios.get(data['x-server-address'] + "/heat-api/v1/" + data['x-project-id'] + "/stacks", {
     headers: {
       'X-Auth-Token': data['x-token']
     }
@@ -463,14 +526,14 @@ function getStacks(data, res, privKey = null){
 
 module.exports.deleteStack = (req, res, next) => {
   let data = req.headers
-  axios.delete(data['x-server-address']+"/heat-api/v1/"+data['x-project-id']+"/stacks/"+req.params.stackName+"/"+req.params.stackId, {
+  axios.delete(data['x-server-address'] + "/heat-api/v1/" + data['x-project-id'] + "/stacks/" + req.params.stackName + "/" + req.params.stackId, {
     headers: {
       'X-Auth-Token': data['x-token']
     }
   })
     .then((resp) => {
       //console.log(resp);
-      res.send({  message: "Stack '"+req.params.stackName+"' deleted successfuly!" });
+      res.send({ message: "Stack '" + req.params.stackName + "' deleted successfuly!" });
     })
     .catch((err) => {
       if (err.response == undefined) {
@@ -486,11 +549,11 @@ module.exports.deleteStack = (req, res, next) => {
 module.exports.createStack = (req, res, next) => {
   let headers = req.headers
   let data = req.body
-  axios.post(headers['x-server-address']+"/heat-api/v1/"+headers['x-project-id']+"/stacks", {
-      "stack_name":data.stack_name,
-      "template_url": data.template_url,
-      "timeout_mins": parseInt(data.timeout_mins)
-    },{
+  axios.post(headers['x-server-address'] + "/heat-api/v1/" + headers['x-project-id'] + "/stacks", {
+    "stack_name": data.stack_name,
+    "template_url": data.template_url,
+    "timeout_mins": parseInt(data.timeout_mins)
+  }, {
     headers: {
       'X-Auth-Token': headers['x-token']
     }
