@@ -7,7 +7,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Token, X-Server-Address, x-project-id, X-Old-Token, X-New-Project-Id, X-Server-Port")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Token, X-Server-Address, x-project-id, X-Old-Token, X-New-Project-Id, X-Server-Port, X-Machine-Name, X-Image, X-Flavor, X-Networks")
   next()
 })
 
@@ -34,3 +34,4 @@ app.get('/api/keypairs', importedFunctions.getKeyPairs)
 app.get('/api/networks', importedFunctions.getNetworks)
 app.post('/api/images', importedFunctions.addImage)
 app.post('/api/volumes', importedFunctions.addVolume)
+app.post('/api/instances', importedFunctions.createMachine)

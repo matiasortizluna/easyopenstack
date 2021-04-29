@@ -181,7 +181,12 @@ module.exports.getSecurityGroups = (req, res, next) => {
   })
     .then((resp) => res.send(resp.data))
     .catch((err) => {
-      res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE" })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
     })
 }
 module.exports.getImages = (req, res, next) => {
@@ -208,9 +213,15 @@ module.exports.getFlavor = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+    .catch((err) => {
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE" })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
 }
-
 module.exports.getFlavorsDetail = (req, res, next) => {
   let data = req.headers
   axios.get(data['x-server-address'] + '/compute/v2.1/flavors/detail', {
@@ -219,7 +230,14 @@ module.exports.getFlavorsDetail = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+    .catch((err) => {
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE" })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
 }
 module.exports.getKeyPairs = (req, res, next) => {
   let data = req.headers
@@ -229,18 +247,39 @@ module.exports.getKeyPairs = (req, res, next) => {
     }
   })
     .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+    .catch((err) => {
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE" })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
 }
-
 module.exports.getNetworks = (req, res, next) => {
-  let data = req.headers
-  axios.get(data['x-server-address'] + ':9696' + '/v2/networks', {
+  let data = req.headers['x-server-address']
+  console.log(data)
+  let url = data + ':9696' + '/v2.0/networks'
+  console.log(url)
+  axios.get(url, {
     headers: {
-      'X-Auth-Token': data['x-token']
+      'X-Auth-Token': req.headers['x-token']
     }
   })
-    .then((resp) => res.send(resp.data))
-    .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
+    .then((resp) => {
+      //console.log(resp);
+      res.send(resp.data);
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        //console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        //console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
 }
 
 module.exports.addImage = (req, res, next) => {
@@ -321,21 +360,32 @@ module.exports.addVolume = (req, res, next) => {
       else
         res.status(err.response.status).send({ message: err.response.statusText })
     })
-
-  module.exports.createMachine = (req, res, next) => {
-    let data = req.headers
-    axios.get(data['x-server-address'] + ':9696' + '/v2/networks', {
-      "server": {
-        "name": data['x-machine-name'],
-        "imageRef": data['x-iamge'],
-        "flavorRef": data['x-flavor'],
-        "networks": [{
-          "auto": ""
-          //"uuid": "61639df8-178f-40cf-b29f-79e0a35f7735"
-        }]
+}
+module.exports.createMachine = (req, res, next) => {
+  let headers = req.headers
+  let data = req.body
+  console.log(req)
+  axios.post(headers['x-server-address'] + '/compute/v2.1/servers', {
+    "server": {
+      "name": data['X-Machine-Name'],
+      "imageRef": data['X-Image'],
+      "flavorRef": "http://openstack.example.com/flavors/" + data['X-Flavor'],
+      "networks": [{ "uuid": data['X-Networks'][0].id }]
+    },
+  }, {
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
+    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .catch((err) => {
+      if (err.response == undefined) {
+        console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText })
       }
     })
-      .then((resp) => res.send(resp.data))
-      .catch((err) => res.status(err.response.data.error.code).send({ message: err.response.data.error.message }))
-  }
 }

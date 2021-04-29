@@ -135,7 +135,7 @@
                         aria-describedby="imageHelp"
                         v-bind:placeholder="machineCreating.image_file"
                         disabled
-                        v-model="this.machineCreating.image_file"
+                        v-model="this.machineCreating.image_file.name"
                       />
                       <small id="emailHelp" class="form-text text-muted"
                         >Image associated to this machine</small
@@ -369,7 +369,7 @@ export default {
   methods: {
     showModal(image) {
       this.getForDeploy();
-      this.machineCreating.image_file = image.name;
+      this.machineCreating.image_file = image;
       setTimeout(() => {
         $("#modalCreate").modal("show");
       }, 1000);
@@ -445,18 +445,20 @@ export default {
         });
     },
     getNetworks() {
+      console.log(this.$store.state.ip_address);
       axios
         .get("http://localhost:3000/api/networks", {
           headers: {
             "X-Token": this.$store.state.authToken,
             "X-Server-Address":
-              this.$store.state.ip_address[0] + this.$store.state.ip_address[1],
+              this.$store.state.ip_address[0] +
+              ":" +
+              this.$store.state.ip_address[1],
             "X-Server-Port": this.$store.state.ip_address[2],
           },
         })
         .then((response) => {
-          console.log(response);
-          //this.networks = response.data["networks"];
+          this.networks = response.data["networks"];
         })
         .catch((error) => {
           console.log(error);
@@ -466,15 +468,15 @@ export default {
     getForDeploy() {
       this.getFlavors();
       this.getInfoVolumes();
-      this.getSecurityGroups();
-      this.getKeyPairs();
+      //this.getSecurityGroups();
+      //this.getKeyPairs();
       this.getNetworks();
       setTimeout(() => {
         console.log(this.volumes);
         console.log(this.flavors);
         console.log(this.images);
-        console.log(this.securityGroups);
-        console.log(this.keyPairs);
+        //console.log(this.securityGroups);
+        //console.log(this.keyPairs);
         console.log(this.networks);
       }, 1000);
     },
@@ -504,10 +506,31 @@ export default {
       return dateObject.toLocaleString();
     },
     deployMachine() {
-      console.log("Machine Born");
-      setTimeout(() => {
-        console.log(this.machineCreating);
-      }, 1000);
+      this.machineCreating.networks = this.networks;
+      console.log(this.machineCreating.flavor);
+      axios
+        .post(
+          "http://localhost:3000/api/instances",
+          {
+            "X-Machine-Name": this.machineCreating.name,
+            "X-Image": this.machineCreating.image_file.id,
+            "X-Flavor": this.machineCreating.flavor,
+            "X-Networks": this.machineCreating.networks,
+          },
+          {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.$store.state.url,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+          this.error = error.response.data.message;
+        });
     },
   },
   mounted() {
