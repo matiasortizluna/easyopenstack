@@ -40,4 +40,5 @@ app.post('/api/instances', importedFunctions.createMachine)
 
 //HEAT
 app.get('/api/heat/stacks', importedFunctions.getHeatStacks)
+app.post('/api/heat/stacks', importedFunctions.createStack)
 app.delete('/api/heat/stacks/:stackName/:stackId', importedFunctions.deleteStack)

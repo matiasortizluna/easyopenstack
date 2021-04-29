@@ -63,19 +63,14 @@
               {{messageModal}}
             </div>
             <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Volume name" aria-label="Volume name" aria-describedby="basic-addon1" required v-model="volumeName">
+              <input type="text" class="form-control" placeholder="Stack name" aria-label="Stack name" aria-describedby="basic-addon1" required v-model="stackName">
             </div>
             <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Volume description" aria-label="Volume description" aria-describedby="basic-addon1" required v-model="volumeDescription">
+              <input type="text" class="form-control" placeholder="Template URL" aria-label="Template URL" aria-describedby="basic-addon1" required v-model="templateUrl">
+              <p>Must return the conten of the file (RAW) (e.g. YAML file on github with all configurations)</p>
             </div>
-            <label for="volume-source">Volume source</label>
-            <br>
-            <select name="volume-source" v-model="volumeSource">
-              <option :value="null">No source, empty</option>
-              <option v-for="image in images" :key="image.id" :value="image.id">Image: {{ image.name }}</option>
-            </select>
             <div class="input-group mb-3 mt-3">
-              <input type="number" class="form-control" placeholder="Size (GB)" aria-label="Size" aria-describedby="basic-addon1" required v-model="volumeSize">
+              <input type="number" class="form-control" placeholder="Timeout (minutes) (how much time to wait for creation)" aria-label="Timeout" aria-describedby="basic-addon1" required v-model="stackTimeout">
             </div>
           </div>
           <div class="modal-footer">
@@ -96,7 +91,10 @@ export default {
       message: "Loading...",
       errorMessage: "",
       errorMessageModal: "",
-      messageModal: ""
+      messageModal: "",
+      stackName: null,
+      templateUrl: null,
+      stackTimeout: null,
     };
   },
 
@@ -131,11 +129,36 @@ export default {
     toggleModal(){
       this.messageModal = ""
       this.errorMessageModal = ""
-      //this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null
+      this.stackName = this.templateUrl = this.stackTimeout = null
       $("#createStackModal").modal("toggle")
     },
     createStack(){
-
+      if(!this.stackName || !this.templateUrl || !this.stackTimeout){
+        this.messageModal=""
+        this.errorMessageModal = "All fields are required!"
+        return
+      }
+      axios.post("http://localhost:3000/api/heat/stacks/",{
+            "stack_name":this.stackName,
+            "template_url": this.templateUrl,
+            "timeout_mins": this.stackTimeout
+      } ,{
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "X-Project-Id": this.$store.state.selectedProject
+          },
+        })
+      .then((resp) => {
+        this.errorMessage = ""
+        this.message = "Stack added successfuly!"
+        this.getStacks()
+        this.toggleModal()
+      })
+      .catch((err) => {
+        this.messageModal=""
+        this.errorMessageModal = err.response.data.message
+      })   
     },
     deleteStack(stack){
       axios.delete("http://localhost:3000/api/heat/stacks/"+stack.stack_name+"/"+stack.id, {

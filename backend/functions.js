@@ -483,4 +483,29 @@ module.exports.deleteStack = (req, res, next) => {
       }
     })
 }
+module.exports.createStack = (req, res, next) => {
+  let headers = req.headers
+  let data = req.body
+  axios.post(headers['x-server-address']+"/heat-api/v1/"+headers['x-project-id']+"/stacks", {
+      "stack_name":data.stack_name,
+      "template_url": data.template_url,
+      "timeout_mins": parseInt(data.timeout_mins)
+    },{
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
+    .then((resp) => {
+      res.status(201).send(resp.response)
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        //console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
 //------------------------------------------- END HEAT -------------------------------------------------------
