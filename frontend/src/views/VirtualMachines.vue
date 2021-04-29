@@ -25,13 +25,14 @@
               <div class="card-body">
                 <img class="rounded mx-auto d-block w-20" :src="serverPNG" >
                 <h5 class="card-title text-center font-weight-bold"> {{ machine.name }}</h5>
-                <p class="mt-2 text-gray-700">Image: {{ machine.image ? machine.image : "Not defined." }}</p>
+                <p class="mt-2 text-gray-700"><strong>Image: </strong>{{ machine.image ? machine.image : "Not defined." }}</p>
                 <p class="text-gray-700" v-show="machine.flavor.name ? machine.flavor.name : getFlavor(machine)">Flavor: {{ machine.flavor.name }}</p>
-                <p class="text-gray-700">Created at: {{ formatDate(machine.created) }}</p>
-                <p class="text-gray-700">Updated at: {{ formatDate(machine.updated) }}</p>
-                <p></p>
+                <p class="text-gray-700"><strong>Created at: </strong>{{ formatDate(machine.created) }}</p>
+                <p class="text-gray-700"><strong>Updated at: </strong>{{ formatDate(machine.updated) }}</p>
+                <p class="text-gray-700 font-weight-bold">IPs</p>
                 <p v-for="ip in machine.addresses.private" :key="ip" :class="ip['OS-EXT-IPS:type'] != 'floating' ? 'text-gray-700' : 'text-red-700 font-weight-bold'">{{ ip.addr }}</p>
-                <div class="text-black-800">Status: {{ machine.status }}</div>
+                <p class="text-gray-700"><strong>Power state: </strong>{{ powerStates[machine["OS-EXT-STS:power_state"]]}}</p>
+                <div class="text-black-800 font-weight-bold">Status: {{ machine.status }}</div>
               </div>
             </div>
           </div>
@@ -50,6 +51,14 @@ export default {
       machines: [],
       errorMessage: "",
       message: "Loading...",
+      powerStates: {
+        "0": "NOSTATE",
+        "1": "RUNNING",
+        "3": "PAUSED",
+        "4": "SHUTDOWN",
+        "6": "CRASHED",
+        "7": "SUSPENDED",
+      }
     };
   },
   methods: {

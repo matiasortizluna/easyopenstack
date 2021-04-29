@@ -33,16 +33,16 @@
                   {{ image.name }}
                 </h5>
                 <p class="mt-2 text-gray-700">
-                  Format: {{ image.disk_format }}
+                  <strong>Format: </strong>{{ image.disk_format }}
                 </p>
                 <p class="text-gray-700">
-                  Size: {{ (image.size * 0.00000095367432).toFixed(1) }} Mb
+                  <strong>Size: </strong>{{ (image.size * 0.00000095367432).toFixed(1) }} Mb
                 </p>
                 <p class="text-gray-700">
-                  Created at: {{ formatDate(image.created_at) }}
+                  <strong>Created at: </strong>{{ formatDate(image.created_at) }}
                 </p>
                 <p class="text-gray-700">
-                  Updated at: {{ formatDate(image.updated_at) }}
+                  <strong>Updated at: </strong>{{ formatDate(image.updated_at) }}
                 </p>
                 <div class="text-black-800 font-weight-bold">
                   Status: {{ image.status }}

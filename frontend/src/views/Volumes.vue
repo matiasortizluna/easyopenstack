@@ -28,13 +28,19 @@
                 <h5 class="card-title text-center font-weight-bold">
                   {{ volume.name ? volume.name : volume.id }}
                 </h5>
-                <p class="mt-2 text-gray-700">Size: {{ volume.size }} Gb</p>
+                <p class="mt-2 text-gray-700"><strong>Size: </strong>{{ volume.size }} Gb</p>
+                <p class="text-gray-700"><strong>Bootable: </strong>{{ volume.bootable }}</p>
+                <p class="text-gray-700" v-if="volume.volume_image_metadata"><strong>Bootable with image: </strong>{{ volume.volume_image_metadata.image_name }}</p>
                 <p class="text-gray-700">
-                  Created at: {{ formatDate(volume.created_at) }}
+                  <strong>Created at: </strong>{{ formatDate(volume.created_at) }}
                 </p>
                 <p class="text-gray-700">
-                  Updated at: {{ formatDate(volume.updated_at) }}
+                  <strong>Updated at: </strong>{{ formatDate(volume.updated_at) }}
                 </p>
+                <div class="text-gray-700" v-if="volume.attachments.length">
+                    <strong>Attached to:</strong>
+                    <p v-for="attachment in volume.attachments" :key="attachment.id">{{ attachment.device }};</p>
+                  </div>
                 <div class="text-black-800 font-weight-bold">
                   Status: {{ volume.status }}
                 </div>
