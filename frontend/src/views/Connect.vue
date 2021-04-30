@@ -1,15 +1,36 @@
 <template>
   <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
     <div class="container mx-auto px-6 py-8">
-      <h3 class="text-gray-700 text-3xl font-medium">Connect</h3>
-
+      <div class="row">
+        <h3 class="text-gray-700 text-3xl font-medium">Connect</h3>
+        <div class="col">
+          <button class="btn btn-info" @click="toggleModal()">
+            Add Floating IPs<i class="far fa-plus-square"></i>
+          </button>
+          &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-warning" @click="toggleModalRules()">
+            Create Security Group Rules <i class="far fa-plus-square"></i>
+          </button>
+        </div>
+      </div>
       <br />
-
-      <button class="btn btn-info" @click="toggleModal()">
-        Add <i class="far fa-plus-square"></i>
-      </button>
-
-      <br />
+      <div>
+        <h2>
+          In order to connect to your machine, you must follow these 3 steps:
+        </h2>
+        <p>
+          1. Associate a Floating Point to your machine, if you don't have any,
+          you can create it
+        </p>
+        <p>
+          2. Change the Security Group Rules (if you haven't yet) so you can
+          have full permissions to access to it
+        </p>
+        <p>
+          3. Check the portforwarding settings of your OpenStack Server so you
+          can connect from the outside
+        </p>
+      </div>
 
       <div class="mt-4">
         <div
@@ -58,15 +79,199 @@
                 <div class="text-black-800 font-weight-bold">
                   Status: {{ floating.status }}
                 </div>
-
+                <br />
                 <button
-                  v-if="floating.status != 'ACTIVE'"
+                  v-show="floating.status != 'ACTIVE'"
                   type="submit"
                   class="btn btn-success"
                   @click="toggleModalConnect(floating)"
                 >
-                  Connect
+                  Associate
                 </button>
+                <button
+                  v-show="floating.status == 'ACTIVE'"
+                  type="submit"
+                  class="btn btn-danger"
+                  @click="desconnect(floating)"
+                >
+                  Dessasociate
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="modalRules"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="exampleModalCenterTitle"
+          aria-hidden="true"
+          ref="modalRules"
+        >
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div
+                v-if="errorMessageModal"
+                class="alert alert-danger text-center"
+                role="alert"
+              >
+                {{ errorMessageModal }}
+              </div>
+              <div
+                v-else-if="messageModal"
+                class="alert alert-primary text-center"
+                role="alert"
+              >
+                {{ messageModal }}
+              </div>
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">
+                  Change Security Group Rules
+                </h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <div class="modal-body">
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col">
+                      <div
+                        v-if="errorMessageModal"
+                        class="alert alert-danger text-center"
+                        role="alert"
+                      >
+                        {{ errorMessageModal }}
+                      </div>
+                      <div
+                        v-else-if="messageModal"
+                        class="alert alert-primary text-center"
+                        role="alert"
+                      >
+                        {{ messageModal }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <div class="input-group mb-3">
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Description"
+                          aria-label="Image name"
+                          aria-describedby="basic-addon1"
+                          required
+                          v-model="security_group_rule.description"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <label>Rule Type</label>
+                      <br />
+                      <select
+                        name="ruleType"
+                        v-model="security_group_rule.protocol"
+                      >
+                        <option value="tcp">TCP</option>
+                        <option value="udp">UDP</option>
+                        <option value="ICMP">ICMP</option>
+                        <option value="SSH">SSH (Default)</option>
+                      </select>
+                    </div>
+                    <div class="col">
+                      <label>Rule Direction</label>
+                      <br />
+                      <select
+                        name="ruleSide"
+                        v-model="security_group_rule.direction"
+                      >
+                        <option value="ingress">Ingress</option>
+                        <option value="egress">Egress</option>
+                      </select>
+                    </div>
+                  </div>
+                  <br />
+                  <div class="row">
+                    <div class="col">
+                      <label>Type</label>
+                      <br />
+                      <select
+                        name="ethernetType"
+                        v-model="security_group_rule.ethertype"
+                      >
+                        <option value="ipv4">IPv4</option>
+                        <option value="ipv6">IPv6</option>
+                      </select>
+                    </div>
+                    <div class="col">
+                      <label>Min Port Number</label>
+                      <br />
+                      <input
+                        type="number"
+                        class="form-control"
+                        placeholder="Port Number"
+                        aria-label="Port Number"
+                        required
+                        v-model="security_group_rule.port_range_min"
+                      />
+                    </div>
+                    <div class="col">
+                      <label>Max Port Number</label>
+                      <br />
+                      <input
+                        type="number"
+                        class="form-control"
+                        placeholder="Port Number"
+                        aria-label="Port Number"
+                        required
+                        v-model="security_group_rule.port_range_max"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <div class="row">
+                  <div class="col">
+                    <button
+                      type="submit"
+                      class="btn btn-success"
+                      @click="easyConnect"
+                    >
+                      Easy (SSH & ICMP)
+                    </button>
+                  </div>
+                  <div class="col">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div class="col">
+                    <button
+                      type="submit"
+                      class="btn btn-primary"
+                      @click="createRules"
+                    >
+                      Create Rule
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -234,6 +439,16 @@ export default {
       floatings: [],
       ports: [],
       machines: [],
+      rules: [],
+      security_group_rule: {
+        direction: "",
+        port_range_min: "",
+        ethertype: "",
+        port_range_max: "",
+        protocol: "",
+        security_group_id: "",
+        remote_ip_prefix: "0.0.0.0/0",
+      },
       request: {
         port: {},
         floating: {},
@@ -251,6 +466,13 @@ export default {
       this.messageModal = "";
       this.errorMessageModal = "";
       $("#modalConnect").modal("toggle");
+    },
+    toggleModalRules() {
+      //this.request.floating = floating;
+      this.getRules();
+      this.messageModal = "";
+      this.errorMessageModal = "";
+      $("#modalRules").modal("toggle");
     },
     getFloatings() {
       axios
@@ -327,9 +549,48 @@ export default {
           }
         )
         .then((response) => {
-          console.log(response);
-          //this.machines = response.data.servers;
-          //console.log(this.machines);
+          console.log(response.data.floatingip);
+          this.toggleModalConnect();
+          /*
+          let index = this.floatings.indexOf(response.data.floatingip);
+          
+          if (index > -1) {
+            this.floatings[index].status = "DOWN";
+          
+          }
+          */
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Machines";
+        });
+    },
+    desconnect(floating) {
+      console.log(floating);
+      axios
+        .put(
+          "http://localhost:3000/api/floating/port",
+          {
+            floatingip: floating,
+            floatingip_id: floating.id,
+            port_id: null,
+          },
+          {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.address,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response.data.floatingip);
+          /*
+          let index = this.floatings.indexOf(response.data.floatingip);
+          if (index > -1) {
+            this.floatings[index].status = "ACTIVE";
+            console.log(this.floatings[index].status);
+          }
+          */
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
@@ -352,7 +613,105 @@ export default {
         });
       });
     },
+    getRules() {
+      axios
+        .get("http://localhost:3000/api/security-groups/rules", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.address,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.rules = response.data.security_group_rules;
+          this.security_group_rule.security_group_id = this.rules[0].security_group_id;
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Machines";
+        });
+    },
+    createRules() {
+      axios
+        .post(
+          "http://localhost:3000/api/security-groups/rules",
+          this.security_group_rule,
+          {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.address,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+          this.rules = response.data.security_group_rules;
+          this.security_group_rule.security_group_id = this.rules[0].security_group_id;
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Machines";
+        });
+    },
+    easyConnect() {
+      axios
+        .post(
+          "http://localhost:3000/api/security-groups/rules",
+          {
+            security_group_rule: {
+              direction: "ingress",
+              port_range_min: "22",
+              ethertype: "ipv4",
+              port_range_max: "22",
+              protocol: "tcp",
+              security_group_id: this.rules[0].security_group_id,
+              remote_ip_prefix: "0.0.0.0/0",
+            },
+          },
+          {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.address,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+
+          setTimeout(() => {
+            axios
+              .post("http://localhost:3000/api/security-groups/rules", {
+                security_group_rule: {
+                  direction: "ingress",
+                  port_range_min: "8",
+                  ethertype: "ipv4",
+                  port_range_max: "0",
+                  protocol: "icmp",
+                  security_group_id: this.rules[0].security_group_id,
+                  remote_ip_prefix: "0.0.0.0/0",
+                },
+                headers: {
+                  "X-Token": this.$store.state.authToken,
+                  "X-Server-Address": this.address,
+                },
+              })
+              .then((response) => {
+                console.log(response);
+              })
+              .catch((error) => {
+                console.log(error.response);
+                this.errorMessage = error.response.data.message;
+                this.errorMessage = "Error in Creating Rule";
+              });
+          }, 1000);
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Creating Rule";
+        });
+    },
   },
+
   mounted() {
     var ip_address = this.$store.state.url.split(":");
     this.address = ip_address[0] + ":" + ip_address[1];

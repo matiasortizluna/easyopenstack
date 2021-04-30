@@ -172,7 +172,7 @@ module.exports.getVolumesWithDetail = (req, res, next) => {
 }
 module.exports.getSecurityGroups = (req, res, next) => {
   let data = req.headers
-  console.log(req.headers)
+  //console.log(req.headers)
   let address = req.headers['x-server-address']
   let url = address + ':9696' + '/v2.0/security-groups'
   axios.get(url, {
@@ -279,7 +279,7 @@ module.exports.getKeyPairs = (req, res, next) => {
     })
 }
 module.exports.getNetworks = (req, res, next) => {
-  console.log(req.headers)
+  //console.log(req.headers)
   let address = req.headers['x-server-address']
   let url = address + ':9696' + '/v2.0/networks'
   axios.get(url, {
@@ -385,7 +385,7 @@ module.exports.createMachine = (req, res, next) => {
   let data = req.body
   let sec_groups = data["X-Security-Groups"]
   let networks = data['X-Networks']
-  console.log(data['X-KeyPairs'])
+  //console.log(data['X-KeyPairs'])
   axios.post(headers['x-server-address'] + '/compute/v2.1/servers', {
     "server": {
       "name": data['X-Machine-Name'],
@@ -417,10 +417,13 @@ module.exports.createMachine = (req, res, next) => {
       'X-Auth-Token': headers['x-token']
     }
   })
-    .then((resp) => { console.log(resp.data); res.send(resp.data); })
+    .then((resp) => {
+      //console.log(resp.data);
+      res.send(resp.data);
+    })
     .catch((err) => {
       if (err.response == undefined) {
-        console.log(err)
+        //console.log(err)
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
@@ -431,66 +434,75 @@ module.exports.createMachine = (req, res, next) => {
 }
 module.exports.deleteMachine = (req, res, next) => {
   let headers = req.headers
-  console.log(headers)
+  //console.log(headers)
   axios.delete(headers['x-server-address'] + '/compute/v2.1/servers/' + req.params.machineId, {
     headers: {
       'X-Auth-Token': headers['x-token']
     }
   })
-    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .then((resp) => {
+      //console.log(resp.data);
+      res.send(resp.data);
+    })
     .catch((err) => {
       if (err.response == undefined) {
-        console.log(err)
+        //console.log(err)
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
-        console.log(err)
+        //console.log(err)
         res.status(err.response.status).send({ message: err.response.statusText })
       }
     })
 }
 module.exports.deleteImage = (req, res, next) => {
   let headers = req.headers
-  console.log(headers)
+  //console.log(headers)
   axios.delete(headers['x-server-address'] + '/image/v2/images/' + req.params.imageId, {
     headers: {
       'X-Auth-Token': headers['x-token']
     }
   })
-    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .then((resp) => {
+      //console.log(resp.data);
+      res.send(resp.data);
+    })
     .catch((err) => {
       if (err.response == undefined) {
-        console.log(err)
+        //console.log(err)
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
-        console.log(err)
+        //console.log(err)
         res.status(err.response.status).send({ message: err.response.statusText })
       }
     })
 }
 module.exports.deleteVolume = (req, res, next) => {
   let headers = req.headers
-  console.log(headers)
+  //console.log(headers)
   axios.delete(headers['x-server-address'] + '/volume/v3/' + headers['x-project-id'] + '/volumes/' + req.params.volumeId, {
     headers: {
       'X-Auth-Token': headers['x-token']
     }
   })
-    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .then((resp) => {
+      //console.log(resp.data);
+      res.send(resp.data);
+    })
     .catch((err) => {
       if (err.response == undefined) {
-        console.log(err)
+        //console.log(err)
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
-        console.log(err)
+        //console.log(err)
         res.status(err.response.status).send({ message: err.response.statusText })
       }
     })
 }
 module.exports.getFloatings = (req, res, next) => {
-  console.log(req.headers)
+  //console.log(req.headers)
   let address = req.headers['x-server-address']
   let url = address + ':9696' + '/v2.0/floatingips'
   axios.get(url, {
@@ -499,7 +511,7 @@ module.exports.getFloatings = (req, res, next) => {
     }
   })
     .then((resp) => {
-      console.log(resp)
+      //console.log(resp)
       res.send(resp.data);
     })
     .catch((err) => {
@@ -512,7 +524,7 @@ module.exports.getFloatings = (req, res, next) => {
     })
 }
 module.exports.getPorts = (req, res, next) => {
-  console.log(req.headers)
+  //console.log(req.headers)
   let address = req.headers['x-server-address']
   let url = address + ':9696' + '/v2.0/ports'
   axios.get(url, {
@@ -521,7 +533,7 @@ module.exports.getPorts = (req, res, next) => {
     }
   })
     .then((resp) => {
-      console.log(resp)
+      //console.log(resp)
       res.send(resp.data);
     })
     .catch((err) => {
@@ -534,6 +546,7 @@ module.exports.getPorts = (req, res, next) => {
     })
 }
 module.exports.getInstanceDetails = (req, res, next) => {
+  console.log(req)
   let data = req.headers
   axios.get(data['x-server-address'] + '/compute/v2.1/servers/' + req.params.instanceId, {
     headers: {
@@ -549,8 +562,8 @@ module.exports.getInstanceDetails = (req, res, next) => {
     })
 }
 module.exports.associatePortToFloating = (req, res, next) => {
-  console.log(req.headers)
-  console.log(req.body)
+  //console.log(req.headers)
+  //console.log(req.body)
   let address = req.headers['x-server-address']
   let url = address + ':9696' + '/v2.0/floatingips/' + req.body['floatingip_id']
   axios.put(url, {
@@ -563,11 +576,11 @@ module.exports.associatePortToFloating = (req, res, next) => {
     }
   })
     .then((resp) => {
-      console.log(resp)
+      //console.log(resp)
       res.send(resp.data);
     })
     .catch((err) => {
-      console.log(err)
+      //console.log(err)
       if (err.response == undefined) {
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
@@ -576,6 +589,63 @@ module.exports.associatePortToFloating = (req, res, next) => {
       }
     })
 }
+module.exports.getRules = (req, res, next) => {
+  //console.log(req.headers)
+  let address = req.headers['x-server-address']
+  let url = address + ':9696' + '/v2.0/security-group-rules'
+  axios.get(url, {
+    headers: {
+      'X-Auth-Token': req.headers['x-token']
+    }
+  })
+    .then((resp) => {
+      //console.log(resp)
+      res.send(resp.data);
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+module.exports.createRule = (req, res, next) => {
+  //console.log(req.headers)
+  let address = req.headers['x-server-address']
+  console.log(req.body.security_group_rule)
+  let url = address + ':9696' + '/v2.0/security-group-rules'
+  axios.post(url, {
+    security_group_rule: {
+      direction: req.body.security_group_rule.direction,
+      port_range_min: req.body.security_group_rule.port_range_min,
+      ethertype: req.body.security_group_rule.ethertype,
+      port_range_max: req.body.security_group_rule.port_range_max,
+      protocol: req.body.security_group_rule.protocol,
+      security_group_id: req.body.security_group_rule.security_group_id,
+      remote_ip_prefix: req.body.security_group_rule.remote_ip_prefix,
+    }
+  }, {
+    headers: {
+      'X-Auth-Token': req.headers['x-token']
+    }
+  })
+    .then((resp) => {
+      //console.log(resp)
+      res.send(resp.data);
+    })
+    .catch((err) => {
+      //console.log(err)
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE", data: err, status: 409 })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+
 
 
 //---------------------------------------------------------------- HEAT ----------------------------------------------------

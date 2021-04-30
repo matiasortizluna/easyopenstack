@@ -323,35 +323,7 @@ export default {
         networks: [],
         security_groups: [],
       },
-      images: [
-        {
-          created_at: "2021-04-08T15:11:30Z",
-          disk_format: "iso",
-          name: "Windows Server 2019",
-          size: 990904320,
-          status: "active",
-          updated_at: "2021-04-08T15:11:42Z",
-          img: windows,
-        },
-        {
-          created_at: "2021-04-08T15:11:30Z",
-          disk_format: "iso",
-          name: "Cirros",
-          size: 990904320,
-          status: "active",
-          updated_at: "2021-04-08T15:11:42Z",
-          img: cirros,
-        },
-        {
-          created_at: "2021-04-08T15:11:30Z",
-          disk_format: "iso",
-          name: "Ubuntu Server 18.04",
-          size: 990904320,
-          status: "active",
-          updated_at: "2021-04-08T15:11:42Z",
-          img: linux,
-        },
-      ],
+      images: [],
       errorMessage: "",
       message: "Loading...",
       errorMessageModal: "",
@@ -478,8 +450,19 @@ export default {
           },
         })
         .then((response) => {
-          response.data.images.forEach((element) => {
-            this.images.push(element);
+          this.images = response.data.images;
+          this.images.forEach((image) => {
+            if (image.name.toLowerCase().includes("windows")) {
+              image.img = windows;
+            } else if (
+              image.name.toLowerCase().includes("ubuntu") ||
+              image.name.toLowerCase().includes("linux") ||
+              image.name.toLowerCase().includes("unix")
+            ) {
+              image.img = linux;
+            } else if (image.name.toLowerCase().includes("cirro")) {
+              image.img = cirros;
+            }
           });
           this.message =
             this.images.length == 0 ? "There are no Images created." : "";

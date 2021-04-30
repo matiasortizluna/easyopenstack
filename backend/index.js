@@ -44,6 +44,8 @@ app.get('/api/floating', importedFunctions.getFloatings)
 app.get('/api/ports', importedFunctions.getPorts)
 app.get('/api/instances/:instanceId/detail', importedFunctions.getInstanceDetails)
 app.put('/api/floating/port', importedFunctions.associatePortToFloating)
+app.get('/api/security-groups/rules', importedFunctions.getRules)
+app.post('/api/security-groups/rules', importedFunctions.createRule)
 //HEAT
 app.get('/api/heat/stacks', importedFunctions.getHeatStacks)
 app.post('/api/heat/stacks', importedFunctions.createStack)
