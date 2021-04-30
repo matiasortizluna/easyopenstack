@@ -105,22 +105,7 @@
                       "
                       @click="changeMachineState(machine)"
                     >
-                      {{ machine.status == "SHUTOFF" ? "Start" : "Stop" }}
-                    </button>
-                  </div>
-                </div>
-                <div class="row mt-3">
-                  <div class="col">
-                    <button
-                      type="button"
-                      class="btn btn-info"
-                      @click="createConnection(machine)"
-                      v-if="
-                        machine.status == 'SHUTOFF' ||
-                        machine.status == 'ACTIVE'
-                      "
-                    >
-                      Create Connection
+                      {{ machine.status == 'SHUTOFF' ? 'Start' : machine.status == 'ACTIVE' ? 'Stop' : 'Wait' }}
                     </button>
                   </div>
                 </div>
@@ -730,9 +715,9 @@ export default {
       let body = {};
       if (machine.status == "SHUTOFF") {
         body = {
-          "os-start": null,
-        };
-      } else {
+          'os-start': null
+        }
+      }else if(machine.status == "ACTIVE"){
         body = {
           "os-stop": null,
         };

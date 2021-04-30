@@ -364,7 +364,7 @@ module.exports.getInstanceDetails = (req, res, next) => {
     })
 }
 module.exports.getRules = (req, res, next) => {
-  console.log(req.headers)
+  //console.log(req.headers)
   let address = req.headers['x-server-address']
   let url = address + ':9696' + '/v2.0/security-group-rules'
   axios.get(url, {
@@ -485,6 +485,7 @@ module.exports.deleteImage = (req, res, next) => {
       }
     })
 }
+
 module.exports.addVolume = (req, res, next) => {
   let headers = req.headers
   let data = req.body
@@ -628,7 +629,32 @@ module.exports.changeMachineState = (req, res, next) => {
       }
     })
 }
-
+module.exports.associatePortToFloating = (req, res, next) => {
+  let address = req.headers['x-server-address']
+  let url = address + ':9696' + '/v2.0/floatingips/' + req.body['floatingip_id']
+  axios.put(url, {
+    "floatingip": {
+      "port_id": req.body['port_id']
+    }
+  }, {
+    headers: {
+      'X-Auth-Token': req.headers['x-token']
+    }
+  })
+    .then((resp) => {
+      console.log(resp)
+      res.send(resp.data);
+    })
+    .catch((err) => {
+      console.log(err)
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
 module.exports.createRule = (req, res, next) => {
   //console.log(req.headers)
   let address = req.headers['x-server-address']
@@ -682,35 +708,6 @@ module.exports.createFloating = (req, res, next) => {
       res.send(resp.data);
     })
     .catch((err) => {
-      if (err.response == undefined) {
-        res.status(400).send({ message: "ERRO ON NODE", data: err })
-      }
-      else {
-        res.status(err.response.status).send({ message: err.response.statusText })
-      }
-    })
-}
-module.exports.associatePortToFloating = (req, res, next) => {
-  //console.log(req.headers)
-  //console.log(req.body)
-
-  let address = req.headers['x-server-address']
-  let url = address + ':9696' + '/v2.0/floatingips/' + req.body['floatingip_id']
-  axios.put(url, {
-    "floatingip": {
-      "port_id": req.body['port_id']
-    }
-  }, {
-    headers: {
-      'X-Auth-Token': req.headers['x-token']
-    }
-  })
-    .then((resp) => {
-      console.log(resp)
-      res.send(resp.data);
-    })
-    .catch((err) => {
-      console.log(err)
       if (err.response == undefined) {
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }

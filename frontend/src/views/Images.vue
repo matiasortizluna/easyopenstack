@@ -192,7 +192,7 @@ export default {
   methods: {
     //http://192.168.56.102/image/v2/images/c0817e7a-8458-4b91-9c5d-d6e31f0ede83/import
     deleteImage(image) {
-      console.log(image);
+      //console.log(image);
       axios
         .delete("http://localhost:3000/api/images/" + image.id, {
           headers: {
@@ -207,9 +207,11 @@ export default {
           }, 2000);
         })
         .catch((error) => {
-          this.errorMessage = "Error in deleting Image.";
-          this.error = error.response.data.message;
           console.log(error);
+          this.errorMessage = "Error in deleting Image.";
+          this.errorMessage = error.response.status == 403 ? "You are not allowed to delete this image" : "Error in deleting Image."
+          //this.errorMessage = error.response.status == 403 ? "You are not allowed to delete this image" : error.response.statusText
+          
         });
     },
     getInfoImages() {
@@ -224,6 +226,7 @@ export default {
           this.images = response.data.images;
           this.message =
             this.images.length == 0 ? "There are no Images created." : "";
+          this.errorMessage = ""
         })
         .catch((error) => {
           this.errorMessage =
