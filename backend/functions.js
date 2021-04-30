@@ -383,35 +383,29 @@ module.exports.addVolume = (req, res, next) => {
 module.exports.createMachine = (req, res, next) => {
   let headers = req.headers
   let data = req.body
-  let sec_groups = data["X-Security-Groups"]
-  let networks = data['X-Networks']
-  //console.log(data['X-KeyPairs'])
-  axios.post(headers['x-server-address'] + '/compute/v2.1/servers', {
-    "server": {
+  let selectedSecGroups = [] 
+  let selectedNetworks = []
+  //Creating Secutiry Groups Array
+  data["X-Security-Groups"].forEach(secGroup => {
+      selectedSecGroups.push({"name": secGroup.name})
+  })
+  //CREATING NETWORKS ARRAY
+  data['X-Networks'].forEach(network => {
+      selectedNetworks.push({"uuid": network.id})
+  })
+  let server = {
       "name": data['X-Machine-Name'],
       "imageRef": data['X-Image'],
-      "flavorRef": "http://openstack.example.com/flavors/" + data['X-Flavor'],
-      "networks": [
-        //networks.forEach(network => {
-        //  { "uuid" : network.id }
-        //})
-        { "uuid": networks[0].id }, { "uuid": networks[1].id }
-      ],
+      "flavorRef": headers['x-server-address']+"/compute/v2/flavors/" + data['X-Flavor'],
+      "networks": selectedNetworks,
       "description": data['"X-Description"'],
-      "security_groups": [
-        {
-          "name": sec_groups[0].name
-        }
-      ],
-      "key_name": data['X-KeyPairs'],
-      "block_device_mapping_v2": [{
-        "uuid": data['X-Volume'],
-        "source_type": "volume",
-        "destination_type": "volume",
-        "boot_index": 0,
-        "volume_size": "1"
-      }],
-    },
+      "security_groups": selectedSecGroups,
+  }
+  if(data['X-KeyPairs'])
+    server.key_name = data['X-KeyPairs']
+
+  axios.post(headers['x-server-address'] + '/compute/v2.1/servers', {
+    server
   }, {
     headers: {
       'X-Auth-Token': headers['x-token']
@@ -422,6 +416,7 @@ module.exports.createMachine = (req, res, next) => {
       res.send(resp.data);
     })
     .catch((err) => {
+      console.log(err)
       if (err.response == undefined) {
         //console.log(err)
         res.status(400).send({ message: "ERRO ON NODE", data: err })
@@ -651,6 +646,7 @@ module.exports.createRule = (req, res, next) => {
 //---------------------------------------------------------------- HEAT ----------------------------------------------------
 module.exports.getHeatStacks = (req, res, next) => {
   let data = req.headers
+
   axios.post(data['x-server-address'] + "/compute/v2.1/os-keypairs", {
     "keypair": {
       "name": "heat_keypair"

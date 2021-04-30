@@ -28,7 +28,7 @@
         </p>
         <p>
           3. Check the portforwarding settings of your OpenStack Server so you
-          can connect from the outside
+          can connect from the outside (If needed)
         </p>
       </div>
 

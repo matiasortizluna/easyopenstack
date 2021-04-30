@@ -1,7 +1,7 @@
 <template>
   <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
     <div class="container mx-auto px-6 py-8">
-      <h3 class="text-gray-700 text-3xl font-medium">Deploy</h3>
+      <h3 class="text-gray-700 text-3xl font-medium">Deploy (Click on an image)</h3>
 
       <br />
 
@@ -180,23 +180,6 @@
                 <div class="form-group">
                   <div class="row">
                     <div class="col">
-                      <label>Select Storage</label><br />
-                      <select
-                        class="form-select"
-                        aria-label="Default select example"
-                        v-model="this.machineCreating.storage"
-                      >
-                        <option
-                          v-for="volume in volumes"
-                          v-bind:key="volume.name"
-                          v-bind:value="volume.id"
-                        >
-                          {{ volume.name == "" ? volume.id : volume.name }}
-                        </option>
-                      </select>
-                      <small id="emailHelp" class="form-text text-muted"
-                        >Storage associated to this machine</small
-                      >
                     </div>
 
                     <div class="col">
@@ -318,7 +301,6 @@ export default {
         description: "",
         image_file: "",
         flavor: "",
-        storage: [],
         key_pair: "",
         networks: [],
         security_groups: [],
@@ -332,7 +314,7 @@ export default {
   },
   methods: {
     toggleModal(image) {
-      console.log(this.machineCreating.project);
+      //console.log(this.machineCreating.project);
       this.machineCreating.image_file = image;
       this.message = "Waiting for verify information ... ";
       setTimeout(() => {
@@ -477,8 +459,6 @@ export default {
       return dateObject.toLocaleString();
     },
     deployMachine() {
-      console.log(this.networks);
-      console.log(this.machineCreating.networks);
       if (
         this.machineCreating.name &&
         this.machineCreating.image_file &&
@@ -497,7 +477,6 @@ export default {
               "X-Description": this.machineCreating.description,
               "X-Security-Groups": this.machineCreating.security_groups,
               "X-KeyPairs": this.machineCreating.key_pair,
-              "X-Volume": this.machineCreating.storage,
             },
             {
               headers: {
@@ -507,7 +486,6 @@ export default {
             }
           )
           .then((response) => {
-            //this.messageModal = "Machine Created Sucessfully!";
             this.machineCreating = {
               project: "",
               name: "",
@@ -525,6 +503,7 @@ export default {
             this.message = "Machine Created Sucessfully!";
           })
           .catch((error) => {
+            console.log(error)
             this.errorMessageModal = error.response.data.message;
           });
       } else {
