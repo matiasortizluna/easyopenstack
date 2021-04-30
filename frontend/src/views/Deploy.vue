@@ -180,8 +180,7 @@
                 <div class="form-group">
                   <div class="row">
                     <div class="col">
-                      <label for="exampleInputPassword1">Select Storage</label
-                      ><br />
+                      <label>Select Storage</label><br />
                       <select
                         class="form-select"
                         aria-label="Default select example"
@@ -201,19 +200,19 @@
                     </div>
 
                     <div class="col">
-                      <label for="exampleInputPassword1">Select Key Pair</label
-                      ><br />
+                      <label>Select Key Pair</label>
+                      <br />
                       <select
                         class="form-select"
-                        aria-label="Default select example"
+                        aria-label="KeyPair Selected"
                         v-model="this.machineCreating.key_pair"
                       >
                         <option
-                          v-for="keyPair in keyPairs"
-                          v-bind:key="keyPair.name"
-                          v-bind:value="keyPair.id"
+                          v-for="keyPair in this.keyPairs"
+                          v-bind:key="keyPair.keypair.name"
+                          v-bind:value="keyPair.keypair.name"
                         >
-                          {{ keyPair.name == "" ? keyPair.id : keyPair.name }}
+                          {{ keyPair.keypair.name }}
                         </option>
                       </select>
                       <small id="emailHelp" class="form-text text-muted"
@@ -228,37 +227,20 @@
                     <div class="form-group">
                       <label for="exampleInputPassword1">Select Network</label>
 
-                      <div class="form-check">
+                      <div
+                        v-for="network in networks"
+                        v-bind:key="network.id"
+                        class="form-check"
+                      >
                         <input
                           class="form-check-input"
                           type="checkbox"
-                          value=""
-                          id="flexCheckDefault"
+                          v-bind:value="network"
+                          v-model="this.machineCreating.networks"
+                          id="checkNetwork"
                         />
                         <label class="form-check-label" for="flexCheckDefault">
-                          Private
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          value=""
-                          id="flexCheckDefault"
-                        />
-                        <label class="form-check-label" for="flexCheckDefault">
-                          Shared
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          value=""
-                          id="flexCheckDefault"
-                        />
-                        <label class="form-check-label" for="flexCheckDefault">
-                          CPD Network 2.0
+                          {{ network.name }}
                         </label>
                       </div>
                     </div>
@@ -269,26 +251,20 @@
                         >Select Security Group</label
                       >
 
-                      <div class="form-check">
+                      <div
+                        v-for="security in this.securityGroups"
+                        v-bind:key="security.id"
+                        class="form-check"
+                      >
                         <input
                           class="form-check-input"
                           type="checkbox"
-                          value=""
-                          id="flexCheckDefault"
+                          v-bind:value="security"
+                          v-model="this.machineCreating.security_groups"
+                          id="checkSecurityGroup"
                         />
                         <label class="form-check-label" for="flexCheckDefault">
-                          Default
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          value=""
-                          id="flexCheckDefault"
-                        />
-                        <label class="form-check-label" for="flexCheckDefault">
-                          CPD Network 2.0
+                          {{ security.name }}
                         </label>
                       </div>
                     </div>
@@ -437,13 +413,11 @@ export default {
         .get("http://localhost:3000/api/security-groups", {
           headers: {
             "X-Token": this.$store.state.authToken,
-            "X-Server-Address":
-              this.$store.state.ip_address[0] + this.$store.state.ip_address[1],
-            "X-Server-Port": this.$store.state.ip_address[2],
+            "X-Server-Address": this.address,
           },
         })
         .then((response) => {
-          this.securityGroups = response.data["security-groups"];
+          this.securityGroups = response.data["security_groups"];
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
@@ -456,13 +430,11 @@ export default {
         .get("http://localhost:3000/api/keypairs", {
           headers: {
             "X-Token": this.$store.state.authToken,
-            "X-Server-Address":
-              this.$store.state.ip_address[0] + this.$store.state.ip_address[1],
-            "X-Server-Port": this.$store.state.ip_address[2],
+            "X-Server-Address": this.$store.state.url,
           },
         })
         .then((response) => {
-          this.keyPairs = response.data["keyPairs"];
+          this.keyPairs = response.data["keypairs"];
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
@@ -489,17 +461,11 @@ export default {
       this.getFlavors();
       this.getInfoVolumes();
       this.getNetworks();
-      //this.getSecurityGroups();
-      //this.getKeyPairs();
+      this.getSecurityGroups();
+      this.getKeyPairs();
       setTimeout(() => {
         this.message = "";
-        console.log(this.volumes);
-        console.log(this.flavors);
-        console.log(this.images);
-        //console.log(this.securityGroups);
-        //console.log(this.keyPairs);
-        console.log(this.networks);
-        this.machineCreating.networks = this.networks;
+        //this.machineCreating.networks = this.networks;
       }, 1000);
     },
     getInfoImages() {
@@ -528,8 +494,8 @@ export default {
       return dateObject.toLocaleString();
     },
     deployMachine() {
-      this.machineCreating.networks = this.networks;
-
+      console.log(this.networks);
+      console.log(this.machineCreating.networks);
       if (
         this.machineCreating.name &&
         this.machineCreating.image_file &&
@@ -545,6 +511,10 @@ export default {
               "X-Image": this.machineCreating.image_file.id,
               "X-Flavor": this.machineCreating.flavor,
               "X-Networks": this.machineCreating.networks,
+              "X-Description": this.machineCreating.description,
+              "X-Security-Groups": this.machineCreating.security_groups,
+              "X-KeyPairs": this.machineCreating.key_pair,
+              "X-Volume": this.machineCreating.storage,
             },
             {
               headers: {
@@ -573,7 +543,6 @@ export default {
           })
           .catch((error) => {
             this.errorMessageModal = error.response.data.message;
-            console.log(error);
           });
       } else {
         this.errorMessageModal = "All fields are required!";

@@ -69,13 +69,23 @@
                   Status: {{ machine.status }}
                 </div>
                 <br />
-                <button
-                  type="submit"
-                  class="btn btn-danger"
-                  @click="deleteMachine(machine)"
-                >
-                  Delete
-                </button>
+                <div>
+                  <button
+                    type="submit"
+                    class="btn btn-warning"
+                    @click="toggleModal(machine)"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="submit"
+                    class="btn btn-danger"
+                    @click="deleteMachine(machine)"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -109,7 +119,7 @@
               </div>
               <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">
-                  A new machine will be born :)
+                  An old machine will be changed :(
                 </h5>
                 <button
                   type="button"
@@ -131,8 +141,8 @@
                           class="form-control"
                           id="exampleInputEmail1"
                           aria-describedby="emailHelp"
-                          v-bind:placeholder="machineCreating.project"
-                          v-bind:value="this.machineCreating.project"
+                          v-bind:placeholder="machineEditing.project"
+                          v-bind:value="this.machineEditing.project"
                           disabled
                         />
                         <small id="emailHelp" class="form-text text-muted"
@@ -147,7 +157,7 @@
                           id="exampleInputName"
                           aria-describedby="nameHelp"
                           placeholder="Tony Stark's Machine"
-                          v-model="this.machineCreating.name"
+                          v-model="this.machineEditing.name"
                         />
                         <small id="emailHelp" class="form-text text-muted"
                           >Name associated to this machine</small
@@ -164,7 +174,7 @@
                       id="exampleFormControlTextarea1"
                       rows="2"
                       placeholder="Write ..."
-                      v-model="this.machineCreating.description"
+                      v-model="this.machineEditing.description"
                     ></textarea>
                   </div>
                   <div class="form-group">
@@ -176,9 +186,9 @@
                           class="form-control"
                           id="exampleInputImage"
                           aria-describedby="imageHelp"
-                          v-bind:placeholder="machineCreating.image_file"
+                          v-bind:placeholder="machineEditing.image_file"
                           disabled
-                          v-model="this.machineCreating.image_file.name"
+                          v-model="this.machineEditing.image_file.name"
                         />
                         <small id="emailHelp" class="form-text text-muted"
                           >Image associated to this machine</small
@@ -190,14 +200,14 @@
                         <select
                           class="form-select"
                           aria-label="Default select example"
-                          v-model="this.machineCreating.flavor"
+                          v-model="this.machineEditing.flavor"
                         >
                           <option
                             v-for="flavor in flavors"
                             v-bind:key="flavor.name"
                             v-bind:value="flavor.id"
                           >
-                            {{ flavor.name }}
+                            {{ this.machineEditing.flavor }}
                           </option>
                         </select>
                         <small id="emailHelp" class="form-text text-muted"
@@ -209,12 +219,11 @@
                   <div class="form-group">
                     <div class="row">
                       <div class="col">
-                        <label for="exampleInputPassword1">Select Storage</label
-                        ><br />
+                        <label>Select Storage</label><br />
                         <select
                           class="form-select"
                           aria-label="Default select example"
-                          v-model="this.machineCreating.storage"
+                          v-model="this.machineEditing.storage"
                         >
                           <option
                             v-for="volume in volumes"
@@ -230,20 +239,19 @@
                       </div>
 
                       <div class="col">
-                        <label for="exampleInputPassword1"
-                          >Select Key Pair</label
-                        ><br />
+                        <label>Select Key Pair</label>
+                        <br />
                         <select
                           class="form-select"
-                          aria-label="Default select example"
-                          v-model="this.machineCreating.key_pair"
+                          aria-label="KeyPair Selected"
+                          v-model="this.machineEditing.key_pair"
                         >
                           <option
-                            v-for="keyPair in keyPairs"
-                            v-bind:key="keyPair.name"
-                            v-bind:value="keyPair.id"
+                            v-for="keyPair in this.keyPairs"
+                            v-bind:key="keyPair.keypair.name"
+                            v-bind:value="keyPair.keypair.name"
                           >
-                            {{ keyPair.name == "" ? keyPair.id : keyPair.name }}
+                            {{ keyPair.keypair.name }}
                           </option>
                         </select>
                         <small id="emailHelp" class="form-text text-muted"
@@ -260,46 +268,23 @@
                           >Select Network</label
                         >
 
-                        <div class="form-check">
+                        <div
+                          v-for="network in networks"
+                          v-bind:key="network.id"
+                          class="form-check"
+                        >
                           <input
                             class="form-check-input"
                             type="checkbox"
-                            value=""
-                            id="flexCheckDefault"
+                            v-bind:value="network"
+                            v-model="this.machineEditing.networks"
+                            id="checkNetwork"
                           />
                           <label
                             class="form-check-label"
                             for="flexCheckDefault"
                           >
-                            Private
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            value=""
-                            id="flexCheckDefault"
-                          />
-                          <label
-                            class="form-check-label"
-                            for="flexCheckDefault"
-                          >
-                            Shared
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            value=""
-                            id="flexCheckDefault"
-                          />
-                          <label
-                            class="form-check-label"
-                            for="flexCheckDefault"
-                          >
-                            CPD Network 2.0
+                            {{ network.name }}
                           </label>
                         </div>
                       </div>
@@ -310,32 +295,23 @@
                           >Select Security Group</label
                         >
 
-                        <div class="form-check">
+                        <div
+                          v-for="security in this.securityGroups"
+                          v-bind:key="security.id"
+                          class="form-check"
+                        >
                           <input
                             class="form-check-input"
                             type="checkbox"
-                            value=""
-                            id="flexCheckDefault"
+                            v-bind:value="security"
+                            v-model="this.machineEditing.security_groups"
+                            id="checkSecurityGroup"
                           />
                           <label
                             class="form-check-label"
                             for="flexCheckDefault"
                           >
-                            Default
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            value=""
-                            id="flexCheckDefault"
-                          />
-                          <label
-                            class="form-check-label"
-                            for="flexCheckDefault"
-                          >
-                            CPD Network 2.0
+                            {{ security.name }}
                           </label>
                         </div>
                       </div>
@@ -351,12 +327,13 @@
                 >
                   Close
                 </button>
+                <br />
                 <button
                   type="submit"
-                  class="btn btn-primary"
-                  @click="deployMachine()"
+                  class="btn btn-success"
+                  @click="editMachine(machine)"
                 >
-                  Deploy
+                  Save Changes
                 </button>
               </div>
             </div>
@@ -374,8 +351,12 @@ export default {
     return {
       serverPNG: server,
       machines: [],
-      errorMessage: "",
-      message: "Loading...",
+      flavors: [],
+      volumes: [],
+      images: [],
+      securityGroups: [],
+      keyPairs: [],
+      networks: [],
       powerStates: {
         0: "NOSTATE",
         1: "RUNNING",
@@ -384,9 +365,118 @@ export default {
         6: "CRASHED",
         7: "SUSPENDED",
       },
+      errorMessage: "",
+      message: "Loading...",
+      errorMessageModal: "",
+      messageModal: "",
+      address: "",
+      machineEditing: {
+        project: "",
+        name: "",
+        description: "",
+        image_file: "",
+        flavor: "",
+        storage: [],
+        key_pair: "",
+        networks: [],
+        security_groups: [],
+      },
     };
   },
   methods: {
+    getForEditing(machine) {
+      (this.machineEditing.project = ""),
+        (this.machineEditing.name = machine.name),
+        //this.machineEditing.description = machine.description,
+        (this.machineEditing.image_file = machine.image),
+        (this.machineEditing.flavor = machine.flavor),
+        (this.machineEditing.storage =
+          machine["os-extended-volumes:volumes_attached"]),
+        (this.machineEditing.key_pair = machine.key_name);
+      //this.machineEditing.networks = machine.networks
+      //this.machineEditing.security_groups = machine.security_groups
+
+      this.getFlavors();
+      this.getInfoVolumes();
+      this.getNetworks();
+      this.getSecurityGroups();
+      this.getKeyPairs();
+      setTimeout(() => {
+        this.message = "";
+        console.log(this.flavors);
+        console.log(this.volumes);
+        console.log(this.networks);
+        console.log(this.securityGroups);
+        console.log(this.keyPairs);
+        //  this.machineCreating.networks = this.networks;
+      }, 1000);
+    },
+    toggleModal(machine) {
+      //console.log(this.machineEditing.project);
+      //this.machineEditing.image_file = image;
+      this.message = "Waiting for verify information ... ";
+      console.log(machine);
+      this.getForEditing(machine);
+      console.log(this.machineEditing);
+      console.log(this.machineEditing);
+      setTimeout(() => {
+        //this.getForDeploy();
+        if (this.errorMessage == "" && this.errorMessageModal == "") {
+          //this.messageModal = "";
+          //this.errorMessageModal = "";
+          //this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
+          $("#modalCreate").modal("toggle");
+        }
+      }, 1000);
+    },
+    editMachine(machine) {
+      console.log("MAC" + this.machineEditing.storage);
+      console.log("KEY" + this.volumes);
+
+      this.errorMessageModal = "";
+      this.messageModal = "Creating machine ...";
+      axios
+        .post(
+          "http://localhost:3000/api/instances",
+          {
+            "X-Machine-Name": this.machineEditing.name,
+            "X-Image": this.machineEditing.image_file.id,
+            "X-Flavor": this.machineEditing.flavor,
+            "X-Networks": this.machineEditing.networks,
+            "X-Description": this.machineEditing.description,
+            "X-Security-Groups": this.machineEditing.security_groups,
+            "X-KeyPairs": this.machineEditing.key_pair,
+            "X-Volume": this.machineEditing.storage,
+          },
+          {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.$store.state.url,
+            },
+          }
+        )
+        .then((response) => {
+          //this.messageModal = "Machine  Sucessfully!";
+          this.machineEditing = {
+            project: "",
+            name: "",
+            description: "",
+            image_file: "",
+            flavor: "",
+            storage: [],
+            key_pair: "",
+            networks: [],
+            security_groups: [],
+          };
+          setTimeout(() => {
+            this.toggleModal();
+          }, 500);
+          this.message = "Machine Changed Sucessfully!";
+        })
+        .catch((error) => {
+          this.errorMessageModal = error.response.data.message;
+        });
+    },
     deleteMachine(machine) {
       console.log(machine);
       axios
@@ -468,9 +558,117 @@ export default {
           (error) => (machine.image.name = "Error while getting flavor name")
         );
     },
+    getFlavors() {
+      axios
+        .get("http://localhost:3000/api/flavors/detail", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+          },
+        })
+        .then((response) => {
+          this.flavors = response.data.flavors;
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Flavors";
+        });
+    },
+    getInfoVolumes() {
+      axios
+        .get("http://localhost:3000/api/volumes/detail", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "X-Project-Id": this.$store.state.selectedProject,
+          },
+        })
+        .then((response) => {
+          this.volumes = response.data.volumes.reverse();
+          this.message =
+            this.volumes.length == 0 ? "There are no Volumes created." : "";
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Volumes";
+        });
+    },
+    getSecurityGroups() {
+      axios
+        .get("http://localhost:3000/api/security-groups", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.address,
+          },
+        })
+        .then((response) => {
+          this.securityGroups = response.data["security_groups"];
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage =
+            "Error in Getting information about Security-Groups";
+        });
+    },
+    getKeyPairs() {
+      axios
+        .get("http://localhost:3000/api/keypairs", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+          },
+        })
+        .then((response) => {
+          this.keyPairs = response.data["keypairs"];
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Key Pairs";
+        });
+    },
+    getNetworks() {
+      axios
+        .get("http://localhost:3000/api/networks", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.address,
+          },
+        })
+        .then((response) => {
+          this.networks = response.data["networks"];
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Networks";
+        });
+    },
+    getInfoImages() {
+      axios
+        .get("http://localhost:3000/api/images", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+            "X-Project-Id": this.$store.state.selectedProject,
+          },
+        })
+        .then((response) => {
+          response.data.images.forEach((element) => {
+            this.images.push(element);
+          });
+          this.message =
+            this.images.length == 0 ? "There are no Images created." : "";
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Images";
+        });
+    },
   },
   mounted() {
     this.getInfoMachines();
+    var ip_address = this.$store.state.url.split(":");
+    this.address = ip_address[0] + ":" + ip_address[1];
+    this.machineEditing.project = this.$store.state.selectedProjectName;
   },
 };
 </script>

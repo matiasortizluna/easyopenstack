@@ -105,7 +105,6 @@ module.exports.getProjects = (req, res, next) => {
         res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
     })
 }
-
 module.exports.getInstances = (req, res, next) => {
 
   let data = req.headers
@@ -173,15 +172,20 @@ module.exports.getVolumesWithDetail = (req, res, next) => {
 }
 module.exports.getSecurityGroups = (req, res, next) => {
   let data = req.headers
-  axios.get(data['x-server-address'] + ':9696' + '/v2/security-groups', {
+  console.log(req.headers)
+  let address = req.headers['x-server-address']
+  let url = address + ':9696' + '/v2.0/security-groups'
+  axios.get(url, {
     headers: {
-      'X-Auth-Token': data['x-token']
+      'X-Auth-Token': req.headers['x-token']
     }
   })
-    .then((resp) => res.send(resp.data))
+    .then((resp) => { res.send(resp.data); })
+
     .catch((err) => {
+
       if (err.response == undefined) {
-        res.status(400).send({ message: "ERRO ON NODE" })
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
         res.status(err.response.status).send({ message: err.response.statusText })
@@ -258,16 +262,16 @@ module.exports.getFlavorsDetail = (req, res, next) => {
     })
 }
 module.exports.getKeyPairs = (req, res, next) => {
-  let data = req.headers
-  axios.get(data['x-server-address'] + ':9696' + '/v2/os-keypairs', {
+  let headers = req.headers
+  axios.get(headers['x-server-address'] + "/compute/v2.1/os-keypairs", {
     headers: {
-      'X-Auth-Token': data['x-token']
+      'X-Auth-Token': headers['x-token']
     }
   })
-    .then((resp) => res.send(resp.data))
+    .then((resp) => { res.send(resp.data); })
     .catch((err) => {
       if (err.response == undefined) {
-        res.status(400).send({ message: "ERRO ON NODE" })
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
         res.status(err.response.status).send({ message: err.response.statusText })
@@ -284,11 +288,11 @@ module.exports.getNetworks = (req, res, next) => {
     }
   })
     .then((resp) => {
-      console.log(resp)
+
       res.send(resp.data);
     })
     .catch((err) => {
-      console.log(err)
+
       if (err.response == undefined) {
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
@@ -297,7 +301,6 @@ module.exports.getNetworks = (req, res, next) => {
       }
     })
 }
-
 module.exports.addImage = (req, res, next) => {
   let headers = req.headers
   let data = req.body
@@ -380,32 +383,52 @@ module.exports.addVolume = (req, res, next) => {
 module.exports.createMachine = (req, res, next) => {
   let headers = req.headers
   let data = req.body
-  console.log(req)
+  let sec_groups = data["X-Security-Groups"]
+  let networks = data['X-Networks']
+  console.log(data['X-KeyPairs'])
   axios.post(headers['x-server-address'] + '/compute/v2.1/servers', {
     "server": {
       "name": data['X-Machine-Name'],
       "imageRef": data['X-Image'],
       "flavorRef": "http://openstack.example.com/flavors/" + data['X-Flavor'],
-      "networks": [{ "uuid": data['X-Networks'][0].id }]
+      "networks": [
+        //networks.forEach(network => {
+        //  { "uuid" : network.id }
+        //})
+        { "uuid": networks[0].id }, { "uuid": networks[1].id }
+      ],
+      "description": data['"X-Description"'],
+      "security_groups": [
+        {
+          "name": sec_groups[0].name
+        }
+      ],
+      "key_name": data['X-KeyPairs'],
+      "block_device_mapping_v2": [{
+        "uuid": data['X-Volume'],
+        "source_type": "volume",
+        "destination_type": "volume",
+        "boot_index": 0,
+        "volume_size": "1"
+      }],
     },
   }, {
     headers: {
       'X-Auth-Token': headers['x-token']
     }
   })
-    .then((resp) => { console.log(resp); res.send(resp.data); })
+    .then((resp) => { console.log(resp.data); res.send(resp.data); })
     .catch((err) => {
       if (err.response == undefined) {
         console.log(err)
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
-        console.log(err)
-        res.status(err.response.status).send({ message: err.response.statusText })
+        //console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText, data: err })
       }
     })
 }
-
 module.exports.deleteMachine = (req, res, next) => {
   let headers = req.headers
   console.log(headers)
@@ -426,7 +449,6 @@ module.exports.deleteMachine = (req, res, next) => {
       }
     })
 }
-
 module.exports.deleteImage = (req, res, next) => {
   let headers = req.headers
   console.log(headers)
@@ -447,7 +469,6 @@ module.exports.deleteImage = (req, res, next) => {
       }
     })
 }
-
 module.exports.deleteVolume = (req, res, next) => {
   let headers = req.headers
   console.log(headers)
@@ -468,6 +489,94 @@ module.exports.deleteVolume = (req, res, next) => {
       }
     })
 }
+module.exports.getFloatings = (req, res, next) => {
+  console.log(req.headers)
+  let address = req.headers['x-server-address']
+  let url = address + ':9696' + '/v2.0/floatingips'
+  axios.get(url, {
+    headers: {
+      'X-Auth-Token': req.headers['x-token']
+    }
+  })
+    .then((resp) => {
+      console.log(resp)
+      res.send(resp.data);
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+module.exports.getPorts = (req, res, next) => {
+  console.log(req.headers)
+  let address = req.headers['x-server-address']
+  let url = address + ':9696' + '/v2.0/ports'
+  axios.get(url, {
+    headers: {
+      'X-Auth-Token': req.headers['x-token']
+    }
+  })
+    .then((resp) => {
+      console.log(resp)
+      res.send(resp.data);
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+module.exports.getInstanceDetails = (req, res, next) => {
+  let data = req.headers
+  axios.get(data['x-server-address'] + '/compute/v2.1/servers/' + req.params.instanceId, {
+    headers: {
+      'X-Auth-Token': data['x-token']
+    }
+  })
+    .then((resp) => res.send(resp.data))
+    .catch((err) => {
+      if (err.response == undefined)
+        res.status(400).send({ message: "ERRO ON NODE" })
+      else
+        res.status(err.response.data.error.code).send({ message: err.response.data.error.message })
+    })
+}
+module.exports.associatePortToFloating = (req, res, next) => {
+  console.log(req.headers)
+  console.log(req.body)
+  let address = req.headers['x-server-address']
+  let url = address + ':9696' + '/v2.0/floatingips/' + req.body['floatingip_id']
+  axios.put(url, {
+    "floatingip": {
+      "port_id": req.body['port_id']
+    }
+  }, {
+    headers: {
+      'X-Auth-Token': req.headers['x-token']
+    }
+  })
+    .then((resp) => {
+      console.log(resp)
+      res.send(resp.data);
+    })
+    .catch((err) => {
+      console.log(err)
+      if (err.response == undefined) {
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
+
 
 //---------------------------------------------------------------- HEAT ----------------------------------------------------
 module.exports.getHeatStacks = (req, res, next) => {
