@@ -91,7 +91,7 @@
                       :class="machine.status == 'SHUTOFF' ? 'btn btn-success' : 'btn btn-danger'"
                       @click="changeMachineState(machine)"
                     >
-                      {{ machine.status == 'SHUTOFF' ? 'Start' : 'Stop' }}
+                      {{ machine.status == 'SHUTOFF' ? 'Start' : machine.status == 'ACTIVE' ? 'Stop' : 'Wait' }}
                     </button>
                   </div>
                 </div>
@@ -708,7 +708,7 @@ export default {
         body = {
           'os-start': null
         }
-      }else{
+      }else if(machine.status == "ACTIVE"){
         body = {
           'os-stop': null
         }

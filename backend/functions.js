@@ -490,7 +490,7 @@ module.exports.deleteImage = (req, res, next) => {
         res.status(400).send({ message: "ERRO ON NODE", data: err })
       }
       else {
-        //console.log(err)
+        //console.log(err.response)
         res.status(err.response.status).send({ message: err.response.statusText })
       }
     })
