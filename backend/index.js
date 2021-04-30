@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Methods", "*")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Token, X-Server-Address, x-project-id, X-Old-Token, X-New-Project-Id, X-Server-Port, X-Machine-Name, X-Image, X-Flavor, X-Networks")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Token, X-Server-Address, x-project-id, X-Old-Token, X-New-Project-Id, X-Server-Port, X-Machine-Name, X-Image, X-Flavor, X-Networks,X-Server-Id")
   next()
 })
 
@@ -47,6 +47,8 @@ app.get('/api/instances/:instanceId/detail', importedFunctions.getInstanceDetail
 app.put('/api/floating/port', importedFunctions.associatePortToFloating)
 app.get('/api/security-groups/rules', importedFunctions.getRules)
 app.post('/api/security-groups/rules', importedFunctions.createRule)
+app.post('/api/floating', importedFunctions.createFloating)
+app.get('/api/ports/machine', importedFunctions.getPortsFromMachine)
 //HEAT
 app.get('/api/heat/stacks', importedFunctions.getHeatStacks)
 app.post('/api/heat/stacks', importedFunctions.createStack)

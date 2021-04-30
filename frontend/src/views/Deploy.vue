@@ -1,7 +1,9 @@
 <template>
   <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
     <div class="container mx-auto px-6 py-8">
-      <h3 class="text-gray-700 text-3xl font-medium">Deploy (Click on an image)</h3>
+      <h3 class="text-gray-700 text-3xl font-medium">
+        Deploy (Click on an image)
+      </h3>
 
       <br />
 
@@ -145,12 +147,10 @@
                       <input
                         type="text"
                         class="form-control"
-                        id="exampleInputImage"
-                        aria-describedby="imageHelp"
-                        v-bind:placeholder="machineCreating.image_file"
+                        v-bind:placeholder="machineCreating.image_file.name"
                         disabled
-                        v-model="this.machineCreating.image_file.name"
                       />
+
                       <small id="emailHelp" class="form-text text-muted"
                         >Image associated to this machine</small
                       >
@@ -179,8 +179,7 @@
                 </div>
                 <div class="form-group">
                   <div class="row">
-                    <div class="col">
-                    </div>
+                    <div class="col"></div>
 
                     <div class="col">
                       <label>Select Key Pair</label>
@@ -221,8 +220,13 @@
                           v-bind:value="network"
                           v-model="this.machineCreating.networks"
                           id="checkNetwork"
+                          v-if="network.name != 'public'"
                         />
-                        <label class="form-check-label" for="flexCheckDefault">
+                        <label
+                          class="form-check-label"
+                          for="flexCheckDefault"
+                          v-if="network.name != 'public'"
+                        >
                           {{ network.name }}
                         </label>
                       </div>
@@ -299,13 +303,12 @@ export default {
         project: "",
         name: "",
         description: "",
-        image_file: { name: ""},
+        image_file: { name: "" },
         flavor: "",
         key_pair: "",
         networks: [],
         security_groups: [],
       },
-      images: [],
       errorMessage: "",
       message: "Loading...",
       errorMessageModal: "",
@@ -316,6 +319,7 @@ export default {
     toggleModal(image) {
       //console.log(this.machineCreating.project);
       this.machineCreating.image_file = image;
+      console.log(image);
       this.message = "Waiting for verify information ... ";
       setTimeout(() => {
         this.getForDeploy();
@@ -412,13 +416,17 @@ export default {
         });
     },
     getForDeploy() {
+      this.for_MachineFloatingip = {};
       this.getFlavors();
       this.getInfoVolumes();
       this.getNetworks();
       this.getSecurityGroups();
       this.getKeyPairs();
+      this.getInfoImages();
+      console.log(this.images);
       setTimeout(() => {
         this.message = "";
+        console.log(this.images);
         //this.machineCreating.networks = this.networks;
       }, 1000);
     },
@@ -462,8 +470,9 @@ export default {
       if (
         this.machineCreating.name &&
         this.machineCreating.image_file &&
-        this.machineCreating.flavor && this.machineCreating.networks.length
-        && this.machineCreating.security_groups.length
+        this.machineCreating.flavor &&
+        this.machineCreating.networks.length &&
+        this.machineCreating.security_groups.length
       ) {
         this.errorMessageModal = "";
         this.messageModal = "Creating machine ...";
@@ -487,24 +496,13 @@ export default {
             }
           )
           .then((response) => {
-            this.machineCreating = {
-              project: "",
-              name: "",
-              description: "",
-              image_file: {name: ""},
-              flavor: "",
-              storage: [],
-              key_pair: "",
-              networks: [],
-              security_groups: [],
-            };
             setTimeout(() => {
               this.toggleModal();
-            }, 500);
+            }, 1000);
             this.message = "Machine Created Sucessfully!";
           })
           .catch((error) => {
-            console.log(error)
+            console.log(error);
             this.errorMessageModal = error.response.data.message;
           });
       } else {
