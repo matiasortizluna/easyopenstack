@@ -450,6 +450,28 @@ module.exports.deleteMachine = (req, res, next) => {
       }
     })
 }
+module.exports.changeMachineState = (req, res, next) => {
+  let headers = req.headers
+  axios.post(headers['x-server-address'] + '/compute/v2.1/servers/' + req.params.machineId+'/action', req.body, {
+    headers: {
+      'X-Auth-Token': headers['x-token']
+    }
+  })
+    .then((resp) => {
+      //console.log(resp.data);
+      res.status(resp.status).send(resp.data);
+    })
+    .catch((err) => {
+      if (err.response == undefined) {
+        //console.log(err)
+        res.status(400).send({ message: "ERRO ON NODE", data: err })
+      }
+      else {
+        //console.log(err)
+        res.status(err.response.status).send({ message: err.response.statusText })
+      }
+    })
+}
 module.exports.deleteImage = (req, res, next) => {
   let headers = req.headers
   //console.log(headers)

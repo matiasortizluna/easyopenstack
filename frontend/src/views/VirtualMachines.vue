@@ -67,22 +67,31 @@
                 </div>
                 <br />
                 <div class="row">
-                  <div class="col">
+                  <div class="col-md-4">
                     <button
-                      type="submit"
+                      type="button"
                       class="btn btn-warning"
                       @click="toggleModal(machine)"
                     >
                       Edit
                     </button>
                   </div>
-                  <div class="col">
+                  <div class="col-md-4">
                     <button
-                      type="submit"
+                      type="button"
                       class="btn btn-danger"
                       @click="deleteMachine(machine)"
                     >
                       Delete
+                    </button>
+                  </div>
+                  <div class="col-md-4">
+                    <button
+                      type="button"
+                      :class="machine.status == 'SHUTOFF' ? 'btn btn-success' : 'btn btn-danger'"
+                      @click="changeMachineState(machine)"
+                    >
+                      {{ machine.status == 'SHUTOFF' ? 'Start' : 'Stop' }}
                     </button>
                   </div>
                 </div>
@@ -547,6 +556,7 @@ export default {
         );
     },
     getInfoMachines() {
+      this.message = ""
       axios
         .get("http://localhost:3000/api/instances/detail", {
           headers: {
@@ -692,6 +702,29 @@ export default {
           this.errorMessage = "Error in Getting information about Images";
         });
     },
+    changeMachineState(machine){
+      let body = {}
+      if(machine.status == "SHUTOFF"){
+        body = {
+          'os-start': null
+        }
+      }else{
+        body = {
+          'os-stop': null
+        }
+      }
+      axios.post("http://localhost:3000/api/instances/"+machine.id, body, {
+        headers: {
+          "X-Token": this.$store.state.authToken,
+          "X-Server-Address": this.$store.state.url
+        }
+      })
+      .then((response) => {
+        this.message = "Changing machine state..."
+        setTimeout(this.getInfoMachines, 4000)
+        })
+      .catch((err) => console.log(err.response))   
+    }
   },
   mounted() {
     this.getInfoMachines();
