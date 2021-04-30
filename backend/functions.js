@@ -399,6 +399,7 @@ module.exports.createMachine = (req, res, next) => {
       "flavorRef": headers['x-server-address']+"/compute/v2/flavors/" + data['X-Flavor'],
       "networks": selectedNetworks,
       "description": data['"X-Description"'],
+<<<<<<< Updated upstream
       "security_groups": selectedSecGroups,
   }
   if(data['X-KeyPairs'])
@@ -406,6 +407,21 @@ module.exports.createMachine = (req, res, next) => {
 
   axios.post(headers['x-server-address'] + '/compute/v2.1/servers', {
     server
+=======
+      "security_groups": [
+        {
+          "name": sec_groups[0].name
+        }
+      ],
+      "key_name": data['X-KeyPairs'],
+      "block_device_mapping_v2": [{
+        "uuid": data['X-Volume'],
+        "source_type": "volume",
+        "destination_type": "volume",
+        "boot_index": 0,
+      }],
+    },
+>>>>>>> Stashed changes
   }, {
     headers: {
       'X-Auth-Token': headers['x-token']
