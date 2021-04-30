@@ -383,45 +383,29 @@ module.exports.addVolume = (req, res, next) => {
 module.exports.createMachine = (req, res, next) => {
   let headers = req.headers
   let data = req.body
-  let selectedSecGroups = [] 
+  let selectedSecGroups = []
   let selectedNetworks = []
   //Creating Secutiry Groups Array
   data["X-Security-Groups"].forEach(secGroup => {
-      selectedSecGroups.push({"name": secGroup.name})
+    selectedSecGroups.push({ "name": secGroup.name })
   })
   //CREATING NETWORKS ARRAY
   data['X-Networks'].forEach(network => {
-      selectedNetworks.push({"uuid": network.id})
+    selectedNetworks.push({ "uuid": network.id })
   })
   let server = {
-      "name": data['X-Machine-Name'],
-      "imageRef": data['X-Image'],
-      "flavorRef": headers['x-server-address']+"/compute/v2/flavors/" + data['X-Flavor'],
-      "networks": selectedNetworks,
-      "description": data['"X-Description"'],
-<<<<<<< Updated upstream
-      "security_groups": selectedSecGroups,
+    "name": data['X-Machine-Name'],
+    "imageRef": data['X-Image'],
+    "flavorRef": headers['x-server-address'] + "/compute/v2/flavors/" + data['X-Flavor'],
+    "networks": selectedNetworks,
+    "description": data['"X-Description"'],
+    "security_groups": selectedSecGroups,
   }
-  if(data['X-KeyPairs'])
+  if (data['X-KeyPairs'])
     server.key_name = data['X-KeyPairs']
 
   axios.post(headers['x-server-address'] + '/compute/v2.1/servers', {
     server
-=======
-      "security_groups": [
-        {
-          "name": sec_groups[0].name
-        }
-      ],
-      "key_name": data['X-KeyPairs'],
-      "block_device_mapping_v2": [{
-        "uuid": data['X-Volume'],
-        "source_type": "volume",
-        "destination_type": "volume",
-        "boot_index": 0,
-      }],
-    },
->>>>>>> Stashed changes
   }, {
     headers: {
       'X-Auth-Token': headers['x-token']
@@ -468,7 +452,7 @@ module.exports.deleteMachine = (req, res, next) => {
 }
 module.exports.changeMachineState = (req, res, next) => {
   let headers = req.headers
-  axios.post(headers['x-server-address'] + '/compute/v2.1/servers/' + req.params.machineId+'/action', req.body, {
+  axios.post(headers['x-server-address'] + '/compute/v2.1/servers/' + req.params.machineId + '/action', req.body, {
     headers: {
       'X-Auth-Token': headers['x-token']
     }
