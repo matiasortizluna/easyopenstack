@@ -50,17 +50,14 @@
                   <strong>Updated at: </strong>{{ formatDate(machine.updated) }}
                 </p>
                 <p class="text-gray-700 font-weight-bold">IPs</p>
-                <p
-                  v-for="ip in machine.addresses.private"
-                  :key="ip"
-                  :class="
-                    ip['OS-EXT-IPS:type'] != 'floating'
-                      ? 'text-gray-700'
-                      : 'text-red-700 font-weight-bold'
-                  "
+                <div
+                  v-for="network, networkName in machine.addresses"
+                  :key="network"
                 >
-                  {{ ip.addr }};
-                </p>
+                  <p v-for="address in network" :key="address.addr" :class="address['OS-EXT-IPS:type'] != 'floating' ? 'text-gray-700': 'text-red-700 font-weight-bold'">
+                    &nbsp;&nbsp;<strong>{{ networkName }}</strong> {{address.addr}}
+                  </p>
+                </div>
                 <p class="text-gray-700">
                   <strong>Power state: </strong
                   >{{ powerStates[machine["OS-EXT-STS:power_state"]] }}

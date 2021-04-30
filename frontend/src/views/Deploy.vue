@@ -299,7 +299,7 @@ export default {
         project: "",
         name: "",
         description: "",
-        image_file: "",
+        image_file: { name: ""},
         flavor: "",
         key_pair: "",
         networks: [],
@@ -462,7 +462,8 @@ export default {
       if (
         this.machineCreating.name &&
         this.machineCreating.image_file &&
-        this.machineCreating.flavor
+        this.machineCreating.flavor && this.machineCreating.networks.length
+        && this.machineCreating.security_groups.length
       ) {
         this.errorMessageModal = "";
         this.messageModal = "Creating machine ...";
@@ -490,7 +491,7 @@ export default {
               project: "",
               name: "",
               description: "",
-              image_file: "",
+              image_file: {name: ""},
               flavor: "",
               storage: [],
               key_pair: "",
