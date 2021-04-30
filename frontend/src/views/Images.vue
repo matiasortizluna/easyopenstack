@@ -201,19 +201,13 @@ export default {
           },
         })
         .then((response) => {
-          console.log("RESPONSE" + response);
-          let imageDeleted = image;
-          let index = this.images.indexOf(imageDeleted);
-          console.log(index + this.images);
-          if (index > -1) {
-            this.images.splice(index, 1);
-            if (this.images.length == 0) {
-              this.message = "There are no Images  created.";
-            }
-          }
-          console.log(index + this.images);
+          this.message = "Image Deleted Successfully!";
+          setTimeout(() => {
+            this.getInfoImages();
+          }, 2000);
         })
         .catch((error) => {
+          this.errorMessage = "Error in deleting Image.";
           this.error = error.response.data.message;
           console.log(error);
         });
@@ -232,6 +226,8 @@ export default {
             this.images.length == 0 ? "There are no Images created." : "";
         })
         .catch((error) => {
+          this.errorMessage =
+            "Error in Getting information about Images, try again.";
           this.errorMessage = error.response.data.message;
           console.log(error);
         });
@@ -260,9 +256,11 @@ export default {
             }
           )
           .then((response) => {
-            this.message = "Image created!";
-            this.getInfoImages();
             this.toggleModal();
+            this.message = "Image created Successfully!";
+            setTimeout(() => {
+              this.getInfoImages();
+            }, 2000);
           })
           .catch((error) => {
             this.messageModal = "";

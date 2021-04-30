@@ -504,6 +504,7 @@ export default {
           .catch((error) => {
             console.log(error);
             this.errorMessageModal = error.response.data.message;
+            this.errorMessage = "Error in creating Machine";
           });
       } else {
         this.errorMessageModal = "All fields are required!";

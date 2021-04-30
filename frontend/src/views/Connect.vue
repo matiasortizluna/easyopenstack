@@ -5,7 +5,7 @@
         <h3 class="text-gray-700 text-3xl font-medium">Connect</h3>
         <div class="col">
           <button class="btn btn-info" @click="toggleModal()">
-            Add Floating IPs<i class="far fa-plus-square"></i>
+            Important Information <i class="far fa-plus-square"></i>
           </button>
           &nbsp;&nbsp;&nbsp;
           <button class="btn btn-warning" @click="toggleModalRules()">
@@ -305,8 +305,9 @@
               </div>
               <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">
-                  Create new IP Floting Points
+                  Information
                 </h5>
+
                 <button
                   type="button"
                   class="close"
@@ -316,7 +317,23 @@
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-
+              <div class="modal-body">
+                <p>
+                  1. Funcionality still in process, try to create one from the
+                  section of the Virtual Machines
+                </p>
+                <br />
+                <p>
+                  2. We are also working on the delete funcionalities, for now,
+                  do it from the Horizon platform.
+                </p>
+                <br />
+                <p>
+                  WARNING: Please, in order to work properly, associate the
+                  Floating IPs to the options where there the NAME OF THE
+                  MACHINE. Otherwise, there is a big change, it won't work.
+                </p>
+              </div>
               <div class="modal-footer">
                 <button
                   type="button"
@@ -325,7 +342,6 @@
                 >
                   Close
                 </button>
-                <button type="submit" class="btn btn-primary">Create</button>
               </div>
             </div>
           </div>
@@ -547,9 +563,12 @@ export default {
           }
         )
         .then((response) => {
-          console.log(response.data.floatingip);
           this.toggleModalConnect();
-          this.getFloatings();
+          console.log(response.data.floatingip);
+          this.message = "Sucessfully Associated to Machine! ";
+          setTimeout(() => {
+            this.getFloatings();
+          }, 2000);
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
@@ -576,10 +595,15 @@ export default {
         .then((response) => {
           console.log(response.data.floatingip);
           this.getFloatings();
+          this.message = "Sucessfully Dessasociated Floating IP from Machine! ";
+          setTimeout(() => {
+            this.getFloatings();
+          }, 2000);
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
-          this.errorMessage = "Error in Getting information about Machines";
+          this.errorMessage =
+            "Error in Dessasociating Floating IP from Machine";
         });
     },
     getAllInfo() {
@@ -613,7 +637,8 @@ export default {
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
-          this.errorMessage = "Error in Getting information about Machines";
+          this.errorMessage =
+            "Error in Getting information about Security Group Rules";
         });
     },
     createRules() {
@@ -632,10 +657,14 @@ export default {
           console.log(response);
           this.rules = response.data.security_group_rules;
           this.security_group_rule.security_group_id = this.rules[0].security_group_id;
+          this.message = "Sucessfully Created Rule for Security Group";
+          setTimeout(() => {
+            this.getFloatings();
+          }, 2000);
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
-          this.errorMessage = "Error in Getting information about Machines";
+          this.errorMessage = "Error in creating Security Group Rule";
         });
     },
     easyConnect() {
@@ -661,6 +690,7 @@ export default {
           }
         )
         .then((response) => {
+          this.message = "Created SSH Security Group Rule Successfully";
           console.log(response);
 
           setTimeout(() => {
@@ -681,18 +711,21 @@ export default {
                 },
               })
               .then((response) => {
-                console.log(response);
+                this.message = "Created ICMP Security Group Rule Successfully";
+                setTimeout(() => {
+                  console.log(response);
+                }, 2000);
               })
               .catch((error) => {
                 console.log(error.response);
                 this.errorMessage = error.response.data.message;
-                this.errorMessage = "Error in Creating Rule";
+                this.errorMessage = "Error in ICMP Creating Rule";
               });
           }, 1000);
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
-          this.errorMessage = "Error in Creating Rule";
+          this.errorMessage = "Error in SSH Creating Rule";
         });
     },
   },
