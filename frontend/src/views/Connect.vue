@@ -385,12 +385,10 @@
                             v-bind:key="port.id"
                             v-bind:value="port"
                           >
-                            {{
-                              port.machine
-                                ? port.machine.name
-                                : port.mac_address
-                            }}
-                            ({{ port.fixed_ips[0].ip_address }})
+                            <template>
+                              {{ port.machine ? port.machine.name : "" }}
+                              ({{ port.fixed_ips[0].ip_address }})
+                            </template>
                           </option>
                         </select>
                         <small id="emailHelp" class="form-text text-muted"
@@ -551,14 +549,7 @@ export default {
         .then((response) => {
           console.log(response.data.floatingip);
           this.toggleModalConnect();
-          /*
-          let index = this.floatings.indexOf(response.data.floatingip);
-          
-          if (index > -1) {
-            this.floatings[index].status = "DOWN";
-          
-          }
-          */
+          this.getFloatings();
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
@@ -584,13 +575,7 @@ export default {
         )
         .then((response) => {
           console.log(response.data.floatingip);
-          /*
-          let index = this.floatings.indexOf(response.data.floatingip);
-          if (index > -1) {
-            this.floatings[index].status = "ACTIVE";
-            console.log(this.floatings[index].status);
-          }
-          */
+          this.getFloatings();
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;

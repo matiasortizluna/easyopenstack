@@ -3,6 +3,7 @@
     <div class="container mx-auto px-6 py-8">
       <h3 class="text-gray-700 text-3xl font-medium">Virtual Machines</h3>
       <br />
+      <p>Flaoating IPs are in red</p>
 
       <div class="mt-4">
         <div
@@ -51,11 +52,20 @@
                 </p>
                 <p class="text-gray-700 font-weight-bold">IPs</p>
                 <div
-                  v-for="network, networkName in machine.addresses"
+                  v-for="(network, networkName) in machine.addresses"
                   :key="network"
                 >
-                  <p v-for="address in network" :key="address.addr" :class="address['OS-EXT-IPS:type'] != 'floating' ? 'text-gray-700': 'text-red-700 font-weight-bold'">
-                    &nbsp;&nbsp;<strong>{{ networkName }}</strong> {{address.addr}}
+                  <p
+                    v-for="address in network"
+                    :key="address.addr"
+                    :class="
+                      address['OS-EXT-IPS:type'] != 'floating'
+                        ? 'text-gray-700'
+                        : 'text-red-700 font-weight-bold'
+                    "
+                  >
+                    &nbsp;&nbsp;<strong>{{ networkName }}</strong>
+                    {{ address.addr }}
                   </p>
                 </div>
                 <p class="text-gray-700">
@@ -88,7 +98,11 @@
                   <div class="col-md-4">
                     <button
                       type="button"
-                      :class="machine.status == 'SHUTOFF' ? 'btn btn-success' : 'btn btn-danger'"
+                      :class="
+                        machine.status == 'SHUTOFF'
+                          ? 'btn btn-success'
+                          : 'btn btn-danger'
+                      "
                       @click="changeMachineState(machine)"
                     >
                       {{ machine.status == 'SHUTOFF' ? 'Start' : machine.status == 'ACTIVE' ? 'Stop' : 'Wait' }}
@@ -408,6 +422,7 @@ export default {
         networks: [],
         security_groups: [],
       },
+      for_MachineFloatingip: {},
     };
   },
   methods: {
@@ -429,12 +444,12 @@ export default {
       setTimeout(() => {
         //this.getForDeploy();
         if (this.errorMessage == "" && this.errorMessageModal == "") {
-          console.log(this.flavors);
-          console.log(this.volumes);
-          console.log(this.networks);
-          console.log(this.securityGroups);
-          console.log(this.keyPairs);
-          console.log(this.machineEditing);
+          //console.log(this.flavors);
+          //console.log(this.volumes);
+          //console.log(this.networks);
+          //console.log(this.securityGroups);
+          //console.log(this.keyPairs);
+          //console.log(this.machineEditing);
           //this.messageModal = "";
           //this.errorMessageModal = "";
           //this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
@@ -496,7 +511,7 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response.data.server);
+          //console.log(response.data.server);
           this.machineEditing.project = "";
           this.machineEditing.name = response.data.server.name;
           this.machineEditing.image_file = response.data.server.image;
@@ -506,7 +521,7 @@ export default {
           this.machineEditing.key_pair = response.data.server.key_name;
           this.machineEditing.security_groups =
             response.data.server.security_groups;
-          console.log(this.machineEditing);
+          //console.log(this.machineEditing);
           this.machineEditing.networks = response.data.server.addresses;
           //this.machineEditing.description = response.data.server.description;
         })
@@ -556,7 +571,7 @@ export default {
         );
     },
     getInfoMachines() {
-      this.message = ""
+      this.message = "";
       axios
         .get("http://localhost:3000/api/instances/detail", {
           headers: {
@@ -674,9 +689,11 @@ export default {
           },
         })
         .then((response) => {
+          //console.log(response);
           this.networks = response.data["networks"];
         })
         .catch((error) => {
+          //console.log(error);
           //this.errorMessage = error.response.data.message;
           this.errorMessage = "Error in Getting information about Networks";
         });
@@ -702,32 +719,151 @@ export default {
           this.errorMessage = "Error in Getting information about Images";
         });
     },
-    changeMachineState(machine){
-      let body = {}
-      if(machine.status == "SHUTOFF"){
+    changeMachineState(machine) {
+      let body = {};
+      if (machine.status == "SHUTOFF") {
         body = {
           'os-start': null
         }
       }else if(machine.status == "ACTIVE"){
         body = {
-          'os-stop': null
-        }
+          "os-stop": null,
+        };
       }
-      axios.post("http://localhost:3000/api/instances/"+machine.id, body, {
-        headers: {
-          "X-Token": this.$store.state.authToken,
-          "X-Server-Address": this.$store.state.url
-        }
-      })
-      .then((response) => {
-        this.message = "Changing machine state..."
-        setTimeout(this.getInfoMachines, 4000)
+      axios
+        .post("http://localhost:3000/api/instances/" + machine.id, body, {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.$store.state.url,
+          },
         })
-      .catch((err) => console.log(err.response))   
-    }
+        .then((response) => {
+          this.message = "Changing machine state...";
+          setTimeout(this.getInfoMachines, 4000);
+        })
+        .catch((err) => console.log(err.response));
+    },
+    createFloatingIP() {
+      let network_id = this.networks.find(
+        (network) => network["router:external"] == true
+      );
+
+      axios
+        .post(
+          "http://localhost:3000/api/floating",
+          {
+            floatingip: {
+              floating_network_id: network_id,
+              project_id: this.$store.state.selectedProject,
+            },
+          },
+          {
+            headers: {
+              "x-token": this.$store.state.authToken,
+              "x-server-address": this.$store.state.url,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+          //console.log(error);
+        });
+    },
+    createConnection(machine) {
+      //console.log(machine);
+      this.getNetworks();
+      setTimeout(() => {
+        this.getPortsFromMachine(machine);
+      }, 2000);
+    },
+    createFloatingIP(machine) {
+      //console.log(this.networks);
+      let network_id = this.networks.find(
+        (network) => network["router:external"] == true
+      );
+
+      axios
+        .post(
+          "http://localhost:3000/api/floating",
+          {
+            floatingip: {
+              floating_network_id: network_id.id,
+              project_id: this.$store.state.selectedProject,
+            },
+          },
+          {
+            headers: {
+              "x-token": this.$store.state.authToken,
+              "x-server-address": this.address,
+            },
+          }
+        )
+        .then((response) => {
+          //console.log(response.data);
+          machine.floatingip = response.data.floatingip;
+
+          setTimeout(() => {
+            this.associate(machine);
+          }, 1000);
+        })
+        .catch((error) => {
+          this.error = error.response.data.message;
+        });
+    },
+    getPortsFromMachine(machine) {
+      let machine_id = machine.id;
+      axios
+        .get("http://localhost:3000/api/ports/machine", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.address,
+            "X-Server-Id": machine_id,
+          },
+        })
+        .then((response) => {
+          //response.data.ports.find(port => port.)
+          machine.ports = response.data.ports;
+          this.createFloatingIP(machine);
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          //console.log(error);
+          this.errorMessage =
+            "Error in Getting information about Floating Points";
+        });
+    },
+    associate(machine) {
+      axios
+        .put(
+          "http://localhost:3000/api/floating/port",
+          {
+            floatingip_id: machine.floatingip.id,
+            port_id: machine.ports[0].id,
+          },
+          {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.address,
+            },
+          }
+        )
+        .then((response) => {
+          //console.log(response);
+          this.getInfoMachines();
+        })
+        .catch((error) => {
+          console.log(error);
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Getting information about Machines";
+        });
+    },
   },
   mounted() {
     this.getInfoMachines();
+    this.getInfoImages();
     var ip_address = this.$store.state.url.split(":");
     this.address = ip_address[0] + ":" + ip_address[1];
     this.machineEditing.project = this.$store.state.selectedProjectName;
