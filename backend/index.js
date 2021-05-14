@@ -19,6 +19,8 @@ const server = app.listen(3000, function () {
 })
 //Import all custom functions
 let importedFunctions = require('./functions.js')
+let importedK8sFunctions = require('./kubernetes.js')
+importedK8sFunctions.getPods()
 //get token
 app.post('/api/token', importedFunctions.getFirstScopedToken)
 app.get('/api/token/changeScope', importedFunctions.changeScopedToken)
