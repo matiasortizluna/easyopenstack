@@ -31,3 +31,12 @@ module.exports.checkKubeconfig = (req, res) => {
             res.status(500).send({ "message":"File exists bue it's not valid. Upload a valid one." })
       });
 }
+
+module.exports.uploadKubeconfig = (req, res) => {
+    var kubeconfig = req.files.kubeconfig;
+    if(!kubeconfig)
+        return res.status(400).send({ "message":"File not found on request." });
+    
+    kubeconfig.mv('./k8s_config');
+    res.send("")
+}

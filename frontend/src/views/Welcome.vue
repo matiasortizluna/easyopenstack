@@ -83,6 +83,7 @@
                   id="kubeconfig-file"
                   placeholder="Kubeconfig"
                   class="block w-full p-4 text-lg rounded-sm bg-black"
+                  @change="selectFile($event)"
                 />
               </div>
               <div class="px-4 pb-2 pt-4">
@@ -111,40 +112,24 @@ export default {
       connecting: true,
       connectingMessage: "Checking KUBECONFIG file...",
       error: "",
+      selectedFile: null
     };
   },
   methods: {
     upload() {
-      let regex = /^(https|http)(\:\/\/)([a-zA-Z0-9\.]+)(\:)([0-9]{2,5})$/;
-      this.error = "";
-      this.connecting = false;
-      if (regex.test(this.url)) {
-        this.connecting = true;
-        axios
-          .post("http://localhost:3000/api/token", {
-            server_address: this.url,
-            username: this.username,
-            password: this.password,
-          })
-          .then((response) => {
-            this.connecting = false;
-            this.$store.commit("setToken", response.data.token);
-            this.$store.commit("setURL", this.url);
-            this.$store.commit("setSelectedProject", response.data.projectId);
-            this.$store.commit(
-              "setSelectedProjectName",
-              response.data.projectName
-            );
-          })
-          .catch((error) => {
-            this.connecting = false;
-            this.error = error.response.data.message;
-            if (error.response.status == 401)
-              this.error += " (Check your credentials.)";
-          });
-      } else {
-        this.error = "Invalid address :( Format: http/https://ip_or_name:port";
-      }
+      this.error = ""
+      this.connecting = true
+      let formData = new FormData()
+      formData.append('kubeconfig', this.selectedFile)
+      axios.post("http://localhost:3000/api/uploadkubeconfig", formData)
+      .then(() => this.checkKubeconfig())
+      .catch((err) => {
+        this.connecting = false
+        this.error = err.response.data.message
+      })
+    },
+    selectFile(event){
+      this.selectedFile = event.target.files[0]
     },
     checkKubeconfig(){
       this.error = ""
@@ -152,7 +137,7 @@ export default {
       axios.get("http://localhost:3000/api/checkkubeconfig")
       .then(() => this.$emit('kubeconfig-valid'))
       .catch((err) => {
-        this.connecting = false;
+        this.connecting = false
         this.error = err.response.data.message
       })
     }

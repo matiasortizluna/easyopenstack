@@ -1,10 +1,15 @@
 const express = require('express')
 
 const app = express();
+const fileUpload = require('express-fileupload');
 
 const bodyParser = require('body-parser');
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+// enable files upload
+app.use(fileUpload({
+  createParentPath: true
+}));
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Methods", "*")
@@ -21,3 +26,4 @@ const server = app.listen(3000, function () {
 let importedK8sFunctions = require('./kubernetes.js')
 //importedK8sFunctions.getPods()
 app.get("/api/checkkubeconfig", importedK8sFunctions.checkKubeconfig)
+app.post("/api/uploadkubeconfig", importedK8sFunctions.uploadKubeconfig)
