@@ -12,7 +12,7 @@
       to="/nodes"
       class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
     >
-      <i class="fas fa-plus"></i>
+      <i class="fas fa-server"></i>
       <span class="mx-3">Nodes</span>
     </router-link>
 
@@ -20,7 +20,7 @@
       to="/namespaces"
       class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
     >
-      <i class="fas fa-server"></i>
+      <i class="fas fa-sitemap"></i>
       <span class="mx-3">Namespaces</span>
     </router-link>
 
@@ -28,7 +28,7 @@
       to="/pods"
       class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
     >
-      <i class="fas fa-database"></i>
+      <i class="fas fa-th"></i>
       <span class="mx-3">Pods</span>
     </router-link>
 
@@ -36,7 +36,7 @@
       to="/deployments"
       class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
     >
-      <i class="fas fa-compact-disc"></i>
+      <i class="fas fa-rocket"></i>
       <span class="mx-3">Deployments</span>
     </router-link>
     <router-link

@@ -16,6 +16,15 @@ module.exports.getPods = () => {
     })*/
 }
 
+module.exports.uploadKubeconfig = (req, res) => {
+    var kubeconfig = req.files.kubeconfig;
+    if(!kubeconfig)
+        return res.status(400).send({ "message":"File not found on request." });
+    
+    kubeconfig.mv('./k8s_config');
+    res.send("")
+}
+
 module.exports.checkKubeconfig = (req, res) => {
     fs.readFile('k8s_config','utf8', function (err, data) {
         if(err){
@@ -32,11 +41,8 @@ module.exports.checkKubeconfig = (req, res) => {
       });
 }
 
-module.exports.uploadKubeconfig = (req, res) => {
-    var kubeconfig = req.files.kubeconfig;
-    if(!kubeconfig)
-        return res.status(400).send({ "message":"File not found on request." });
-    
-    kubeconfig.mv('./k8s_config');
-    res.send("")
+module.exports.getNodes = (req, res) => {
+    k8sApi.listPodForAllNamespaces().then((res) => {
+        console.log(res.body.items)
+    })
 }
