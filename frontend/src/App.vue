@@ -1,6 +1,6 @@
 <template>
   <main>
-    <template v-if="token">
+    <template v-if="isKubeconfigValid">
         <div>
           <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-200">
             <div
@@ -99,7 +99,7 @@
           </div>
         </div>
     </template>
-    <welcome v-else></welcome>
+    <welcome v-else @kubeconfig-valid="validKubeconfig"></welcome>
   </main>
 </template>
 <script>
@@ -115,25 +115,16 @@ export default {
   },
   data() {
     return {
-      dropdownOpen: false,
       logoUrl: imgUrl,
       person: personPNG,
+      isKubeconfigValid: false,
     }
   },
-  methods: {
-    menuUser() {
-      this.dropdownOpen = !this.dropdownOpen;
-      console.log(this.dropdownOpen);
-    },
-    logout() {
-      this.$store.commit("logout");
-      console.log("Log out");
-    },
-  },
-  computed: {
-    token() {
-      return this.$store.state.authToken
-    },
-  },
+  methods:{
+    validKubeconfig(){
+      this.isKubeconfigValid = true
+    }
+  }
+
 };
 </script>

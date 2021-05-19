@@ -1,22 +1,19 @@
 import DashboardComponent from "./views/Dashboard.vue"
-import DeployComponent from "./views/Deploy.vue"
-import ImagesComponent from "./views/Images.vue"
-import ConnectComponent from "./views/Connect.vue"
-import VirtualMachinesComponent from "./views/VirtualMachines.vue"
-import VolumesComponent from "./views/Volumes.vue"
-import NewServiceComponent from "./views/NewService.vue"
+import NodesComponent from "./views/Nodes.vue"
+import NamespacesComponent from "./views/Namespaces.vue"
+import PodsComponent from "./views/Pods.vue"
+import DeploymentsComponent from "./views/Deployments.vue"
+import ServicesComponent from "./views/Services.vue"
 import NotFound from './views/NotFound.vue'
 
 
 /** @type {import('vue-router').RouterOptions['routes']} */
 export const routes = [
-  //{ path: '/', component: Home, meta: { title: 'Home' } },
   { path: '/', component: DashboardComponent, meta: { title: 'Dashboard' } },
-  { path: '/deploy', component: DeployComponent, meta: { title: 'Deploy' } },
-  { path: '/images', component: ImagesComponent, meta: { title: 'Images' } },
-  { path: '/connect', component: ConnectComponent, meta: { title: 'Connect' } },
-  { path: '/vm', component: VirtualMachinesComponent, meta: { title: 'Virtual Machines' } },
-  { path: '/volumes', component: VolumesComponent, meta: { title: 'Volumes' } },
-  { path: '/new', component: NewServiceComponent, meta: { title: 'New Service' } },
+  { path: '/nodes', component: NodesComponent, meta: { title: 'Nodes' } },
+  { path: '/namespaces', component: NamespacesComponent, meta: { title: 'Namespaces' } },
+  { path: '/pods', component: PodsComponent, meta: { title: 'Pods' } },
+  { path: '/deployments', component: DeploymentsComponent, meta: { title: 'Deployments' } },
+  { path: '/sevices', component: ServicesComponent, meta: { title: 'Services' } },
   { path: '/:path(.*)', component: NotFound },
 ]
