@@ -135,7 +135,15 @@ export default {
       this.error = ""
       this.connecting = true
       axios.get("http://localhost:3000/api/checkkubeconfig")
-      .then(() => this.$emit('kubeconfig-valid'))
+      .then(() => {
+       this.connectingMessage = "Trying to connect to server..."
+       axios.get("http://localhost:3000/api/nodes")
+       .then(() => this.$emit('kubeconfig-valid'))
+       .catch((err) => {
+         this.connecting = false
+         this.error = "Can't connect to server. Check the IP in your KUBECONFIG file and upload it again or check connection to server (e.g send a ping) and then reload this page. ERRNO: "+err.response.data.err_code
+       })
+      })
       .catch((err) => {
         this.connecting = false
         this.error = err.response.data.message

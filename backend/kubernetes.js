@@ -37,7 +37,7 @@ module.exports.getNodes = (req, res) => {
     k8sApi.listNode().then((resp) => {
         res.send(resp.body.items);
     })
-    .catch((err) => console.log(err))
+    .catch((err) => res.status(500).send({"err_code": err.errno}))
 }
 
 module.exports.getNamespaces = (req, res) => {
