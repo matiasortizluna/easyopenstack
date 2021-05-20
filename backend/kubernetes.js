@@ -5,6 +5,8 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+//Required because some endpoint don't exists in the CoreV1Api
+const k8sApiBeta = kc.makeApiClient(k8s.AppsV1Api);
 
 module.exports.getPods = () => {
     k8sApi.listNamespacedService('default').then((res) => {
@@ -42,7 +44,33 @@ module.exports.checkKubeconfig = (req, res) => {
 }
 
 module.exports.getNodes = (req, res) => {
-    k8sApi.listPodForAllNamespaces().then((res) => {
-        console.log(res.body.items)
+    k8sApi.listNode().then((resp) => {
+        res.send(resp.body.items);
     })
+    .catch((err) => console.log(err))
+}
+
+module.exports.getNamespaces = (req, res) => {
+    k8sApi.listNamespace().then((resp) => {
+        res.send(resp.body.items);
+    })
+    .catch((err) => console.log(err));
+}
+module.exports.getPods = (req, res) => {
+    k8sApi.listPodForAllNamespaces().then((resp) => {
+        res.send(resp.body.items);
+    })
+    .catch((err) => console.log(err));
+}
+module.exports.getDeployments = (req, res) => {
+    k8sApiBeta.listDeploymentForAllNamespaces().then((resp) => {
+        res.send(resp.body.items);
+    })
+    .catch((err) => console.log(err));
+}
+module.exports.getServices = (req, res) => {
+    k8sApi.listServiceForAllNamespaces().then((resp) => {
+        res.send(resp.body.items);
+    })
+    .catch((err) => console.log(err));
 }

@@ -110,11 +110,36 @@ export default {
       numberPods: "...",
       numberDeployments: "...",
       numberServices: "...",
+      error: ""
     };
   },
   methods: {
     getData(){
-      
+      axios.get("http://localhost:3000/api/nodes")
+      .then((resp) => {
+        this.numberNodes = resp.data.length
+      })
+      .catch(() => this.error = "Error requesting server! Check your connection.")
+      axios.get("http://localhost:3000/api/namespaces")
+      .then((resp) => {
+        this.numberNamespaces = resp.data.length
+      })
+      .catch(() => this.error = "Error requesting server! Check your connection.")
+      axios.get("http://localhost:3000/api/pods")
+      .then((resp) => {
+        this.numberPods = resp.data.length
+      })
+      .catch(() => this.error = "Error requesting server! Check your connection.")
+      axios.get("http://localhost:3000/api/deployments")
+      .then((resp) => {
+        this.numberDeployments = resp.data.length
+      })
+      .catch(() => this.error = "Error requesting server! Check your connection.")
+      axios.get("http://localhost:3000/api/services")
+      .then((resp) => {
+        this.numberServices = resp.data.length
+      })
+      .catch(() => this.error = "Error requesting server! Check your connection.")
     }
   },
   mounted() {
