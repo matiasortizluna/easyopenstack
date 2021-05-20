@@ -84,6 +84,7 @@
                   placeholder="Kubeconfig"
                   class="block w-full p-4 text-lg rounded-sm bg-black"
                   @change="selectFile($event)"
+                  required
                 />
               </div>
               <div class="px-4 pb-2 pt-4">
