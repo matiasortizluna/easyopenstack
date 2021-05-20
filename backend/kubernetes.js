@@ -5,18 +5,8 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
-//Required because some endpoint don't exists in the CoreV1Api
+//Required because some endpoints don't exists in the CoreV1Api
 const k8sApiBeta = kc.makeApiClient(k8s.AppsV1Api);
-
-module.exports.getPods = () => {
-    k8sApi.listNamespacedService('default').then((res) => {
-        console.log(res.body);
-    })
-
-    /*k8sApi.listNamespacedPod('default').then((res) => {
-        console.log(res.body.items[0].status);
-    })*/
-}
 
 module.exports.uploadKubeconfig = (req, res) => {
     var kubeconfig = req.files.kubeconfig;
