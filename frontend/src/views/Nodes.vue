@@ -1,9 +1,7 @@
 <template>
   <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
     <div class="container mx-auto px-6 py-8">
-      <h3 class="text-gray-700 text-3xl font-medium">
-        Nodes
-      </h3>
+      <h3 class="text-gray-700 text-3xl font-medium">Nodes</h3>
 
       <br />
 
@@ -26,11 +24,8 @@
           <div class="col-md-3" v-for="node in nodes" :key="node.metadata.uid">
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img
-                  class="rounded mx-auto d-block w-20"
-                  :src="serverPNG"
-                />
-                
+                <img class="rounded mx-auto d-block w-20" :src="serverPNG" />
+
                 <h5 class="card-title text-center font-weight-bold">
                   {{ node.metadata.name }}
                 </h5>
@@ -41,16 +36,44 @@
                   Allocatable CPUs: {{ node.status.allocatable.cpu }}
                 </p>
                 <p class="text-gray-700">
-                  Allocatable storage: {{ (parseInt(node.status.allocatable["ephemeral-storage"])/1000000).toFixed(2) }} GB
+                  Allocatable storage:
+                  {{
+                    (
+                      parseInt(node.status.allocatable["ephemeral-storage"]) /
+                      1000000
+                    ).toFixed(2)
+                  }}
+                  GB
                 </p>
                 <p class="text-gray-700">
-                  Allocatable RAM {{ (parseInt(node.status.allocatable.memory)/1000000).toFixed(2) }} GB
+                  Allocatable RAM
+                  {{
+                    (
+                      parseInt(node.status.allocatable.memory) / 1000000
+                    ).toFixed(2)
+                  }}
+                  GB
                 </p>
                 <p class="text-gray-700">
                   Capacity of pods: {{ node.status.allocatable.pods }}
                 </p>
                 <div class="text-black-700">
                   Images on the node: {{ node.status.images.length }}
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="row">
+                  <div class="col">
+                    <button type="button" class="btn btn-warning">Edit</button
+                    >&nbsp&nbsp
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      @click="deleteNode(node)"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -72,16 +95,43 @@ export default {
     };
   },
   methods: {
-    getNodes(){
-      axios.get("http://localhost:3000/api/nodes")
-      .then((resp) => {
-        this.nodes = resp.data
-        this.message = ""
-      })
-    }
+    getNodes() {
+      axios.get("http://localhost:3000/api/nodes").then((resp) => {
+        this.nodes = resp.data;
+        this.message = "";
+      });
+    },
+    deleteNode(node) {
+      console.log(node.metadata.name);
+      axios
+        .delete("http://localhost:3000/api/nodes/" + node.metadata.name)
+        .then((resp) => {
+          //console.log(resp.data);
+          this.getNodes();
+          this.message = "Node deleted Sucessfully";
+          /*
+          this.message = "Deleting Node, please wait 8 seconds";
+          setTimeout(() => {
+            this.getNodes();
+            setTimeout(() => {
+              this.message = "Node deleted Sucessfully";
+            }, 1000);
+          }, 8000);
+          */
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message.body
+            ? "Error " +
+              err.response.data.message.body.code +
+              ": " +
+              err.response.data.message.body.message
+            : err.response.data.message;
+        });
+    },
   },
   mounted() {
-    this.getNodes()
+    this.getNodes();
   },
 };
 </script>

@@ -114,7 +114,7 @@ module.exports.createNamespace = (req, res) => {
 }
 
 module.exports.deleteDeployment = (req, res) => {
-    console.log(req.params)
+    //console.log(req.params)
     k8sApiBeta.deleteNamespacedDeployment(req.params.name, req.params.namespace).then((resp) => {
         res.send(resp.body);
     })
@@ -127,8 +127,22 @@ module.exports.deleteDeployment = (req, res) => {
 }
 
 module.exports.deleteNamespace = (req, res) => {
-    console.log(req.params.namespace)
+    //console.log(req.params.namespace)
     k8sApi.deleteNamespace(req.params.namespace).then((resp) => {
+        res.send(resp.body);
+    })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
+}
+
+
+module.exports.deleteNode = (req, res) => {
+    console.log(req.params)
+    k8sApi.deleteNode(req.params.name).then((resp) => {
         res.send(resp.body);
     })
         .catch((err) => {
