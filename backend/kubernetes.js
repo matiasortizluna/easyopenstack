@@ -1,5 +1,6 @@
 const k8s = require('@kubernetes/client-node');
 const fs = require('fs');
+const yaml = require('js-yaml');
 
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
@@ -110,4 +111,24 @@ module.exports.createNamespace = (req, res) => {
     .catch((err) => {
        res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
     })
+}
+
+module.exports.createPod = (req, res) => {
+    var configFile = req.files.pod_configfile;
+    if(configFile.name.split(".")[1] != "yml" && configFile.name.split(".")[1] != "yaml")
+        return res.status(400).send({"message": "It's not an YAML file!"});
+    configFile.mv("podconfig.yml")
+    fs.readFile("podconfig.yml", 'utf8', (err, data) => {
+        if(err)
+            return res.status(500).send({"message": "Error while reading file. Try again."});
+        var podConfig = yaml.load(data);
+        console.log(podConfig)
+        if(!podConfig.metadata.namespace)
+            podConfig.metadata.namespace = "default"
+        k8sApi.createNamespacedPod(podConfig.metadata.namespace, podConfig)
+        .then((resp) => res.send(resp.body))
+        .catch((err) => {
+            res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
+        })
+    });
 }

@@ -64,18 +64,18 @@
       </div>
     </div>
     <!-- Modal -->
-    <!-- <div
+    <div
       class="modal fade"
-      id="addImageModal"
+      id="addPodModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="addImageModalLabel"
+      aria-labelledby="addPodModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addImageModalLabel">Add image</h5>
+            <h5 class="modal-title" id="addPodModalLabel">Add Pod</h5>
             <button
               type="button"
               class="close"
@@ -100,57 +100,14 @@
             >
               {{ messageModal }}
             </div>
+            <p>Select the YAML file that contains the pod configuration</p>
             <div class="input-group mb-3">
               <input
-                type="text"
+                type="file"
                 class="form-control"
-                placeholder="Image name"
-                aria-label="Image name"
-                aria-describedby="basic-addon1"
+                placeholder="Pod config file"
                 required
-                v-model="imageName"
-              />
-            </div>
-            <div class="input-group mb-3">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="URI to download the image"
-                aria-label="Image URI"
-                aria-describedby="basic-addon1"
-                required
-                v-model="imageURI"
-              />
-            </div>
-            <select name="disk-format" v-model="diskFormat">
-              <option value="ami">ami</option>
-              <option value="ari">ari</option>
-              <option value="vhd">vhd</option>
-              <option value="vhdx">vhdx</option>
-              <option value="vmdk">vmdk</option>
-              <option value="raw">raw</option>
-              <option value="qcow2">qcow2</option>
-              <option value="vdi">vdi</option>
-              <option value="iso">iso</option>
-              <option value="ploop">ploop</option>
-            </select>
-            <div class="input-group mb-3">
-              <input
-                type="number"
-                class="form-control"
-                placeholder="Min. RAM (MB)"
-                aria-label="Min. Disk"
-                required
-                v-model="minRam"
-              />
-              <span class="input-group-text">|</span>
-              <input
-                type="number"
-                class="form-control"
-                placeholder="Min. Disk (GB)"
-                aria-label="Min. Disk"
-                required
-                v-model="minDisk"
+                @change="selectFile($event)"
               />
             </div>
           </div>
@@ -162,13 +119,13 @@
             >
               Close
             </button>
-            <button type="button" @click="addImage()" class="btn btn-primary">
+            <button type="button" @click="addPod()" class="btn btn-primary">
               Add
             </button>
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
   </main>
 </template>
 <script>
@@ -182,6 +139,7 @@ export default {
       message: "Loading...",
       errorMessageModal: "",
       messageModal: "",
+      selectedFile: null
     };
   },
   methods: {
@@ -204,9 +162,29 @@ export default {
     toggleModal() {
       this.messageModal = "";
       this.errorMessageModal = "";
-      this.imageName = this.imageURI = this.minRam = this.minDisk = null;
-      $("#addImageModal").modal("toggle");
+      this.PodName = null
+      $("#addPodModal").modal("toggle");
     },
+    selectFile(event){
+      this.selectedFile = event.target.files[0]
+    },
+    addPod(){
+      this.errorMessageModal = ""
+      if(!this.selectedFile)
+        return this.errorMessageModal = "Please select a file!"
+      this.messageModal = "Creating pod..."
+      let formData = new FormData()
+      formData.append('pod_configfile', this.selectedFile)
+      axios.post("http://localhost:3000/api/pods", formData)
+      .then((resp) => {
+        this.pods.push(resp.data)
+        this.message = "Pod created successfully!"
+        this.toggleModal()
+      })
+      .catch((err) => {
+        this.errorMessageModal = err.response.data.message
+      })
+    }
   },
   mounted() {
     this.getInfoPods()
