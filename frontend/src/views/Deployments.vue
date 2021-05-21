@@ -73,8 +73,7 @@
                 <div class="row">
                   <div class="col">
                     <button type="button" class="btn btn-warning">Edit</button>
-                  </div>
-                  <div class="col">
+                    &nbsp&nbsp
                     <button
                       type="button"
                       class="btn btn-danger"
@@ -235,8 +234,7 @@ export default {
         )
         .then((resp) => {
           console.log(resp.data);
-          this.message = "";
-          this.deployments = resp.data;
+          this.message = "Deleting Deployment";
         })
         .catch((err) => {
           this.message = "";

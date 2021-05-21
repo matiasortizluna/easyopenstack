@@ -1,0 +1,65 @@
+{
+    "message": {
+        "response": {
+            "statusCode": 403,
+            "body": {
+                "kind": "Status",
+                "apiVersion": "v1",
+                "metadata": {},
+                "status": "Failure",
+                "message": "namespaces \"default\" is forbidden: this namespace may not be deleted",
+                "reason": "Forbidden",
+                "details": {
+                    "name": "default",
+                    "kind": "namespaces"
+                },
+                "code": 403
+            },
+            "headers": {
+                "cache-control": "no-cache, private",
+                "content-type": "application/json",
+                "x-kubernetes-pf-flowschema-uid": "1b3e9597-4093-4dc5-b5ec-3584cfff85d9",
+                "x-kubernetes-pf-prioritylevel-uid": "3ef2ee58-77dd-4775-8168-d9c4cb834aed",
+                "date": "Fri, 21 May 2021 14:58:49 GMT",
+                "content-length": "233",
+                "connection": "close"
+            },
+            "request": {
+                "uri": {
+                    "protocol": "https:",
+                    "slashes": true,
+                    "auth": null,
+                    "host": "127.0.0.1:52569",
+                    "port": "52569",
+                    "hostname": "127.0.0.1",
+                    "hash": null,
+                    "search": null,
+                    "query": null,
+                    "pathname": "/api/v1/namespaces/default",
+                    "path": "/api/v1/namespaces/default",
+                    "href": "https://127.0.0.1:52569/api/v1/namespaces/default"
+                },
+                "method": "DELETE",
+                "headers": {
+                    "Accept": "application/json",
+                    "content-length": 0
+                }
+            }
+        },
+        "body": {
+            "apiVersion": "v1",
+            "code": 403,
+            "details": {
+                "kind": "namespaces",
+                "name": "default"
+            },
+            "kind": "Status",
+            "message": "namespaces \"default\" is forbidden: this namespace may not be deleted",
+            "metadata": {},
+            "reason": "Forbidden",
+            "status": "Failure"
+        },
+        "statusCode": 403,
+        "name": "HttpError"
+    }
+}
