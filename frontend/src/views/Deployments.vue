@@ -26,32 +26,64 @@
           {{ message }}
         </div>
         <div class="row">
-          <div class="col-md-3 mb-3" v-for="deployment in deployments" :key="deployment.metadata.uid">
+          <div
+            class="col-md-3 mb-3"
+            v-for="deployment in deployments"
+            :key="deployment.metadata.uid"
+          >
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20 mb-3" :src="deploymentsPNG" />
+                <img
+                  class="rounded mx-auto d-block w-20 mb-3"
+                  :src="deploymentsPNG"
+                />
                 <h5 class="card-title text-center font-weight-bold">
                   {{ deployment.metadata.name }}
                 </h5>
                 <p class="mt-2 text-gray-700">
-                  <strong>Namespace: </strong>{{ deployment.metadata.namespace }}
+                  <strong>Namespace: </strong
+                  >{{ deployment.metadata.namespace }}
+                </p>
+
+                <p class="text-gray-700">
+                  <strong>Running app: </strong
+                  >{{
+                    deployment.metadata.labels
+                      ? deployment.metadata.labels["k8s-app"]
+                      : "---"
+                  }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Running app: </strong>{{ deployment.metadata.labels.app }}
-                </p>
-                <p class="text-gray-700">
-                  <strong>Strategy type: </strong>{{ deployment.spec.strategy.type }}
+                  <strong>Strategy type: </strong
+                  >{{ deployment.spec.strategy.type }}
                 </p>
                 <div class="text-black-800 font-weight-bold">
                   Replicas: {{ deployment.status.replicas }}
                 </div>
                 <p class="text-gray-700">
-                  <strong>Containers: </strong>{{ deployment.spec.template.spec.containers.length }}
+                  <strong>Containers: </strong
+                  >{{ deployment.spec.template.spec.containers.length }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Created at: </strong
                   >{{ formatDate(deployment.metadata.creationTimestamp) }}
                 </p>
+              </div>
+              <div class="card-footer">
+                <div class="row">
+                  <div class="col">
+                    <button type="button" class="btn btn-warning">Edit</button>
+                  </div>
+                  <div class="col">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      @click="deleteDeployment(deployment)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -169,17 +201,18 @@ export default {
   },
 
   methods: {
-    getInfoDeployments(){
-      axios.get("http://localhost:3000/api/deployments")
-      .then((resp) => {
-        console.log(resp.data)
-        this.message = ""
-        this.deployments = resp.data
-      })
-      .catch((err) => {
-        this.message = ""
-        this.errorMessage = err.response.data.message
-      })
+    getInfoDeployments() {
+      axios
+        .get("http://localhost:3000/api/deployments")
+        .then((resp) => {
+          console.log(resp.data);
+          this.message = "";
+          this.deployments = resp.data;
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message;
+        });
     },
     formatDate(date) {
       let dateObject = new Date(date);
@@ -190,6 +223,25 @@ export default {
       this.errorMessageModal = "";
       this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
       $("#addVolumeModal").modal("toggle");
+    },
+    deleteDeployment(deployment) {
+      console.log(deployment.metadata);
+      axios
+        .delete(
+          "http://localhost:3000/api/deployments/" +
+            deployment.metadata.namespace +
+            "/" +
+            deployment.metadata.name
+        )
+        .then((resp) => {
+          console.log(resp.data);
+          this.message = "";
+          this.deployments = resp.data;
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message;
+        });
     },
   },
   mounted() {

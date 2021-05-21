@@ -36,7 +36,8 @@ module.exports.checkKubeconfig = (req, res) => {
 module.exports.getNodes = (req, res) => {
     k8sApi.listNode().then((resp) => {
         res.send(resp.body.items);
-    }).catch((err) => res.status(500).send({ "err_code": err.errno }))
+
+    }).catch((err) => { console.log(err); res.status(500).send({ "err_code": err.errno }) })
 }
 
 module.exports.getNamespaces = (req, res) => {
@@ -110,4 +111,18 @@ module.exports.createNamespace = (req, res) => {
     .catch((err) => {
        res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
     })
+}
+
+
+module.exports.deleteDeployment = (req, res) => {
+    console.log(req.params)
+    k8sApiBeta.deleteNamespacedDeployment(req.params.name, req.params.namespace).then((resp) => {
+        res.send(resp.body);
+    })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
 }

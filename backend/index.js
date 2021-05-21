@@ -32,5 +32,6 @@ app.get("/api/namespaces", importedK8sFunctions.getNamespaces);
 app.get("/api/pods", importedK8sFunctions.getPods);
 app.get("/api/deployments", importedK8sFunctions.getDeployments);
 app.get("/api/services", importedK8sFunctions.getServices);
+app.delete("/api/deployments/:namespace/:name", importedK8sFunctions.deleteDeployment);
 
 app.post("/api/namespaces", importedK8sFunctions.createNamespace);
