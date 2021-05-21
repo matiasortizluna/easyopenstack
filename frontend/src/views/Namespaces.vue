@@ -3,8 +3,8 @@
     <div class="container mx-auto px-6 py-8">
       <h3 class="text-gray-700 text-3xl font-medium">Namespaces</h3>
       <button class="btn btn-info" @click="toggleModal()">
-          Add <i class="far fa-plus-square"></i>
-        </button>
+        Add <i class="far fa-plus-square"></i>
+      </button>
       <br />
       <div class="mt-4">
         <div
@@ -22,21 +22,30 @@
           {{ message }}
         </div>
         <div class="row">
-          <div class="col-md-3" v-for="namespace in namespaces" :key="namespace.metadata.uid">
+          <div
+            class="col-md-3"
+            v-for="namespace in namespaces"
+            :key="namespace.metadata.uid"
+          >
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20" :src="namespacesPNG" />
+                <img
+                  class="rounded mx-auto d-block w-20"
+                  :src="namespacesPNG"
+                />
                 <h5 class="card-title text-center font-weight-bold">
                   {{ namespace.metadata.name }}
                 </h5>
                 <p class="text-gray-700">
-                  <strong>Created at: </strong>{{ formatDate(namespace.metadata.creationTimestamp) }}
+                  <strong>Created at: </strong
+                  >{{ formatDate(namespace.metadata.creationTimestamp) }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Pods: </strong>{{ namespace.quant_pods }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Deployments: </strong>{{ namespace.quant_deployments }}
+                  <strong>Deployments: </strong
+                  >{{ namespace.quant_deployments }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Services: </strong>{{ namespace.quant_services }}
@@ -44,7 +53,21 @@
                 <div class="text-black-800 font-weight-bold">
                   Status: {{ namespace.status.phase }}
                 </div>
-                <br />
+              </div>
+              <div class="card-footer">
+                <div class="row">
+                  <div class="col">
+                    <button type="button" class="btn btn-warning">Edit</button
+                    >&nbsp&nbsp
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      @click="deleteNamespace(namespace)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -109,7 +132,11 @@
             >
               Close
             </button>
-            <button type="button" @click="addNamespace()" class="btn btn-primary">
+            <button
+              type="button"
+              @click="addNamespace()"
+              class="btn btn-primary"
+            >
               Add
             </button>
           </div>
@@ -133,17 +160,18 @@ export default {
     };
   },
   methods: {
-    getInfoNamespaces(){
-      axios.get("http://localhost:3000/api/namespaces")
-      .then((resp) => {
-        //console.log(resp.data)
-        this.namespaces = resp.data
-        this.message = ""
-      })
-      .catch((err) => {
-        this.message = ""
-        this.errorMessage = err.response.data.message
-      })
+    getInfoNamespaces() {
+      axios
+        .get("http://localhost:3000/api/namespaces")
+        .then((resp) => {
+          //console.log(resp.data)
+          this.namespaces = resp.data;
+          this.message = "";
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message;
+        });
     },
     formatDate(date) {
       let dateObject = new Date(date);
@@ -152,23 +180,51 @@ export default {
     toggleModal() {
       this.messageModal = "";
       this.errorMessageModal = "";
-      this.namespaceName = null
+      this.namespaceName = null;
       $("#addNamespaceModal").modal("toggle");
     },
-    addNamespace(){
-      this.errorMessageModal = ""
-      this.messageModal = "Creating namespace..."
-      axios.post("http://localhost:3000/api/namespaces", {name: this.namespaceName})
-      .then((resp) => {
-        this.message = "Namespace created successfully!"
-        this.namespaces.push(resp.data)
-        this.toggleModal()
-      })
-      .catch((err) => {
-        this.messageModal = ""
-        this.errorMessageModal = err.response.data.message
-      })
-    }
+    addNamespace() {
+      this.errorMessageModal = "";
+      this.messageModal = "Creating namespace...";
+      axios
+        .post("http://localhost:3000/api/namespaces", {
+          name: this.namespaceName,
+        })
+        .then((resp) => {
+          this.message = "Namespace created successfully!";
+          this.namespaces.push(resp.data);
+          this.toggleModal();
+        })
+        .catch((err) => {
+          this.messageModal = "";
+          this.errorMessageModal = err.response.data.message;
+        });
+    },
+    deleteNamespace(namespace) {
+      axios
+        .delete(
+          "http://localhost:3000/api/namespaces/" + namespace.metadata.name
+        )
+        .then((resp) => {
+          console.log(resp.data);
+          this.message = "Deleting Namespace, please wait 8 seconds";
+          setTimeout(() => {
+            this.getInfoNamespaces();
+            setTimeout(() => {
+              this.message = "Namespace deleted Sucessfully";
+            }, 1000);
+          }, 8000);
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message.body
+            ? "Error " +
+              err.response.data.message.body.code +
+              ": " +
+              err.response.data.message.body.message
+            : err.response.data.message;
+        });
+    },
   },
   mounted() {
     this.getInfoNamespaces();

@@ -37,7 +37,8 @@ module.exports.checkKubeconfig = (req, res) => {
 module.exports.getNodes = (req, res) => {
     k8sApi.listNode().then((resp) => {
         res.send(resp.body.items);
-    }).catch((err) => res.status(500).send({ "err_code": err.errno }))
+
+    }).catch((err) => { console.log(err); res.status(500).send({ "err_code": err.errno }) })
 }
 
 module.exports.getNamespaces = (req, res) => {
@@ -92,25 +93,38 @@ module.exports.getServices = (req, res) => {
     k8sApi.listServiceForAllNamespaces().then((resp) => {
         res.send(resp.body.items);
     })
-    .catch((err) => {
-        console.log(err)
-        res.status(500).send({
-            "message": err
-        })
-    });
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
 }
 
 module.exports.createNamespace = (req, res) => {
-    var data  = req.body;
+    var data = req.body;
     k8sApi.createNamespace({
         metadata: {
             name: data.name
         }
     })
-    .then((resp) => res.send(resp.body))
-    .catch((err) => {
-       res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
+        .then((resp) => res.send(resp.body))
+        .catch((err) => {
+            res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message })
+        })
+}
+
+module.exports.deleteDeployment = (req, res) => {
+    //console.log(req.params)
+    k8sApiBeta.deleteNamespacedDeployment(req.params.name, req.params.namespace).then((resp) => {
+        res.send(resp.body);
     })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
 }
 
 module.exports.createPod = (req, res) => {
@@ -139,4 +153,29 @@ module.exports.createPod = (req, res) => {
             res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
         })
     });
+module.exports.deleteNamespace = (req, res) => {
+    //console.log(req.params.namespace)
+    k8sApi.deleteNamespace(req.params.namespace).then((resp) => {
+        res.send(resp.body);
+    })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
+}
+
+
+module.exports.deleteNode = (req, res) => {
+    console.log(req.params)
+    k8sApi.deleteNode(req.params.name).then((resp) => {
+        res.send(resp.body);
+    })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
 }
