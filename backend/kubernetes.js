@@ -10,34 +10,33 @@ const k8sApiBeta = kc.makeApiClient(k8s.AppsV1Api);
 
 module.exports.uploadKubeconfig = (req, res) => {
     var kubeconfig = req.files.kubeconfig;
-    if(!kubeconfig)
-        return res.status(400).send({ "message":"File not found on request." });
-    
+    if (!kubeconfig)
+        return res.status(400).send({ "message": "File not found on request." });
+
     kubeconfig.mv('./k8s_config');
     res.send("")
 }
 
 module.exports.checkKubeconfig = (req, res) => {
-    fs.readFile('k8s_config','utf8', function (err, data) {
-        if(err){
+    fs.readFile('k8s_config', 'utf8', function (err, data) {
+        if (err) {
             if (err.errno == -4058)
-                return res.status(404).send( {"message": "KUBECONFIG file is not present! Please upload it."} );
+                return res.status(404).send({ "message": "KUBECONFIG file is not present! Please upload it." });
             else
-                return res.status(500).send( {"message": "Error on server."} );
+                return res.status(500).send({ "message": "Error on server." });
         }
         var regex = /^apiVersion:/;
-        if(regex.test(data))
+        if (regex.test(data))
             res.send("")
         else
-            res.status(500).send({ "message":"File exists bue it's not valid. Upload a valid one." })
-      });
+            res.status(500).send({ "message": "File exists bue it's not valid. Upload a valid one." })
+    });
 }
 
 module.exports.getNodes = (req, res) => {
     k8sApi.listNode().then((resp) => {
         res.send(resp.body.items);
-    })
-    .catch((err) => res.status(500).send({"err_code": err.errno}))
+    }).catch((err) => res.status(500).send({ "err_code": err.errno }))
 }
 
 module.exports.getNamespaces = (req, res) => {
@@ -45,7 +44,7 @@ module.exports.getNamespaces = (req, res) => {
         var namespaces = resp.body.items;
         var count = 0;
         await new Promise((resolve, reject) => {
-            namespaces.forEach( async (item) => {
+            namespaces.forEach(async (item) => {
                 var pods = await k8sApi.listNamespacedPod(item.metadata.name);
                 var deployments = await k8sApiBeta.listNamespacedDeployment(item.metadata.name);
                 var services = await k8sApi.listNamespacedService(item.metadata.name);
@@ -59,34 +58,34 @@ module.exports.getNamespaces = (req, res) => {
         })
         res.send(namespaces);
     })
-    .catch((err) => {
-        console.log(err)
-        res.status(500).send({
-            "message": err
-        })
-    });
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
 }
 module.exports.getPods = (req, res) => {
     k8sApi.listPodForAllNamespaces().then((resp) => {
         res.send(resp.body.items);
     })
-    .catch((err) => {
-        console.log(err)
-        res.status(500).send({
-            "message": err
-        })
-    });
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
 }
 module.exports.getDeployments = (req, res) => {
     k8sApiBeta.listDeploymentForAllNamespaces().then((resp) => {
         res.send(resp.body.items);
     })
-    .catch((err) => {
-        console.log(err)
-        res.status(500).send({
-            "message": err
-        })
-    });
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
 }
 module.exports.getServices = (req, res) => {
     k8sApi.listServiceForAllNamespaces().then((resp) => {
