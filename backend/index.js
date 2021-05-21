@@ -24,7 +24,7 @@ const server = app.listen(3000, function () {
 })
 //Import all custom functions
 let importedK8sFunctions = require('./kubernetes.js');
-//importedK8sFunctions.getDeployments()
+//importedK8sFunctions.getNamespaces()
 app.get("/api/checkkubeconfig", importedK8sFunctions.checkKubeconfig);
 app.post("/api/uploadkubeconfig", importedK8sFunctions.uploadKubeconfig);
 app.get("/api/nodes", importedK8sFunctions.getNodes);

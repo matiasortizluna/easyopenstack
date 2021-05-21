@@ -41,26 +41,61 @@ module.exports.getNodes = (req, res) => {
 }
 
 module.exports.getNamespaces = (req, res) => {
-    k8sApi.listNamespace().then((resp) => {
-        res.send(resp.body.items);
+    k8sApi.listNamespace().then(async (resp) => {
+        var namespaces = resp.body.items;
+        var count = 0;
+        await new Promise((resolve, reject) => {
+            namespaces.forEach( async (item) => {
+                var pods = await k8sApi.listNamespacedPod(item.metadata.name);
+                var deployments = await k8sApiBeta.listNamespacedDeployment(item.metadata.name);
+                var services = await k8sApi.listNamespacedService(item.metadata.name);
+                item.quant_pods = pods.body.items.length;
+                item.quant_deployments = deployments.body.items.length;
+                item.quant_services = services.body.items.length;
+                count++;
+                if (count == namespaces.length)
+                    resolve();
+            })
+        })
+        res.send(namespaces);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+        console.log(err)
+        res.status(500).send({
+            "message": err
+        })
+    });
 }
 module.exports.getPods = (req, res) => {
     k8sApi.listPodForAllNamespaces().then((resp) => {
         res.send(resp.body.items);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+        console.log(err)
+        res.status(500).send({
+            "message": err
+        })
+    });
 }
 module.exports.getDeployments = (req, res) => {
     k8sApiBeta.listDeploymentForAllNamespaces().then((resp) => {
         res.send(resp.body.items);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+        console.log(err)
+        res.status(500).send({
+            "message": err
+        })
+    });
 }
 module.exports.getServices = (req, res) => {
     k8sApi.listServiceForAllNamespaces().then((resp) => {
         res.send(resp.body.items);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+        console.log(err)
+        res.status(500).send({
+            "message": err
+        })
+    });
 }

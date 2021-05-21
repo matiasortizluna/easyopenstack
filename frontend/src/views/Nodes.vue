@@ -23,7 +23,7 @@
           {{ message }}
         </div>
         <div class="row">
-          <div class="col-md-3" v-for="node in nodes" :key="node.id">
+          <div class="col-md-3" v-for="node in nodes" :key="node.metadata.uid">
             <div class="card" style="width: 18rem">
               <div class="card-body">
                 <img
@@ -76,7 +76,6 @@ export default {
       axios.get("http://localhost:3000/api/nodes")
       .then((resp) => {
         this.nodes = resp.data
-        console.log(resp.data)
         this.message = ""
       })
     }
