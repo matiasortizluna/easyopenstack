@@ -233,12 +233,24 @@ export default {
             deployment.metadata.name
         )
         .then((resp) => {
-          console.log(resp.data);
-          this.message = "Deleting Deployment";
+          //console.log(resp.data);
+
+          this.message = "Deleting Deployment, please wait 3 seconds";
+          setTimeout(() => {
+            this.getNodes();
+            setTimeout(() => {
+              this.message = "Deployment deleted Sucessfully";
+            }, 1000);
+          }, 3000);
         })
         .catch((err) => {
           this.message = "";
-          this.errorMessage = err.response.data.message;
+          this.errorMessage = err.response.data.message.body
+            ? "Error " +
+              err.response.data.message.body.code +
+              ": " +
+              err.response.data.message.body.message
+            : err.response.data.message;
         });
     },
   },

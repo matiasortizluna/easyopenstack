@@ -103,13 +103,14 @@ export default {
     },
     deleteNode(node) {
       console.log(node.metadata.name);
+      /*
       axios
         .delete("http://localhost:3000/api/nodes/" + node.metadata.name)
         .then((resp) => {
           //console.log(resp.data);
           this.getNodes();
           this.message = "Node deleted Sucessfully";
-          /*
+          
           this.message = "Deleting Node, please wait 8 seconds";
           setTimeout(() => {
             this.getNodes();
@@ -117,7 +118,7 @@ export default {
               this.message = "Node deleted Sucessfully";
             }, 1000);
           }, 8000);
-          */
+          
         })
         .catch((err) => {
           this.message = "";
@@ -128,6 +129,7 @@ export default {
               err.response.data.message.body.message
             : err.response.data.message;
         });
+        */
     },
   },
   mounted() {

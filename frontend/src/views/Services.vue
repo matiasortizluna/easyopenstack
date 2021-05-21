@@ -26,10 +26,17 @@
           {{ message }}
         </div>
         <div class="row">
-          <div class="col-md-3 mb-3" v-for="service in services" :key="service.metadata.uid">
+          <div
+            class="col-md-3 mb-3"
+            v-for="service in services"
+            :key="service.metadata.uid"
+          >
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20 mb-3" :src="servicesPNG" />
+                <img
+                  class="rounded mx-auto d-block w-20 mb-3"
+                  :src="servicesPNG"
+                />
                 <h5 class="card-title text-center font-weight-bold">
                   {{ service.metadata.name }}
                 </h5>
@@ -37,16 +44,23 @@
                   <strong>Namespace: </strong>{{ service.metadata.namespace }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Component: </strong>{{ service.metadata.labels.component }}
+                  <strong>Component: </strong
+                  >{{ service.metadata.labels.component }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Provider: </strong>{{ service.metadata.labels.provider }}
+                  <strong>Provider: </strong
+                  >{{ service.metadata.labels.provider }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Cluster IP: </strong>{{ service.spec.clusterIP }}
                 </p>
                 <div class="text-gray-700">
-                  <strong>Ports:</strong> <p v-for="port in service.spec.ports" :key="port.port"> &nbsp;&nbsp;&nbsp;&nbsp;{{ port.port+", "+port.protocol}}</p>
+                  <strong>Ports:</strong>
+                  <p v-for="port in service.spec.ports" :key="port.port">
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{
+                      port.port + ", " + port.protocol
+                    }}
+                  </p>
                 </div>
                 <p class="text-gray-700">
                   <strong>Created at: </strong
@@ -169,17 +183,18 @@ export default {
   },
 
   methods: {
-    getInfoservices(){
-      axios.get("http://localhost:3000/api/services")
-      .then((resp) => {
-        //console.log(resp.data)
-        this.message = ""
-        this.services = resp.data
-      })
-      .catch((err) => {
-        this.message = ""
-        this.errorMessage = err.response.data.message
-      })
+    getInfoservices() {
+      axios
+        .get("http://localhost:3000/api/services")
+        .then((resp) => {
+          //console.log(resp.data)
+          this.message = "";
+          this.services = resp.data;
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message;
+        });
     },
     formatDate(date) {
       let dateObject = new Date(date);
@@ -190,6 +205,35 @@ export default {
       this.errorMessageModal = "";
       this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
       $("#addVolumeModal").modal("toggle");
+    },
+    deletePod(pod) {
+      console.log(pod);
+      axios
+        .delete(
+          "http://localhost:3000/api/namespaces/" +
+            pod.metadata.namespace +
+            "/" +
+            pod.metadata.name
+        )
+        .then((resp) => {
+          console.log(resp.data);
+          this.message = "Deleting Pod, please wait 3 seconds";
+          setTimeout(() => {
+            this.getInfoPods();
+            setTimeout(() => {
+              this.message = "Pod deleted Sucessfully";
+            }, 1000);
+          }, 3000);
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message.body
+            ? "Error " +
+              err.response.data.message.body.code +
+              ": " +
+              err.response.data.message.body.message
+            : err.response.data.message;
+        });
     },
   },
   mounted() {

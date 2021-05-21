@@ -25,7 +25,11 @@
           {{ message }}
         </div>
         <div class="row">
-          <div class="col-md-3 mb-3" v-for="pod in pods" :key="pod.metadata.uid">
+          <div
+            class="col-md-3 mb-3"
+            v-for="pod in pods"
+            :key="pod.metadata.uid"
+          >
             <div class="card" style="width: 18rem">
               <div class="card-body">
                 <img class="rounded mx-auto d-block w-20" :src="podsPNG" />
@@ -56,6 +60,21 @@
                 </p>
                 <div class="text-black-800 font-weight-bold">
                   Status: {{ pod.status.phase }}
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="row">
+                  <div class="col">
+                    <button type="button" class="btn btn-warning">Edit</button
+                    >&nbsp&nbsp
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      @click="deletePod(pod)"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -139,21 +158,22 @@ export default {
       message: "Loading...",
       errorMessageModal: "",
       messageModal: "",
-      selectedFile: null
+      selectedFile: null,
     };
   },
   methods: {
-    getInfoPods(){
-      axios.get("http://localhost:3000/api/pods")
-      .then((resp) => {
-        //console.log(resp.data)
-        this.message = ""
-        this.pods = resp.data
-      })
-      .catch((err) => {
-        this.message = ""
-        this.errorMessage = err.response.data.message
-      })
+    getInfoPods() {
+      axios
+        .get("http://localhost:3000/api/pods")
+        .then((resp) => {
+          //console.log(resp.data)
+          this.message = "";
+          this.pods = resp.data;
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message;
+        });
     },
     formatDate(date) {
       let dateObject = new Date(date);
@@ -162,32 +182,62 @@ export default {
     toggleModal() {
       this.messageModal = "";
       this.errorMessageModal = "";
-      this.PodName = null
+      this.PodName = null;
       $("#addPodModal").modal("toggle");
     },
-    selectFile(event){
-      this.selectedFile = event.target.files[0]
+    selectFile(event) {
+      this.selectedFile = event.target.files[0];
     },
-    addPod(){
-      this.errorMessageModal = ""
-      if(!this.selectedFile)
-        return this.errorMessageModal = "Please select a file!"
-      this.messageModal = "Creating pod..."
-      let formData = new FormData()
-      formData.append('pod_configfile', this.selectedFile)
-      axios.post("http://localhost:3000/api/pods", formData)
-      .then((resp) => {
-        this.pods.push(resp.data)
-        this.message = "Pod created successfully!"
-        this.toggleModal()
-      })
-      .catch((err) => {
-        this.errorMessageModal = err.response.data.message
-      })
-    }
+    addPod() {
+      this.errorMessageModal = "";
+      if (!this.selectedFile)
+        return (this.errorMessageModal = "Please select a file!");
+      this.messageModal = "Creating pod...";
+      let formData = new FormData();
+      formData.append("pod_configfile", this.selectedFile);
+      axios
+        .post("http://localhost:3000/api/pods", formData)
+        .then((resp) => {
+          this.pods.push(resp.data);
+          this.message = "Pod created successfully!";
+          this.toggleModal();
+        })
+        .catch((err) => {
+          this.errorMessageModal = err.response.data.message;
+        });
+    },
+    deletePod(pod) {
+      console.log(pod);
+      axios
+        .delete(
+          "http://localhost:3000/api/namespaces/" +
+            pod.metadata.namespace +
+            "/" +
+            pod.metadata.name
+        )
+        .then((resp) => {
+          console.log(resp.data);
+          this.message = "Deleting Pod, please wait 3 seconds";
+          setTimeout(() => {
+            this.getInfoPods();
+            setTimeout(() => {
+              this.message = "Pod deleted Sucessfully";
+            }, 1000);
+          }, 3000);
+        })
+        .catch((err) => {
+          this.message = "";
+          this.errorMessage = err.response.data.message.body
+            ? "Error " +
+              err.response.data.message.body.code +
+              ": " +
+              err.response.data.message.body.message
+            : err.response.data.message;
+        });
+    },
   },
   mounted() {
-    this.getInfoPods()
+    this.getInfoPods();
   },
 };
 </script>
