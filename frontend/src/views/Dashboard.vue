@@ -96,7 +96,8 @@
 import computer from "../assets/images/computer.png";
 import namespaces from "../assets/images/namespaces.png";
 import pods from "../assets/images/pods.png";
-//import deployments from "../assets/images/deployments.png";
+import deployments from "../assets/images/deployments.png";
+import services from "../assets/images/services.png";
 
 export default {
   data() {
@@ -104,7 +105,8 @@ export default {
       computerPNG: computer,
       namespacesPNG: namespaces,
       podsPNG: pods,
-  //    deploymentsPNG, deployments,
+      deploymentsPNG: deployments,
+      servicesPNG: services,
       numberNodes: "...",
       numberNamespaces: "...",
       numberPods: "...",

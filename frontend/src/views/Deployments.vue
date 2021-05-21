@@ -2,7 +2,7 @@
   <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
     <div class="container mx-auto px-6 py-8">
       <h3 class="text-gray-700 text-3xl font-medium">
-        Volumes
+        Deployments
         <button class="btn btn-info" @click="toggleModal()">
           Add <i class="far fa-plus-square"></i>
         </button>
@@ -26,51 +26,32 @@
           {{ message }}
         </div>
         <div class="row">
-          <div class="col-md-3 mb-3" v-for="volume in volumes" :key="volume.id">
+          <div class="col-md-3 mb-3" v-for="deployment in deployments" :key="deployment.metadata.uid">
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20" :src="diskPNG" />
+                <img class="rounded mx-auto d-block w-20" :src="deploymentsPNG" />
                 <h5 class="card-title text-center font-weight-bold">
-                  {{ volume.name ? volume.name : volume.id }}
+                  {{ deployment.metadata.name }}
                 </h5>
                 <p class="mt-2 text-gray-700">
-                  <strong>Size: </strong>{{ volume.size }} Gb
+                  <strong>Namespace: </strong>{{ deployment.metadata.namespace }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Bootable: </strong>{{ volume.bootable }}
+                  <strong>Running app: </strong>{{ deployment.metadata.labels.app }}
                 </p>
-                <p class="text-gray-700" v-if="volume.volume_image_metadata">
-                  <strong>Bootable with image: </strong
-                  >{{ volume.volume_image_metadata.image_name }}
+                <p class="text-gray-700">
+                  <strong>Strategy type: </strong>{{ deployment.spec.strategy.type }}
+                </p>
+                <div class="text-black-800 font-weight-bold">
+                  Replicas: {{ deployment.status.replicas }}
+                </div>
+                <p class="text-gray-700">
+                  <strong>Containers: </strong>{{ deployment.spec.template.spec.containers.length }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Created at: </strong
-                  >{{ formatDate(volume.created_at) }}
+                  >{{ formatDate(deployment.metadata.creationTimestamp) }}
                 </p>
-                <p class="text-gray-700">
-                  <strong>Updated at: </strong
-                  >{{ formatDate(volume.updated_at) }}
-                </p>
-                <div class="text-gray-700" v-if="volume.attachments.length">
-                  <strong>Attached to:</strong>
-                  <p
-                    v-for="attachment in volume.attachments"
-                    :key="attachment.id"
-                  >
-                    {{ attachment.device }};
-                  </p>
-                </div>
-                <div class="text-black-800 font-weight-bold">
-                  Status: {{ volume.status }}
-                </div>
-
-                <button
-                  type="submit"
-                  class="btn btn-danger"
-                  @click="deleteVolume(volume)"
-                >
-                  Delete
-                </button>
               </div>
             </div>
           </div>
@@ -78,7 +59,7 @@
       </div>
     </div>
     <!-- Modal -->
-    <div
+    <!--<div
       class="modal fade"
       id="addVolumeModal"
       tabindex="-1"
@@ -170,21 +151,16 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
   </main>
 </template>
 <script>
-import disk from "../assets/images/database.png";
+import deployments from "../assets/images/database.png";
 export default {
   data() {
     return {
-      diskPNG: disk,
-      volumes: [],
-      images: [],
-      volumeName: null,
-      volumeDescription: null,
-      volumeSource: null,
-      volumeSize: null,
+      deploymentsPNG: deployments,
+      deployments: [],
       errorMessage: "",
       message: "Loading...",
       errorMessageModal: "",
@@ -193,90 +169,17 @@ export default {
   },
 
   methods: {
-    deleteVolume(volume) {
-      console.log(volume);
-      axios
-        .delete("http://localhost:3000/api/volumes/" + volume.id, {
-          headers: {
-            "x-token": this.$store.state.authToken,
-            "x-server-address": this.$store.state.url,
-            "X-Project-Id": this.$store.state.selectedProject,
-          },
-        })
-        .then((response) => {
-          console.log("RESPONSE" + response);
-          let volumeDeleted = volume;
-          let index = this.volumes.indexOf(volumeDeleted);
-          console.log(index + this.volumes);
-          if (index > -1) {
-            this.volumes.splice(index, 1);
-            if (this.volumes.length == 0) {
-              this.message = "There are no Images  created.";
-            }
-          }
-          console.log(index + this.volumes);
-        })
-        .catch((error) => {
-          this.error = error.response.data.message;
-          console.log(error);
-        });
-    },
-    getInfoVolumes() {
-      axios
-        .get("http://localhost:3000/api/volumes/detail", {
-          headers: {
-            "X-Token": this.$store.state.authToken,
-            "X-Server-Address": this.$store.state.url,
-            "X-Project-Id": this.$store.state.selectedProject,
-          },
-        })
-        .then((response) => {
-          this.volumes = response.data.volumes.reverse();
-          this.message =
-            this.volumes.length == 0 ? "There are no Volumes created." : "";
-        })
-        .catch((error) => {
-          this.error = error.response.data.message;
-          console.log(error);
-        });
-    },
-    addVolume() {
-      this.errorMessageModal = "";
-      this.messageModal = "";
-      if (this.volumeName && this.volumeDescription && this.volumeSize) {
-        this.errorMessageModal = "";
-        this.messageModal = "Creating volume...";
-        axios
-          .post(
-            "http://localhost:3000/api/volumes",
-            {
-              volumeSize: parseInt(this.volumeSize),
-              volumeName: this.volumeName,
-              volumeSource: this.volumeSource,
-              volumeDescription: this.volumeDescription,
-            },
-            {
-              headers: {
-                "X-Token": this.$store.state.authToken,
-                "X-Server-Address": this.$store.state.url,
-                "X-Project-Id": this.$store.state.selectedProject,
-              },
-            }
-          )
-          .then((response) => {
-            this.message = "Volume created!";
-            this.getInfoVolumes();
-            this.toggleModal();
-          })
-          .catch((error) => {
-            this.messageModal = "";
-            this.errorMessageModal = error.response.data.message;
-            console.log(error);
-          });
-
-        return;
-      }
-      this.errorMessageModal = "All fields are required!";
+    getInfoDeployments(){
+      axios.get("http://localhost:3000/api/deployments")
+      .then((resp) => {
+        //console.log(resp.data)
+        this.message = ""
+        this.deployments = resp.data
+      })
+      .catch((err) => {
+        this.message = ""
+        this.errorMessage = err.response.data.message
+      })
     },
     formatDate(date) {
       let dateObject = new Date(date);
@@ -290,21 +193,7 @@ export default {
     },
   },
   mounted() {
-    this.getInfoVolumes();
-    axios
-      .get("http://localhost:3000/api/images", {
-        headers: {
-          "X-Token": this.$store.state.authToken,
-          "X-Server-Address": this.$store.state.url,
-        },
-      })
-      .then((response) => {
-        this.images = response.data.images;
-      })
-      .catch((error) => {
-        this.errorMessage = error.response.data.message;
-        console.log(error);
-      });
+    this.getInfoDeployments();
   },
 };
 </script>

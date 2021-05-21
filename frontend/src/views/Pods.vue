@@ -192,6 +192,10 @@ export default {
         this.message = ""
         this.pods = resp.data
       })
+      .catch((err) => {
+        this.message = ""
+        this.errorMessage = err.response.data.message
+      })
     },
     formatDate(date) {
       let dateObject = new Date(date);
