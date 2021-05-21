@@ -14,6 +14,6 @@ export const routes = [
   { path: '/namespaces', component: NamespacesComponent, meta: { title: 'Namespaces' } },
   { path: '/pods', component: PodsComponent, meta: { title: 'Pods' } },
   { path: '/deployments', component: DeploymentsComponent, meta: { title: 'Deployments' } },
-  { path: '/sevices', component: ServicesComponent, meta: { title: 'Services' } },
+  { path: '/services', component: ServicesComponent, meta: { title: 'Services' } },
   { path: '/:path(.*)', component: NotFound },
 ]
