@@ -2,6 +2,9 @@
   <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
     <div class="container mx-auto px-6 py-8">
       <h3 class="text-gray-700 text-3xl font-medium">Namespaces</h3>
+      <button class="btn btn-info" @click="toggleModal()">
+          Add <i class="far fa-plus-square"></i>
+        </button>
       <br />
       <div class="mt-4">
         <div
@@ -49,6 +52,70 @@
       </div>
     </div>
     <br />
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="addNamespaceModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addNamespaceModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addImageModalLabel">Add Namespace</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div
+              v-if="errorMessageModal"
+              class="alert alert-danger text-center"
+              role="alert"
+            >
+              {{ errorMessageModal }}
+            </div>
+            <div
+              v-else-if="messageModal"
+              class="alert alert-primary text-center"
+              role="alert"
+            >
+              {{ messageModal }}
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Namespace name"
+                aria-label="Namespace name"
+                aria-describedby="basic-addon1"
+                required
+                v-model="namespaceName"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" @click="addNamespace()" class="btn btn-primary">
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 <script>
@@ -58,8 +125,11 @@ export default {
     return {
       namespacesPNG: namespaces,
       namespaces: [],
+      namespaceName: "",
       errorMessage: "",
       message: "Loading...",
+      errorMessageModal: "",
+      messageModal: "",
     };
   },
   methods: {
@@ -79,7 +149,26 @@ export default {
       let dateObject = new Date(date);
       return dateObject.toLocaleString();
     },
-    
+    toggleModal() {
+      this.messageModal = "";
+      this.errorMessageModal = "";
+      this.namespaceName = null
+      $("#addNamespaceModal").modal("toggle");
+    },
+    addNamespace(){
+      this.errorMessageModal = ""
+      this.messageModal = "Creating namespace..."
+      axios.post("http://localhost:3000/api/namespaces", {name: this.namespaceName})
+      .then((resp) => {
+        this.message = "Namespace created successfully!"
+        this.namespaces.push(resp.data)
+        this.toggleModal()
+      })
+      .catch((err) => {
+        this.messageModal = ""
+        this.errorMessageModal = err.response.data.message
+      })
+    }
   },
   mounted() {
     this.getInfoNamespaces();

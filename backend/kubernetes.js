@@ -99,3 +99,16 @@ module.exports.getServices = (req, res) => {
         })
     });
 }
+
+module.exports.createNamespace = (req, res) => {
+    var data  = req.body;
+    k8sApi.createNamespace({
+        metadata: {
+            name: data.name
+        }
+    })
+    .then((resp) => res.send(resp.body))
+    .catch((err) => {
+       res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
+    })
+}
