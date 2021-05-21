@@ -2,7 +2,7 @@
   <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
     <div class="container mx-auto px-6 py-8">
       <h3 class="text-gray-700 text-3xl font-medium">
-        Images
+        Pods
         <button class="btn btn-info" @click="toggleModal()">
           Add <i class="far fa-plus-square"></i>
         </button>
@@ -25,38 +25,38 @@
           {{ message }}
         </div>
         <div class="row">
-          <div class="col-md-3 mb-3" v-for="image in images" :key="image.id">
+          <div class="col-md-3 mb-3" v-for="pod in pods" :key="pod.metadata.uid">
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20" :src="cdPNG" />
+                <img class="rounded mx-auto d-block w-20" :src="podsPNG" />
                 <h5 class="card-title text-center font-weight-bold">
-                  {{ image.name }}
+                  {{ pod.metadata.name }}
                 </h5>
                 <p class="mt-2 text-gray-700">
-                  <strong>Format: </strong>{{ image.disk_format }}
+                  <strong>Namespace: </strong>{{ pod.metadata.namespace }}
+                </p>
+                <p class="mt-2 text-gray-700">
+                  <strong>On node: </strong>{{ pod.spec.nodeName }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Size: </strong
-                  >{{ (image.size * 0.00000095367432).toFixed(1) }} Mb
+                  <strong>Running app: </strong>{{ pod.metadata.labels.app }}
+                </p>
+                <p class="text-gray-700">
+                  <strong>Containers: </strong>{{ pod.spec.containers.length }}
+                </p>
+                <p class="text-gray-700">
+                  <strong>Host IP: </strong>{{ pod.status.hostIP }}
+                </p>
+                <p class="text-gray-700">
+                  <strong>Pod IP: </strong>{{ pod.status.podIP }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Created at: </strong
-                  >{{ formatDate(image.created_at) }}
-                </p>
-                <p class="text-gray-700">
-                  <strong>Updated at: </strong
-                  >{{ formatDate(image.updated_at) }}
+                  >{{ formatDate(pod.metadata.creationTimestamp) }}
                 </p>
                 <div class="text-black-800 font-weight-bold">
-                  Status: {{ image.status }}
+                  Status: {{ pod.status.phase }}
                 </div>
-                <button
-                  type="submit"
-                  class="btn btn-danger"
-                  @click="deleteImage(image)"
-                >
-                  Delete
-                </button>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@
       </div>
     </div>
     <!-- Modal -->
-    <div
+    <!-- <div
       class="modal fade"
       id="addImageModal"
       tabindex="-1"
@@ -168,21 +168,16 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </main>
 </template>
 <script>
-import cd from "../assets/images/cd.png";
+import pods from "../assets/images/pods.png";
 export default {
   data() {
     return {
-      cdPNG: cd,
-      images: [],
-      imageName: null,
-      imageURI: null,
-      minRam: null,
-      minDisk: null,
-      diskFormat: "ami",
+      podsPNG: pods,
+      pods: [],
       errorMessage: "",
       message: "Loading...",
       errorMessageModal: "",
@@ -190,91 +185,13 @@ export default {
     };
   },
   methods: {
-    //http://192.168.56.102/image/v2/images/c0817e7a-8458-4b91-9c5d-d6e31f0ede83/import
-    deleteImage(image) {
-      //console.log(image);
-      axios
-        .delete("http://localhost:3000/api/images/" + image.id, {
-          headers: {
-            "x-token": this.$store.state.authToken,
-            "x-server-address": this.$store.state.url,
-          },
-        })
-        .then((response) => {
-          console.log("RESPONSE" + response);
-          let imageDeleted = image;
-          let index = this.images.indexOf(imageDeleted);
-          console.log(index + this.images);
-          if (index > -1) {
-            this.images.splice(index, 1);
-            if (this.images.length == 0) {
-              this.message = "There are no Images  created.";
-            }
-          }
-          console.log(index + this.images);
-        })
-        .catch((error) => {
-          this.errorMessage = error.response.status == 403 ? "You are not allowed to delete this image" : error.response.statusText
-          //console.log(error);
-        });
-    },
-    getInfoImages() {
-      axios
-        .get("http://localhost:3000/api/images", {
-          headers: {
-            "X-Token": this.$store.state.authToken,
-            "X-Server-Address": this.$store.state.url,
-          },
-        })
-        .then((response) => {
-          this.images = response.data.images;
-          this.message =
-            this.images.length == 0 ? "There are no Images created." : "";
-          this.errorMessage = ""
-        })
-        .catch((error) => {
-          this.errorMessage = error.response.data.message;
-          console.log(error);
-        });
-    },
-    addImage() {
-      this.errorMessageModal = "";
-      this.messageModal = "";
-      if (this.imageName && this.imageURI && this.minRam && this.minDisk) {
-        this.errorMessageModal = "";
-        this.messageModal = "Creating image...";
-        axios
-          .post(
-            "http://localhost:3000/api/images",
-            {
-              imageName: this.imageName,
-              imageURI: this.imageURI,
-              minRam: this.minRam,
-              minDisk: this.minDisk,
-              diskFormat: this.diskFormat,
-            },
-            {
-              headers: {
-                "X-Token": this.$store.state.authToken,
-                "X-Server-Address": this.$store.state.url,
-              },
-            }
-          )
-          .then((response) => {
-            this.message = "Image created!";
-            this.getInfoImages();
-            this.toggleModal();
-          })
-          .catch((error) => {
-            this.messageModal = "";
-            this.errorMessageModal =
-              error.response.data.message + " (Check the URI)";
-            console.log(error);
-          });
-
-        return;
-      }
-      this.errorMessageModal = "All fields are required!";
+    getInfoPods(){
+      axios.get("http://localhost:3000/api/pods")
+      .then((resp) => {
+        //console.log(resp.data)
+        this.message = ""
+        this.pods = resp.data
+      })
     },
     formatDate(date) {
       let dateObject = new Date(date);
@@ -288,7 +205,7 @@ export default {
     },
   },
   mounted() {
-    this.getInfoImages();
+    this.getInfoPods()
   },
 };
 </script>
