@@ -126,8 +126,16 @@ module.exports.createPod = (req, res) => {
         if(!podConfig.metadata.namespace)
             podConfig.metadata.namespace = "default"
         k8sApi.createNamespacedPod(podConfig.metadata.namespace, podConfig)
-        .then((resp) => res.send(resp.body))
+        .then((resp) => {
+            fs.unlink("podconfig.yml", () => {
+                return
+            });
+            res.send(resp.body);
+        })
         .catch((err) => {
+            fs.unlink("podconfig.yml", () => {
+                return
+            });
             res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
         })
     });
