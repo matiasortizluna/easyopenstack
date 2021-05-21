@@ -424,7 +424,7 @@
   </main>
 </template>
 <script>
-import ip from "../assets/images/address.png";
+import ip from "../assets/images/server.png";
 export default {
   data() {
     return {

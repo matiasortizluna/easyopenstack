@@ -29,7 +29,7 @@
           <div class="col-md-3 mb-3" v-for="deployment in deployments" :key="deployment.metadata.uid">
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <img class="rounded mx-auto d-block w-20" :src="deploymentsPNG" />
+                <img class="rounded mx-auto d-block w-20 mb-3" :src="deploymentsPNG" />
                 <h5 class="card-title text-center font-weight-bold">
                   {{ deployment.metadata.name }}
                 </h5>
@@ -155,7 +155,7 @@
   </main>
 </template>
 <script>
-import deployments from "../assets/images/database.png";
+import deployments from "../assets/images/deployments.png";
 export default {
   data() {
     return {
