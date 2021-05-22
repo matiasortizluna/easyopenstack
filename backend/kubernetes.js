@@ -240,3 +240,36 @@ module.exports.createService = (req, res) => {
             })
     });
 }
+
+
+module.exports.createDeployment = (req, res) => {
+    console.log(req.body)
+    console.log(req.files)
+
+    var configFile = req.files.deployment_configfile;
+    if (configFile.name.split(".")[1] != "yml" && configFile.name.split(".")[1] != "yaml")
+        return res.status(400).send({ "message": "It's not an YAML file!" });
+    configFile.mv("deploymentconfig.yml")
+    fs.readFile("deploymentconfig.yml", 'utf8', (err, data) => {
+        if (err)
+            return res.status(500).send({ "message": "Error while reading file. Try again." });
+        var deploymentconfig = yaml.load(data);
+        console.log(deploymentconfig)
+        if (!deploymentconfig.metadata.namespace)
+            deploymentconfig.metadata.namespace = "default"
+
+        k8sApi.createNamespacedService(deploymentconfig.metadata.namespace, deploymentconfig)
+            .then((resp) => {
+                fs.unlink("deploymentconfig.yml", () => {
+                    return
+                });
+                res.send(resp.body);
+            })
+            .catch((err) => {
+                fs.unlink("deploymentconfig.yml", () => {
+                    return
+                });
+                res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message })
+            })
+    });
+}

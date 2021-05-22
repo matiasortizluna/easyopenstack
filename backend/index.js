@@ -42,5 +42,6 @@ app.delete("/api/services/:namespace/:name", importedK8sFunctions.deleteService)
 app.post("/api/namespaces", importedK8sFunctions.createNamespace);
 app.post("/api/pods", importedK8sFunctions.createPod);
 app.post("/api/services", importedK8sFunctions.createService);
+app.post("/api/deployments", importedK8sFunctions.createDeployment);
 
 
