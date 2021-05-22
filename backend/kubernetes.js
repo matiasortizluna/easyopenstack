@@ -128,31 +128,34 @@ module.exports.deleteDeployment = (req, res) => {
 }
 
 module.exports.createPod = (req, res) => {
+    console.log(req.body)
+    console.log(req.files)
     var configFile = req.files.pod_configfile;
-    if(configFile.name.split(".")[1] != "yml" && configFile.name.split(".")[1] != "yaml")
-        return res.status(400).send({"message": "It's not an YAML file!"});
+    if (configFile.name.split(".")[1] != "yml" && configFile.name.split(".")[1] != "yaml")
+        return res.status(400).send({ "message": "It's not an YAML file!" });
     configFile.mv("podconfig.yml")
     fs.readFile("podconfig.yml", 'utf8', (err, data) => {
-        if(err)
-            return res.status(500).send({"message": "Error while reading file. Try again."});
+        if (err)
+            return res.status(500).send({ "message": "Error while reading file. Try again." });
         var podConfig = yaml.load(data);
         console.log(podConfig)
-        if(!podConfig.metadata.namespace)
+        if (!podConfig.metadata.namespace)
             podConfig.metadata.namespace = "default"
         k8sApi.createNamespacedPod(podConfig.metadata.namespace, podConfig)
-        .then((resp) => {
-            fs.unlink("podconfig.yml", () => {
-                return
-            });
-            res.send(resp.body);
-        })
-        .catch((err) => {
-            fs.unlink("podconfig.yml", () => {
-                return
-            });
-            res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
-        })
+            .then((resp) => {
+                fs.unlink("podconfig.yml", () => {
+                    return
+                });
+                res.send(resp.body);
+            })
+            .catch((err) => {
+                fs.unlink("podconfig.yml", () => {
+                    return
+                });
+                res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message })
+            })
     });
+}
 module.exports.deleteNamespace = (req, res) => {
     //console.log(req.params.namespace)
     k8sApi.deleteNamespace(req.params.namespace).then((resp) => {
@@ -190,4 +193,50 @@ module.exports.deletePod = (req, res) => {
                 "message": err
             })
         });
+}
+
+module.exports.deleteService = (req, res) => {
+    console.log(req.params)
+    k8sApi.deleteNamespacedService(req.params.name, req.params.namespace).then((resp) => {
+        res.send(resp.body);
+    })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                "message": err
+            })
+        });
+}
+
+
+module.exports.createService = (req, res) => {
+    console.log(req.body)
+    console.log(req.files)
+
+    var configFile = req.files.service_configfile;
+    if (configFile.name.split(".")[1] != "yml" && configFile.name.split(".")[1] != "yaml")
+        return res.status(400).send({ "message": "It's not an YAML file!" });
+    configFile.mv("serviceconfig.yml")
+    fs.readFile("serviceconfig.yml", 'utf8', (err, data) => {
+        if (err)
+            return res.status(500).send({ "message": "Error while reading file. Try again." });
+        var serviceConfig = yaml.load(data);
+        console.log(serviceConfig)
+        if (!serviceConfig.metadata.namespace)
+            serviceConfig.metadata.namespace = "default"
+
+        k8sApi.createNamespacedService(serviceConfig.metadata.namespace, serviceConfig)
+            .then((resp) => {
+                fs.unlink("serviceconfig.yml", () => {
+                    return
+                });
+                res.send(resp.body);
+            })
+            .catch((err) => {
+                fs.unlink("serviceconfig.yml", () => {
+                    return
+                });
+                res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message })
+            })
+    });
 }
