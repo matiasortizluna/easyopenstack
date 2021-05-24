@@ -73,7 +73,6 @@
                 <div class="row">
                   <div class="col">
                     <button type="button" class="btn btn-warning">Edit</button>
-                    &nbsp&nbsp
                     <button
                       type="button"
                       class="btn btn-danger"
@@ -224,7 +223,8 @@ export default {
       $("#addVolumeModal").modal("toggle");
     },
     deleteDeployment(deployment) {
-      console.log(deployment.metadata);
+      //console.log(deployment.metadata);
+      this.message = "Deleting Deployment";
       axios
         .delete(
           "http://localhost:3000/api/deployments/" +
@@ -233,8 +233,8 @@ export default {
             deployment.metadata.name
         )
         .then((resp) => {
-          console.log(resp.data);
-          this.message = "Deleting Deployment";
+          //console.log(resp.data);
+          this.getInfoDeployments()
         })
         .catch((err) => {
           this.message = "";

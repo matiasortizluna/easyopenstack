@@ -153,6 +153,7 @@ module.exports.createPod = (req, res) => {
             res.status(err.response.request.response.body.code).send({"message":err.response.request.response.body.message})
         })
     });
+}
 module.exports.deleteNamespace = (req, res) => {
     //console.log(req.params.namespace)
     k8sApi.deleteNamespace(req.params.namespace).then((resp) => {
