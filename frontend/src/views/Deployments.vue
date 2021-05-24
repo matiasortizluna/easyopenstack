@@ -89,18 +89,18 @@
       </div>
     </div>
     <!-- Modal -->
-    <!--<div
+    <div
       class="modal fade"
-      id="addVolumeModal"
+      id="addDeploymentModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="addVolumeModalLabel"
+      aria-labelledby="addDeploymentModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addImageModalLabel">Add Volume</h5>
+            <h5 class="modal-title" id="addDeploymentLabel">Add Deployment</h5>
             <button
               type="button"
               class="close"
@@ -125,45 +125,17 @@
             >
               {{ messageModal }}
             </div>
-            <div class="input-group mb-3">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Volume name"
-                aria-label="Volume name"
-                aria-describedby="basic-addon1"
-                required
-                v-model="volumeName"
-              />
-            </div>
-            <div class="input-group mb-3">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Volume description"
-                aria-label="Volume description"
-                aria-describedby="basic-addon1"
-                required
-                v-model="volumeDescription"
-              />
-            </div>
-            <label for="volume-source">Volume source</label>
+            <p>
+              Select the YAML file that contains the Deployment Configuration
+            </p>
             <br />
-            <select name="volume-source" v-model="volumeSource">
-              <option :value="null">No source, empty</option>
-              <option v-for="image in images" :key="image.id" :value="image.id">
-                Image: {{ image.name }}
-              </option>
-            </select>
-            <div class="input-group mb-3 mt-3">
+            <div class="input-group mb-3">
               <input
-                type="number"
+                type="file"
                 class="form-control"
-                placeholder="Size (GB)"
-                aria-label="Size"
-                aria-describedby="basic-addon1"
+                placeholder="Deployment config file"
                 required
-                v-model="volumeSize"
+                @change="selectFile($event)"
               />
             </div>
           </div>
@@ -175,13 +147,17 @@
             >
               Close
             </button>
-            <button type="button" @click="addVolume()" class="btn btn-primary">
+            <button
+              type="button"
+              @click="addDeployment()"
+              class="btn btn-primary"
+            >
               Add
             </button>
           </div>
         </div>
       </div>
-    </div>-->
+    </div>
   </main>
 </template>
 <script>
@@ -195,6 +171,7 @@ export default {
       message: "Loading...",
       errorMessageModal: "",
       messageModal: "",
+      selectedFile: null,
     };
   },
 
@@ -220,7 +197,10 @@ export default {
       this.messageModal = "";
       this.errorMessageModal = "";
       this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
-      $("#addVolumeModal").modal("toggle");
+      $("#addDeploymentModal").modal("toggle");
+    },
+    selectFile(event) {
+      this.selectedFile = event.target.files[0];
     },
     deleteDeployment(deployment) {
       //console.log(deployment.metadata);
@@ -235,10 +215,41 @@ export default {
         .then((resp) => {
           //console.log(resp.data);
           this.getInfoDeployments()
+
+          this.message = "Deleting Deployment, please wait 3 seconds";
+          setTimeout(() => {
+            this.getNodes();
+            setTimeout(() => {
+              this.message = "Deployment deleted Sucessfully";
+            }, 1000);
+          }, 3000);
         })
         .catch((err) => {
           this.message = "";
-          this.errorMessage = err.response.data.message;
+          this.errorMessage = err.response.data.message.body
+            ? "Error " +
+              err.response.data.message.body.code +
+              ": " +
+              err.response.data.message.body.message
+            : err.response.data.message;
+        });
+    },
+    addDeployment() {
+      this.errorMessageModal = "";
+      if (!this.selectedFile)
+        return (this.errorMessageModal = "Please select a file!");
+      this.messageModal = "Creating Deployment...";
+      let formData = new FormData();
+      formData.append("deployment_configfile", this.selectedFile);
+      axios
+        .post("http://localhost:3000/api/deployments", formData)
+        .then((resp) => {
+          this.deployments.push(resp.data);
+          this.message = "Deployment created successfully!";
+          this.toggleModal();
+        })
+        .catch((err) => {
+          this.errorMessageModal = err.response.data.message;
         });
     },
   },
