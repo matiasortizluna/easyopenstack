@@ -45,5 +45,7 @@ app.post("/api/services", importedK8sFunctions.createService);
 app.post("/api/deployments", importedK8sFunctions.createDeployment);
 app.post("/api/deployments/fast", importedK8sFunctions.fastCreateDeployment);
 
+app.patch("/api/deployments/:namespace/:name", importedK8sFunctions.updateDeployment);
+
 
 

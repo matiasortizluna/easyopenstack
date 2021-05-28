@@ -36,7 +36,7 @@ module.exports.checkKubeconfig = (req, res) => {
 
 module.exports.deleteKubeconfig = (req, res) => {
     fs.unlink("./k8s_config", (err) => {
-        if (err){
+        if (err) {
             res.status(500).send(err)
             return
         }
@@ -268,17 +268,31 @@ module.exports.createDeployment = (req, res) => {
     });
 }
 
+module.exports.updateDeployment = (req, res) => {
+    let deployment = req.body.depoyment_to_update;
+    console.log(deployment)
+
+    k8sApiBeta.patchNamespacedDeployment(req.params.name, req.params.namespace, deployment).then((resp) => {
+        res.send(resp.body);
+    })
+        .catch((err) => {
+            console.log(err)
+            res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message })
+        })
+}
+
+
 module.exports.fastCreateDeployment = (req, res) => {
     let deployment = req.body.deployment;
     k8sApiBeta.createNamespacedDeployment(deployment.metadata.namespace, deployment)
-    .then((resp) => {
-        if(!req.body.service.create_service || !deployment.spec.template.spec.containers[0].ports)
-            return res.send("");
-        fastCreateService(res, deployment.metadata.labels.app, req.body.service, deployment.metadata.namespace);
-    })
-    .catch((err) => {
-        res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message });
-    })
+        .then((resp) => {
+            if (!req.body.service.create_service || !deployment.spec.template.spec.containers[0].ports)
+                return res.send("");
+            fastCreateService(res, deployment.metadata.labels.app, req.body.service, deployment.metadata.namespace);
+        })
+        .catch((err) => {
+            res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message });
+        })
 }
 
 function fastCreateService(res, label, serviceInfo, namespace) {
@@ -286,10 +300,10 @@ function fastCreateService(res, label, serviceInfo, namespace) {
         apiVersion: "v1",
         kind: "Service",
         metadata: {
-            name: label+"-service"
+            name: label + "-service"
         },
-        spec:{
-            selector:{
+        spec: {
+            selector: {
                 app: label
             },
             ports: [
@@ -303,8 +317,8 @@ function fastCreateService(res, label, serviceInfo, namespace) {
         }
     }
     k8sApi.createNamespacedService(namespace, service)
-    .then(() => res.send(""))
-    .catch((err) => {
-        res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message });
-    })
+        .then(() => res.send(""))
+        .catch((err) => {
+            res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message });
+        })
 }
