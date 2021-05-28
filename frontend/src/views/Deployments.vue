@@ -72,7 +72,7 @@
               <div class="card-footer">
                 <div class="row">
                   <div class="col">
-                    <button type="button" class="btn btn-warning">Edit</button>
+                    <button type="button" class="btn btn-warning">Edit</button>&nbsp;&nbsp;
                     <button
                       type="button"
                       class="btn btn-danger"
