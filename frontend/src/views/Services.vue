@@ -61,23 +61,29 @@
                   }}
                 </p>
                 <p class="text-gray-700">
+                  <strong>Type: </strong
+                  >{{
+                    service.spec.type
+                  }}
+                </p>
+                <div class="text-gray-700">
                   <strong>Selectors: </strong>
                   <p v-for="selector,key in service.spec.selector" :key="selector">
                     &nbsp;&nbsp;&nbsp;&nbsp;{{
                       key+ ": " + selector
                     }}
                   </p>
-                </p>
+                </div>
                 <p class="text-gray-700">
                   <strong>Cluster IP: </strong>{{ service.spec.clusterIP }}
                 </p>
                 <div class="text-gray-700">
                   <strong>Ports:</strong>
-                  <p v-for="port in service.spec.ports" :key="port.port">
-                    &nbsp;&nbsp;&nbsp;&nbsp;{{
-                      port.port + ", " + port.protocol
-                    }}
-                  </p>
+                  <div class="ml-10" v-for="port in service.spec.ports" :key="port.port">
+                      <p>Containers: {{port.targetPort}}, {{port.protocol}} </p>
+                      <p>Internal: {{port.port}}, {{port.protocol}} </p>
+                      <p v-show="port.nodePort">External: {{ port.nodePort }}, {{port.protocol}} </p>
+                  </div>
                 </div>
                 <p class="text-gray-700">
                   <strong>Created at: </strong

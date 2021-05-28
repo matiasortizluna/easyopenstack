@@ -295,10 +295,11 @@ function fastCreateService(res, label, serviceInfo, namespace) {
             ports: [
                 {
                     protocol: serviceInfo.protocol,
-                    port: parseInt(serviceInfo.port),
+                    port: parseInt(serviceInfo.service_port),
                     targetPort: parseInt(serviceInfo.port)
                 }
-            ]
+            ],
+            type: serviceInfo.service_type
         }
     }
     k8sApi.createNamespacedService(namespace, service)

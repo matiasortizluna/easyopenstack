@@ -244,15 +244,30 @@
               <input v-model="fastDeployment.createService" type="checkbox" class="form-check-input" id="create-service-check">
               <label class="form-check-label" for="create-service-check">Create a service associated with the pods of this deployment</label>
             </div>
-            <div class="row" v-show="fastDeployment.createService">
-              <div class="col">
-                  <label for="protocol">Protocol</label>
-                  <select v-model="fastDeployment.protocol" name="protocol" id="protocol" class="form-control">
-                    <option value="TCP">TCP</option>
-                    <option value="UDP">UDP</option>
-                  </select>
+            <template v-if="fastDeployment.createService">
+              <div class="row" >
+                <div class="col">
+                    <label for="protocol">Protocol</label>
+                    <select v-model="fastDeployment.protocol" name="protocol" id="protocol" class="form-control">
+                      <option value="TCP">TCP</option>
+                      <option value="UDP">UDP</option>
+                    </select>
+                  </div>
+                <div class="col">
+                    <label for="service-type">Service Type</label>
+                    <select v-model="fastDeployment.serviceType" name="service-type" id="service-type" class="form-control">
+                      <option value="ClusterIP">Cluster IP (Internal)</option>
+                      <option value="NodePort">NodePort (External)</option>
+                    </select>
+                  </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <label for="service-port">Service port</label>
+                  <input v-model="fastDeployment.servicePort" type="number" class="form-control" id="servicePort">
                 </div>
-            </div>
+              </div>
+            </template>
           </div>
           <div class="modal-footer">
             <button
@@ -297,6 +312,8 @@ export default {
         port: 0,
         createService: false,
         protocol: "TCP",
+        serviceType: "NodePort",
+        servicePort: 80
       }
     };
   },
@@ -398,6 +415,11 @@ export default {
         return this.errorMessageModal = "All fields are required!"
       if(this.fastDeployment.replicas < 1 || this.fastDeployment.port < 0)
         return this.errorMessageModal = "Replica's quantity must be greater than zero and the Port number must be zero or greater!"
+      if(this.fastDeployment.createService){
+        if(this.fastDeployment.servicePort < 1)
+          return this.errorMessageModal = "Service port must be greater than 0!"
+      }
+        
       this.messageModal = "Creating Deployment..."
       let deployment = {
         apiVersion: "apps/v1",
@@ -440,7 +462,14 @@ export default {
          }
         ]
       }
-      axios.post("http://localhost:3000/api/deployments/fast", {"deployment": deployment, "service": { create_service: this.fastDeployment.createService, protocol: this.fastDeployment.protocol, port: this.fastDeployment.port}})
+      let service = { 
+        create_service: this.fastDeployment.createService,
+        protocol: this.fastDeployment.protocol,
+        port: this.fastDeployment.port,
+        service_type: this.fastDeployment.serviceType,
+        service_port: this.fastDeployment.servicePort
+      }
+      axios.post("http://localhost:3000/api/deployments/fast", {"deployment": deployment, "service": service})
       .then(() => {
         this.message = "Deployment created successfully!"
         this.toggleModalFastCreate()

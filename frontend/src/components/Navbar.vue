@@ -43,7 +43,7 @@
       to="/services"
       class="flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
     >
-      <i class="fas fa-fire-alt"></i>
+      <i class="fas fa-cogs"></i>
       <span class="mx-3">Services</span>
     </router-link>
   </nav>
