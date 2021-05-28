@@ -4,7 +4,7 @@
       <h3 class="text-gray-700 text-3xl font-medium">
         Services
         <button class="btn btn-info" @click="toggleModal()">
-          Add <i class="far fa-plus-square"></i>
+          Create <i class="far fa-plus-square"></i>
         </button>
       </h3>
 
@@ -81,7 +81,7 @@
                 <div class="row">
                   <div class="col">
                     <button type="button" class="btn btn-warning">Edit</button
-                    >&nbsp&nbsp
+                    >&nbsp;&nbsp;
                     <button
                       type="button"
                       class="btn btn-danger"
@@ -100,16 +100,16 @@
     <!-- Modal -->
     <div
       class="modal fade"
-      id="addServiceModal"
+      id="createServiceModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="addServiceModalLabel"
+      aria-labelledby="createServiceModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addServiceLabel">Add Service</h5>
+            <h5 class="modal-title" id="createServiceLabel">create Service</h5>
             <button
               type="button"
               class="close"
@@ -154,8 +154,8 @@
             >
               Close
             </button>
-            <button type="button" @click="addService()" class="btn btn-primary">
-              Add
+            <button type="button" @click="createService()" class="btn btn-primary">
+              create
             </button>
           </div>
         </div>
@@ -199,7 +199,7 @@ export default {
       this.messageModal = "";
       this.errorMessageModal = "";
       this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
-      $("#addServiceModal").modal("toggle");
+      $("#createServiceModal").modal("toggle");
     },
     selectFile(event) {
       this.selectedFile = event.target.files[0];
@@ -234,7 +234,7 @@ export default {
             : err.response.data.message;
         });
     },
-    addService() {
+    createService() {
       this.errorMessageModal = "";
       if (!this.selectedFile)
         return (this.errorMessageModal = "Please select a file!");

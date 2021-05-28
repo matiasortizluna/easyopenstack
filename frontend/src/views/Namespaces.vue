@@ -3,7 +3,7 @@
     <div class="container mx-auto px-6 py-8">
       <h3 class="text-gray-700 text-3xl font-medium">Namespaces</h3>
       <button class="btn btn-info" @click="toggleModal()">
-        Add <i class="far fa-plus-square"></i>
+        Create <i class="far fa-plus-square"></i>
       </button>
       <br />
       <div class="mt-4">
@@ -58,7 +58,7 @@
                 <div class="row">
                   <div class="col">
                     <button type="button" class="btn btn-warning">Edit</button
-                    >&nbsp&nbsp
+                    >&nbsp;&nbsp;
                     <button
                       type="button"
                       class="btn btn-danger"
@@ -78,16 +78,16 @@
     <!-- Modal -->
     <div
       class="modal fade"
-      id="addNamespaceModal"
+      id="createNamespaceModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="addNamespaceModalLabel"
+      aria-labelledby="createNamespaceModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addImageModalLabel">Add Namespace</h5>
+            <h5 class="modal-title" id="createImageModalLabel">create Namespace</h5>
             <button
               type="button"
               class="close"
@@ -118,7 +118,7 @@
                 class="form-control"
                 placeholder="Namespace name"
                 aria-label="Namespace name"
-                aria-describedby="basic-addon1"
+                aria-describedby="basic-createon1"
                 required
                 v-model="namespaceName"
               />
@@ -134,10 +134,10 @@
             </button>
             <button
               type="button"
-              @click="addNamespace()"
+              @click="createNamespace()"
               class="btn btn-primary"
             >
-              Add
+              create
             </button>
           </div>
         </div>
@@ -181,9 +181,9 @@ export default {
       this.messageModal = "";
       this.errorMessageModal = "";
       this.namespaceName = null;
-      $("#addNamespaceModal").modal("toggle");
+      $("#createNamespaceModal").modal("toggle");
     },
-    addNamespace() {
+    createNamespace() {
       this.errorMessageModal = "";
       this.messageModal = "Creating namespace...";
       axios

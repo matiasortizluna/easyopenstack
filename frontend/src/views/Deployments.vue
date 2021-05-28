@@ -3,8 +3,11 @@
     <div class="container mx-auto px-6 py-8">
       <h3 class="text-gray-700 text-3xl font-medium">
         Deployments
-        <button class="btn btn-info" @click="toggleModal()">
-          Add <i class="far fa-plus-square"></i>
+        <button class="btn btn-info mr-3" @click="toggleModal()">
+          Create <i class="far fa-plus-square"></i>
+        </button>
+        <button class="btn btn-success" @click="toggleModalFastCreate()">
+          Fast create <i class="far fa-plus-square"></i>
         </button>
       </h3>
 
@@ -46,10 +49,10 @@
                 </p>
 
                 <p class="text-gray-700">
-                  <strong>Running app: </strong
+                  <strong>Label: </strong
                   >{{
                     deployment.metadata.labels
-                      ? deployment.metadata.labels["k8s-app"]
+                      ? deployment.metadata.labels["k8s-app"] ?? deployment.metadata.labels["app"]
                       : "---"
                   }}
                 </p>
@@ -91,16 +94,16 @@
     <!-- Modal -->
     <div
       class="modal fade"
-      id="addDeploymentModal"
+      id="createDeploymentModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="addDeploymentModalLabel"
+      aria-labelledby="createDeploymentModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addDeploymentLabel">Add Deployment</h5>
+            <h5 class="modal-title" id="createDeploymentLabel">Create Deployment</h5>
             <button
               type="button"
               class="close"
@@ -149,10 +152,109 @@
             </button>
             <button
               type="button"
-              @click="addDeployment()"
+              @click="createDeployment()"
               class="btn btn-primary"
             >
-              Add
+              Create
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Fast Create -->
+    <div
+      class="modal fade"
+      id="fastCreateDeploymentModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="createDeploymentModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createDeploymentLabel">Deployment fast creation</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div
+              v-if="errorMessageModal"
+              class="alert alert-danger text-center"
+              role="alert"
+            >
+              {{ errorMessageModal }}
+            </div>
+            <div
+              v-else-if="messageModal"
+              class="alert alert-primary text-center"
+              role="alert"
+            >
+              {{ messageModal }}
+            </div>
+            <p>
+              Fill the fields to create a deployment easily
+            </p>
+            <br />
+            <div class="row mb-3">
+                <div class="col">
+                  <label for="depolyment-name">Deployment name</label>
+                  <input v-model="fastDeployment.name" type="text" class="form-control" id="deployment-name" placeholder="Enter deployment name">
+                </div>
+                <div class="col">
+                  <label for="namespace">Namespace</label>
+                  <select v-model="fastDeployment.namespace" name="namespace" id="namespace" class="form-control">
+                    <option v-for="namespace in namespaces" :key="namespace.metadata.name" :value="namespace.metadata.name">
+                      {{ namespace.metadata.name }}
+                    </option>
+                  </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                  <label for="label">Label</label>
+                  <input v-model="fastDeployment.label" type="text" class="form-control" id="label" placeholder="Enter label for the containers and deployment">
+                  <small class="form-text text-muted">Label used to identify the containers if this deployment.</small>
+                </div>
+                <div class="col">
+                  <label for="image-name">Image name</label>
+                  <input v-model="fastDeployment.image" type="text" class="form-control" id="image-name" placeholder="Enter the image name to use in the containers">
+                  <small class="form-text text-muted">Image name for the containers. Must be the exact name!</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                  <label for="replicas">Replicas</label>
+                  <input v-model="fastDeployment.replicas" type="number" class="form-control" id="replicas">
+                </div>
+                <div class="col">
+                  <label for="port">Port to expose</label>
+                  <input v-model="fastDeployment.port" type="number" class="form-control" id="port">
+                  <small class="form-text text-muted">Select "0" if no port needed</small>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              @click="fastCreateDeployment()"
+              class="btn btn-primary"
+            >
+              Create
             </button>
           </div>
         </div>
@@ -172,6 +274,15 @@ export default {
       errorMessageModal: "",
       messageModal: "",
       selectedFile: null,
+      namespaces: [],
+      fastDeployment: {
+        name: "",
+        namespace: "",
+        label: "",
+        image: "",
+        replicas: 1,
+        port: 0
+      }
     };
   },
 
@@ -180,7 +291,6 @@ export default {
       axios
         .get("http://localhost:3000/api/deployments")
         .then((resp) => {
-          console.log(resp.data);
           this.message = "";
           this.deployments = resp.data;
         })
@@ -196,8 +306,22 @@ export default {
     toggleModal() {
       this.messageModal = "";
       this.errorMessageModal = "";
-      this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
-      $("#addDeploymentModal").modal("toggle");
+      this.selectedFile = null
+      $("#createDeploymentModal").modal("toggle");
+    },
+    toggleModalFastCreate() {
+      this.messageModal = "Loading...";
+      this.errorMessageModal = "";
+      this.fastDeployment.name = this.fastDeployment.namespace = this.fastDeployment.label = this.fastDeployment.image = null
+      this.fastDeployment.replicas = 1
+      this.fastDeployment.port = 0
+      axios.get("http://localhost:3000/api/namespaces")
+      .then((resp) => {
+        this.namespaces = resp.data
+        this.messageModal = ""
+      })
+      .catch(() => this.errorMessageModal = "Error while fetching namespaces.")
+      $("#fastCreateDeploymentModal").modal("toggle");
     },
     selectFile(event) {
       this.selectedFile = event.target.files[0];
@@ -234,7 +358,7 @@ export default {
             : err.response.data.message;
         });
     },
-    addDeployment() {
+    createDeployment() {
       this.errorMessageModal = "";
       if (!this.selectedFile)
         return (this.errorMessageModal = "Please select a file!");
@@ -252,6 +376,62 @@ export default {
           this.errorMessageModal = err.response.data.message;
         });
     },
+    fastCreateDeployment(){
+      this.errorMessageModal = ""
+      if(!this.fastDeployment.name || !this.fastDeployment.namespace || !this.fastDeployment.label || !this.fastDeployment.image)
+        return this.errorMessageModal = "All fields are required!"
+      if(this.fastDeployment.replicas < 1 || this.fastDeployment.port < 0)
+        return this.errorMessageModal = "Replica's quantity must be greater than zero and the Port number must be zero or greater!"
+      this.messageModal = "Creating Deployment..."
+      let deployment = {
+        apiVersion: "apps/v1",
+        kind: "Deployment",
+        metadata: {
+          name: this.fastDeployment.name,
+          namespace: this.fastDeployment.namespace,
+          labels: {
+            app: this.fastDeployment.label
+          }
+        },
+        spec: {
+          replicas: this.fastDeployment.replicas,
+          selector: {
+            matchLabels: {
+              app: this.fastDeployment.label
+            }
+          },
+          template: {
+            metadata: {
+              labels: {
+                app: this.fastDeployment.label
+              }
+            },
+            spec: {
+              containers: [
+                {
+                  name: this.fastDeployment.label,
+                  image: this.fastDeployment.image
+                }
+              ]
+            }
+          } 
+        }
+      }
+      if (this.fastDeployment.port > 0)
+        deployment.spec.template.spec.containers.ports = {
+          containerPort: this.fastDeployment.port
+        }
+      axios.post("http://localhost:3000/api/deployments/fast", deployment)
+      .then(() => {
+        this.message = "Deployment created successfully!"
+        this.toggleModalFastCreate()
+        this.getInfoDeployments()
+      })
+      .catch((err) => {
+        this.messageModal = ""
+        this.errorMessageModal = err.response.data.message
+      })
+    }
   },
   mounted() {
     this.getInfoDeployments();

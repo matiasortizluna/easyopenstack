@@ -43,5 +43,7 @@ app.post("/api/namespaces", importedK8sFunctions.createNamespace);
 app.post("/api/pods", importedK8sFunctions.createPod);
 app.post("/api/services", importedK8sFunctions.createService);
 app.post("/api/deployments", importedK8sFunctions.createDeployment);
+app.post("/api/deployments/fast", importedK8sFunctions.fastCreateDeployment);
+
 
 

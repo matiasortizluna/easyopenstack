@@ -4,7 +4,7 @@
       <h3 class="text-gray-700 text-3xl font-medium">
         Pods
         <button class="btn btn-info" @click="toggleModal()">
-          Add <i class="far fa-plus-square"></i>
+          Create <i class="far fa-plus-square"></i>
         </button>
       </h3>
       <br />
@@ -66,7 +66,7 @@
                 <div class="row">
                   <div class="col">
                     <button type="button" class="btn btn-warning">Edit</button
-                    >&nbsp&nbsp
+                    >&nbsp;&nbsp;
                     <button
                       type="button"
                       class="btn btn-danger"
@@ -85,16 +85,16 @@
     <!-- Modal -->
     <div
       class="modal fade"
-      id="addPodModal"
+      id="createPodModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="addPodModalLabel"
+      aria-labelledby="createPodModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addPodModalLabel">Add Pod</h5>
+            <h5 class="modal-title" id="createPodModalLabel">create Pod</h5>
             <button
               type="button"
               class="close"
@@ -138,8 +138,8 @@
             >
               Close
             </button>
-            <button type="button" @click="addPod()" class="btn btn-primary">
-              Add
+            <button type="button" @click="createPod()" class="btn btn-primary">
+              create
             </button>
           </div>
         </div>
@@ -183,12 +183,12 @@ export default {
       this.messageModal = "";
       this.errorMessageModal = "";
       this.PodName = null;
-      $("#addPodModal").modal("toggle");
+      $("#createPodModal").modal("toggle");
     },
     selectFile(event) {
       this.selectedFile = event.target.files[0];
     },
-    addPod() {
+    createPod() {
       this.errorMessageModal = "";
       if (!this.selectedFile)
         return (this.errorMessageModal = "Please select a file!");
