@@ -60,7 +60,14 @@
                       : "---"
                   }}
                 </p>
-
+                <p class="text-gray-700">
+                  <strong>Selectors: </strong>
+                  <p v-for="key,selector in service.spec.selector" :key="selector">
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{
+                      key+ ": " + selector
+                    }}
+                  </p>
+                </p>
                 <p class="text-gray-700">
                   <strong>Cluster IP: </strong>{{ service.spec.clusterIP }}
                 </p>
@@ -182,7 +189,7 @@ export default {
       axios
         .get("http://localhost:3000/api/services")
         .then((resp) => {
-          //console.log(resp.data)
+          console.log(resp.data)
           this.message = "";
           this.services = resp.data;
         })

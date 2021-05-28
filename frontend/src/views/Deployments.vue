@@ -240,6 +240,19 @@
                   <small class="form-text text-muted">Select "0" if no port needed</small>
                 </div>
             </div>
+            <div class="form-check mt-3">
+              <input v-model="fastDeployment.createService" type="checkbox" class="form-check-input" id="create-service-check">
+              <label class="form-check-label" for="create-service-check">Create a service associated with the pods of this deployment</label>
+            </div>
+            <div class="row" v-show="fastDeployment.createService">
+              <div class="col">
+                  <label for="protocol">Protocol</label>
+                  <select v-model="fastDeployment.protocol" name="protocol" id="protocol" class="form-control">
+                    <option value="TCP">TCP</option>
+                    <option value="UDP">UDP</option>
+                  </select>
+                </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -281,7 +294,9 @@ export default {
         label: "",
         image: "",
         replicas: 1,
-        port: 0
+        port: 0,
+        createService: false,
+        protocol: "TCP",
       }
     };
   },
@@ -315,6 +330,7 @@ export default {
       this.fastDeployment.name = this.fastDeployment.namespace = this.fastDeployment.label = this.fastDeployment.image = null
       this.fastDeployment.replicas = 1
       this.fastDeployment.port = 0
+      this.fastDeployment.createService = false
       axios.get("http://localhost:3000/api/namespaces")
       .then((resp) => {
         this.namespaces = resp.data
@@ -342,7 +358,7 @@ export default {
 
           this.message = "Deleting Deployment, please wait 3 seconds";
           setTimeout(() => {
-            this.getNodes();
+            this.getInfoDeployments();
             setTimeout(() => {
               this.message = "Deployment deleted Sucessfully";
             }, 1000);
@@ -417,11 +433,14 @@ export default {
           } 
         }
       }
-      if (this.fastDeployment.port > 0)
-        deployment.spec.template.spec.containers.ports = {
-          containerPort: this.fastDeployment.port
-        }
-      axios.post("http://localhost:3000/api/deployments/fast", deployment)
+      if (this.fastDeployment.port > 0){
+        deployment.spec.template.spec.containers[0].ports = [
+         {
+           containerPort: parseInt(this.fastDeployment.port)
+         }
+        ]
+      }
+      axios.post("http://localhost:3000/api/deployments/fast", {"deployment": deployment, "service": { create_service: this.fastDeployment.createService, protocol: this.fastDeployment.protocol, port: this.fastDeployment.port}})
       .then(() => {
         this.message = "Deployment created successfully!"
         this.toggleModalFastCreate()
@@ -431,7 +450,7 @@ export default {
         this.messageModal = ""
         this.errorMessageModal = err.response.data.message
       })
-    }
+    },
   },
   mounted() {
     this.getInfoDeployments();

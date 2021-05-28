@@ -269,10 +269,41 @@ module.exports.createDeployment = (req, res) => {
 }
 
 module.exports.fastCreateDeployment = (req, res) => {
-    let deployment = req.body;
+    let deployment = req.body.deployment;
     k8sApiBeta.createNamespacedDeployment(deployment.metadata.namespace, deployment)
-    .then((resp) => res.send(""))
+    .then((resp) => {
+        if(!req.body.service.create_service || !deployment.spec.template.spec.containers[0].ports)
+            return res.send("");
+        fastCreateService(res, deployment.metadata.labels.app, req.body.service, deployment.metadata.namespace);
+    })
     .catch((err) => {
-        res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message })
+        res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message });
+    })
+}
+
+function fastCreateService(res, label, serviceInfo, namespace) {
+    let service = {
+        apiVersion: "v1",
+        kind: "Service",
+        metadata: {
+            name: label+"-service"
+        },
+        spec:{
+            selector:{
+                app: label
+            },
+            ports: [
+                {
+                    protocol: serviceInfo.protocol,
+                    port: parseInt(serviceInfo.port),
+                    targetPort: parseInt(serviceInfo.port)
+                }
+            ]
+        }
+    }
+    k8sApi.createNamespacedService(namespace, service)
+    .then(() => res.send(""))
+    .catch((err) => {
+        res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message });
     })
 }
