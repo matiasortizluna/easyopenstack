@@ -62,7 +62,7 @@
                 </p>
                 <p class="text-gray-700">
                   <strong>Selectors: </strong>
-                  <p v-for="key,selector in service.spec.selector" :key="selector">
+                  <p v-for="selector,key in service.spec.selector" :key="selector">
                     &nbsp;&nbsp;&nbsp;&nbsp;{{
                       key+ ": " + selector
                     }}
@@ -87,8 +87,8 @@
               <div class="card-footer">
                 <div class="row">
                   <div class="col">
-                    <button type="button" class="btn btn-warning">Edit</button
-                    >&nbsp;&nbsp;
+                   <!-- <button type="button" class="btn btn-warning">Edit</button
+                    >&nbsp;&nbsp;-->
                     <button
                       type="button"
                       class="btn btn-danger"
