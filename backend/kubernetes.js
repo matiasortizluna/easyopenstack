@@ -169,18 +169,6 @@ module.exports.deleteNamespace = (req, res) => {
         });
 }
 
-module.exports.deleteNode = (req, res) => {
-    //console.log(req.params)
-    k8sApi.deleteNode(req.params.name).then((resp) => {
-        res.send(resp.body);
-    })
-        .catch((err) => {
-            console.log(err)
-            res.status(500).send({
-                "message": err
-            })
-        });
-}
 
 module.exports.deletePod = (req, res) => {
     console.log(req.params)

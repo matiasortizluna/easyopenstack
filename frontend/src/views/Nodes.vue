@@ -61,21 +61,6 @@
                   Images on the node: {{ node.status.images.length }}
                 </div>
               </div>
-              <div class="card-footer">
-                <div class="row">
-                  <div class="col">
-                    <button type="button" class="btn btn-warning">Edit</button
-                    >&nbsp&nbsp
-                    <button
-                      type="button"
-                      class="btn btn-danger"
-                      @click="deleteNode(node)"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -100,36 +85,6 @@ export default {
         this.nodes = resp.data;
         this.message = "";
       });
-    },
-    deleteNode(node) {
-      console.log(node.metadata.name);
-      /*
-      axios
-        .delete("http://localhost:3000/api/nodes/" + node.metadata.name)
-        .then((resp) => {
-          //console.log(resp.data);
-          this.getNodes();
-          this.message = "Node deleted Sucessfully";
-          
-          this.message = "Deleting Node, please wait 8 seconds";
-          setTimeout(() => {
-            this.getNodes();
-            setTimeout(() => {
-              this.message = "Node deleted Sucessfully";
-            }, 1000);
-          }, 8000);
-          
-        })
-        .catch((err) => {
-          this.message = "";
-          this.errorMessage = err.response.data.message.body
-            ? "Error " +
-              err.response.data.message.body.code +
-              ": " +
-              err.response.data.message.body.message
-            : err.response.data.message;
-        });
-        */
     },
   },
   mounted() {
