@@ -279,7 +279,6 @@ module.exports.fastCreateDeployment = (req, res) => {
     .catch((err) => {
         res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message });
     })
-    k8sApiBeta.patchNamespacedDeployment
 }
 
 function fastCreateService(res, label, serviceInfo, namespace) {

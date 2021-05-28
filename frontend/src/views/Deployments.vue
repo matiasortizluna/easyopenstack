@@ -323,6 +323,7 @@ export default {
       axios
         .get("http://localhost:3000/api/deployments")
         .then((resp) => {
+          console.log(resp.data)
           this.message = "";
           this.deployments = resp.data;
         })

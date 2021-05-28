@@ -43,7 +43,9 @@
                   <strong>On node: </strong>{{ pod.spec.nodeName }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Running app: </strong>{{ pod.metadata.labels.app }}
+                  <strong>Label: </strong>{{ pod.metadata.labels
+                      ? pod.metadata.labels["k8s-app"] ?? pod.metadata.labels["app"]
+                      : "---" }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Containers: </strong>{{ pod.spec.containers.length }}
@@ -166,7 +168,7 @@ export default {
       axios
         .get("http://localhost:3000/api/pods")
         .then((resp) => {
-          //console.log(resp.data)
+          console.log(resp.data)
           this.message = "";
           this.pods = resp.data;
         })
@@ -210,7 +212,7 @@ export default {
       console.log(pod);
       axios
         .delete(
-          "http://localhost:3000/api/namespaces/" +
+          "http://localhost:3000/api/pods/" +
             pod.metadata.namespace +
             "/" +
             pod.metadata.name

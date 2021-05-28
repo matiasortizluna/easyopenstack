@@ -81,8 +81,8 @@
                   <strong>Ports:</strong>
                   <div class="ml-10" v-for="port in service.spec.ports" :key="port.port">
                       <p>Containers: {{port.targetPort}}, {{port.protocol}} </p>
-                      <p>Internal: {{port.port}}, {{port.protocol}} </p>
-                      <p v-show="port.nodePort">External: {{ port.nodePort }}, {{port.protocol}} </p>
+                      <p>Internal (Cluster): {{port.port}}, {{port.protocol}} </p>
+                      <p v-show="port.nodePort">External (Node): {{ port.nodePort }}, {{port.protocol}} </p>
                   </div>
                 </div>
                 <p class="text-gray-700">
