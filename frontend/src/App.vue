@@ -49,7 +49,7 @@
                   </button>
                 </div>
 
-                <div class="flex items-center">
+ <div class="flex items-center">
                   <div class="relative">
                     <button
                       @click.prevent="menuUser"
@@ -73,21 +73,11 @@
                       class="absolute right-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-10"
                       style="display: none"
                     >
-                      <a
-                        href="#"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
-                        >Profile</a
-                      >
-                      <a
-                        href="#"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
-                        >Products</a
-                      >
-                      <button @click.prevent="logout">
+                      <button @click.prevent="deleteKubeconfig">
                         <a
                           href="#"
                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
-                          >Logout</a
+                          >Change KUBECONFIG file</a
                         >
                       </button>
                     </div>
@@ -118,11 +108,21 @@ export default {
       logoUrl: imgUrl,
       person: personPNG,
       isKubeconfigValid: false,
+      dropdownOpen: false
     }
   },
   methods:{
     validKubeconfig(){
       this.isKubeconfigValid = true
+    },
+    menuUser(){
+      this.dropdownOpen = !this.dropdownOpen
+    },
+    deleteKubeconfig(){
+      this.dropdownOpen = false
+      axios.delete('http://localhost:3000/api/kubeconfig')
+      .then(() => this.isKubeconfigValid = false)
+      .catch((err) => console.log(err.response))
     }
   }
 

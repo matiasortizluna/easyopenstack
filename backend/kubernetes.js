@@ -34,6 +34,16 @@ module.exports.checkKubeconfig = (req, res) => {
     });
 }
 
+module.exports.deleteKubeconfig = (req, res) => {
+    fs.unlink("./k8s_config", (err) => {
+        if (err){
+            res.status(500).send(err)
+            return
+        }
+        res.send("")
+    });
+}
+
 module.exports.getNodes = (req, res) => {
     k8sApi.listNode().then((resp) => {
         res.send(resp.body.items);
