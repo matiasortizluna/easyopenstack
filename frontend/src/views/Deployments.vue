@@ -213,9 +213,7 @@
             >
               {{ messageModal }}
             </div>
-
             <br />
-
             <div class="row mb-3">
               <div class="col">
                 <label for="depolyment-name">Deployment Name</label>
@@ -242,18 +240,46 @@
               <div class="col">
                 <label for="deployment_labels">Deployment Labels</label>
                 <br />
-                <strong>Check box with options</strong>
-                <br />
-                <strong>Text to write more, separated by ;</strong>
-                <br />
+                <div
+                  v-for="label in deployments_labels.before"
+                  v-bind:key="label"
+                  class="form-check form-check-inline"
+                  :value="label"
+                >
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="inlineCheckbox1"
+                    v-model="deployments_labels.before"
+                    checked
+                    disabled
+                  />
+                  <label class="form-check-label" for="inlineCheckbox1">{{
+                    label
+                  }}</label>
+                </div>
+                <div>
+                  <input
+                    v-model="deployments_labels.new"
+                    type="text"
+                    class="form-control"
+                    id="deployment-label"
+                    placeholder="New Deployment Label"
+                  />
+                </div>
               </div>
-
               <div class="col">
                 <label for="stategy_type">Strategy Type</label>
-                <br />
-                <strong
-                  >Select with available options and selected option</strong
+                <select
+                  v-model="selectedDeployment.spec.strategy.type"
+                  name="strategy"
+                  id="strategy"
+                  class="form-control"
                 >
+                  <option value="Recreation">Recreation</option>
+                  <option value="Canary">Canary</option>
+                  <option value="RollingUpdate">Rolling Update</option>
+                </select>
                 <br />
               </div>
             </div>
@@ -261,15 +287,39 @@
               <div class="col">
                 <label for="replicas_labels">Replicas Labels</label>
                 <br />
-                <strong>Check box with options</strong>
-                <br />
-                <strong>Text to write more, separated by ;</strong>
-                <br />
+                <div
+                  v-for="label in replicas_labels.before"
+                  v-bind:key="label"
+                  class="form-check form-check-inline"
+                  :value="label"
+                >
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="inlineCheckbox1"
+                    v-model="replicas_labels.before"
+                    checked
+                    disabled
+                  />
+                  <label class="form-check-label" for="inlineCheckbox1">{{
+                    label
+                  }}</label>
+                </div>
+                <div>
+                  <input
+                    v-model="replicas_labels.new"
+                    type="text"
+                    class="form-control"
+                    id="replicas-label"
+                    placeholder="New Replicas Label"
+                    disabled
+                  />
+                </div>
               </div>
               <div class="col">
                 <label for="replicas">Replicas</label>
                 <input
-                  v-model="this.selectedDeployment.spec.replicas"
+                  v-model="selectedDeployment.spec.replicas"
                   type="number"
                   class="form-control"
                   id="replicas"
@@ -507,6 +557,8 @@ export default {
       messageModal: "",
       selectedFile: null,
       namespaces: [],
+      deployments_labels: { before: {}, new: [] },
+      replicas_labels: { before: {}, new: [] },
       fastDeployment: {
         name: "",
         namespace: "",
@@ -519,7 +571,6 @@ export default {
         serviceType: "NodePort",
         servicePort: 80,
       },
-
       selectedDeployment: {
         apiVersion: "",
         kind: "",
@@ -533,6 +584,9 @@ export default {
           },
         },
         spec: {
+          strategy: {
+            type: "",
+          },
           replicas: 0,
           selector: {
             matchLabels: {
@@ -562,7 +616,6 @@ export default {
       },
     };
   },
-
   methods: {
     getInfoDeployments() {
       axios
@@ -591,6 +644,8 @@ export default {
       this.messageModal = "Loading...";
       this.errorMessageModal = "";
       this.selectedDeployment = deployment;
+      this.deployments_labels.before = deployment.metadata.labels;
+      this.replicas_labels.before = deployment.spec.selector.matchLabels;
       console.log(this.selectedDeployment);
       $("#updateDeploymentModal").modal("toggle");
       this.messageModal = "";
@@ -675,27 +730,28 @@ export default {
         !this.fastDeployment.image
       )
         return (this.errorMessageModal = "All fields are required!");
-      if (this.fastDeployment.replicas < 1 || this.fastDeployment.port < 0)
+        */
+      if (this.selectedDeployment.spec.replicas < 1)
         return (this.errorMessageModal =
           "Replica's quantity must be greater than zero and the Port number must be zero or greater!");
-          */
-      //this.messageModal = "Updating Deployment...";
-      console.log("selectedDeployment");
-      console.log(this.selectedDeployment);
-      this.selectedDeployment.metadata.labels.app = "new_label";
+
+      // Update Replicas type to Int
       this.selectedDeployment.spec.replicas = parseInt(
         this.selectedDeployment.spec.replicas
       );
+      // Add new labels to replicas
+      this.selectedDeployment.spec.selector.matchLabels[
+        this.replicas_labels.new
+      ] = this.replicas_labels.new;
+      // Add new labels to deployment
+      this.selectedDeployment.metadata.labels[
+        this.deployments_labels.new
+      ] = this.deployments_labels.new;
+
       console.log("selectedDeploymentXXXX");
       console.log(this.selectedDeployment);
-      /*let depoyment_to_update = {
-        metadata: {
-          labels: {
-            app: "hello_new",
-          },
-        },
-      };
-      */
+      console.log(this.deployments_labels.new);
+
       let depoyment_to_update = this.selectedDeployment;
       axios
         .patch(
