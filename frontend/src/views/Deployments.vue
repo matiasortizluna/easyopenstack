@@ -269,7 +269,7 @@
               <div class="col">
                 <label for="replicas">Replicas</label>
                 <input
-                  v-model="selectedDeployment.spec.replicas"
+                  v-model="this.selectedDeployment.spec.replicas"
                   type="number"
                   class="form-control"
                   id="replicas"
@@ -680,9 +680,14 @@ export default {
           "Replica's quantity must be greater than zero and the Port number must be zero or greater!");
           */
       //this.messageModal = "Updating Deployment...";
+      console.log("selectedDeployment");
       console.log(this.selectedDeployment);
       this.selectedDeployment.metadata.labels.app = "new_label";
-      this.selectedDeployment.spec.replicas = 20;
+      this.selectedDeployment.spec.replicas = parseInt(
+        this.selectedDeployment.spec.replicas
+      );
+      console.log("selectedDeploymentXXXX");
+      console.log(this.selectedDeployment);
       /*let depoyment_to_update = {
         metadata: {
           labels: {
@@ -706,7 +711,10 @@ export default {
           console.log(res);
           this.message = "Deployment Updated successfully!";
           this.toggleUpdateDeploymentModal();
-          this.getInfoDeployments();
+          this.cleanSelectedDeployment();
+          setTimeout(() => {
+            this.getInfoDeployments();
+          }, 500);
         })
         .catch((err) => {
           this.messageModal = "";
@@ -793,6 +801,48 @@ export default {
           this.messageModal = "";
           this.errorMessageModal = err.response.data.message;
         });
+    },
+    cleanSelectedDeployment() {
+      this.selectedDeployment = {
+        apiVersion: "",
+        kind: "",
+        metadata: {
+          name: "",
+          namespace: "",
+          labels: {
+            app: "",
+            other: "",
+            another: "",
+          },
+        },
+        spec: {
+          replicas: 0,
+          selector: {
+            matchLabels: {
+              app: "",
+              other: "",
+              another: "",
+            },
+          },
+          template: {
+            metadata: {
+              labels: {
+                app: "",
+                other: "",
+                another: "",
+              },
+            },
+            spec: {
+              containers: [
+                {
+                  name: "",
+                  image: "",
+                },
+              ],
+            },
+          },
+        },
+      };
     },
   },
   mounted() {
