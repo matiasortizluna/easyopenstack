@@ -276,7 +276,6 @@
                   id="strategy"
                   class="form-control"
                 >
-                  <option value="Recreation">Recreation</option>
                   <option value="Canary">Canary</option>
                   <option value="RollingUpdate">Rolling Update</option>
                 </select>
@@ -297,9 +296,7 @@
                     class="form-check-input"
                     type="checkbox"
                     id="inlineCheckbox1"
-                    v-model="replicas_labels.before"
-                    checked
-                    disabled
+                    v-model="replicas_labels.new"
                   />
                   <label class="form-check-label" for="inlineCheckbox1">{{
                     label
@@ -469,6 +466,21 @@
                 >
               </div>
             </div>
+            <div class="row">
+              <div class="col">
+                <label for="strategy_deployment">Strategy Type</label>
+                <select
+                  v-model="fastCreateDeployment.strategy_type"
+                  name="strategy_deployment"
+                  id="strategy_deployment"
+                  class="form-control"
+                >
+                  <option value="Canary">Canary</option>
+                  <option value="RollingUpdate">Rolling Update</option>
+                </select>
+                <br />
+              </div>
+            </div>
             <div class="form-check mt-3">
               <input
                 v-model="fastDeployment.createService"
@@ -570,6 +582,7 @@ export default {
         protocol: "TCP",
         serviceType: "NodePort",
         servicePort: 80,
+        strategy_type: "Recreate",
       },
       selectedDeployment: {
         apiVersion: "",
@@ -643,17 +656,22 @@ export default {
     toggleUpdateDeploymentModal(deployment) {
       this.messageModal = "Loading...";
       this.errorMessageModal = "";
-      this.selectedDeployment = deployment;
-      this.deployments_labels.before = deployment.metadata.labels;
-      this.replicas_labels.before = deployment.spec.selector.matchLabels;
-      console.log(this.selectedDeployment);
+      if (deployment) {
+        this.selectedDeployment = deployment;
+        this.deployments_labels.before = deployment.metadata.labels;
+        this.replicas_labels.before = deployment.spec.selector.matchLabels;
+      }
       $("#updateDeploymentModal").modal("toggle");
       this.messageModal = "";
     },
     toggleModalFastCreate() {
       this.messageModal = "Loading...";
       this.errorMessageModal = "";
-      this.fastDeployment.name = this.fastDeployment.namespace = this.fastDeployment.label = this.fastDeployment.image = null;
+      this.fastDeployment.name =
+        this.fastDeployment.namespace =
+        this.fastDeployment.label =
+        this.fastDeployment.image =
+          null;
       this.fastDeployment.replicas = 1;
       this.fastDeployment.port = 0;
       this.fastDeployment.createService = false;
@@ -723,14 +741,6 @@ export default {
     },
     updateDeployment() {
       this.errorMessageModal = "";
-      /*if (
-        !this.fastDeployment.name ||
-        !this.fastDeployment.namespace ||
-        !this.fastDeployment.label ||
-        !this.fastDeployment.image
-      )
-        return (this.errorMessageModal = "All fields are required!");
-        */
       if (this.selectedDeployment.spec.replicas < 1)
         return (this.errorMessageModal =
           "Replica's quantity must be greater than zero and the Port number must be zero or greater!");
@@ -739,18 +749,43 @@ export default {
       this.selectedDeployment.spec.replicas = parseInt(
         this.selectedDeployment.spec.replicas
       );
-      // Add new labels to replicas
-      this.selectedDeployment.spec.selector.matchLabels[
-        this.replicas_labels.new
-      ] = this.replicas_labels.new;
-      // Add new labels to deployment
-      this.selectedDeployment.metadata.labels[
-        this.deployments_labels.new
-      ] = this.deployments_labels.new;
 
-      console.log("selectedDeploymentXXXX");
+      // Add new labels to replicas
+      if (this.replicas_labels.new.length > 1) {
+        this.selectedDeployment.spec.selector.matchLabels[
+          this.replicas_labels.new
+        ] = this.replicas_labels.new;
+        this.selectedDeployment.spec.selector.template.metadata.labels[
+          this.replicas_labels.new
+        ] = this.replicas_labels.new;
+      }
+
+      // Add new labels to deployment
+      if (this.deployments_labels.new.length > 1) {
+        this.selectedDeployment.metadata.labels[this.deployments_labels.new] =
+          this.deployments_labels.new;
+      }
+
+      //Change Strategy Type
+      switch (this.selectedDeployment.spec.strategy.type) {
+        case "Canary":
+          break;
+        case "RollingUpdate":
+          this.selectedDeployment.spec.strategy = {
+            rollingUpdate: { maxSurge: "25%", maxUnavailable: "25%" },
+            type: "RollingUpdate",
+          };
+          break;
+        case "Recreate":
+          if (this.selectedDeployment.spec.strategy.rollingUpdate != null) {
+            this.selectedDeployment.spec.strategy.rollingUpdate = null;
+          }
+          this.selectedDeployment.spec.strategy.type = "Recreate";
+          break;
+      }
+
+      console.log("selectedDeploymen");
       console.log(this.selectedDeployment);
-      console.log(this.deployments_labels.new);
 
       let depoyment_to_update = this.selectedDeployment;
       axios
@@ -764,13 +799,13 @@ export default {
           }
         )
         .then((res) => {
+          console.log("REsult");
           console.log(res);
           this.message = "Deployment Updated successfully!";
           this.toggleUpdateDeploymentModal();
-          this.cleanSelectedDeployment();
           setTimeout(() => {
             this.getInfoDeployments();
-          }, 500);
+          }, 1000);
         })
         .catch((err) => {
           this.messageModal = "";
@@ -783,7 +818,8 @@ export default {
         !this.fastDeployment.name ||
         !this.fastDeployment.namespace ||
         !this.fastDeployment.label ||
-        !this.fastDeployment.image
+        !this.fastDeployment.image ||
+        !this.fastCreateDeployment.strategy_type
       )
         return (this.errorMessageModal = "All fields are required!");
       if (this.fastDeployment.replicas < 1 || this.fastDeployment.port < 0)
@@ -794,6 +830,18 @@ export default {
           return (this.errorMessageModal =
             "Service port must be greater than 0!");
       }
+      switch (this.fastDeployment.strategy_type) {
+        case "RollingUpdate":
+          this.fastDeployment.strategy_type = {
+            rollingUpdate: { maxSurge: "25%", maxUnavailable: "25%" },
+            type: "RollingUpdate",
+          };
+          break;
+        case "Recreate":
+          this.fastDeployment.strategy_type = { type: "Recreate" };
+          break;
+      }
+
       this.messageModal = "Creating Deployment...";
       let deployment = {
         apiVersion: "apps/v1",
@@ -806,6 +854,7 @@ export default {
           },
         },
         spec: {
+          strategy: this.fastDeployment.strategy_type,
           replicas: this.fastDeployment.replicas,
           selector: {
             matchLabels: {
