@@ -32,6 +32,7 @@ app.get("/api/namespaces", importedK8sFunctions.getNamespaces);
 app.get("/api/pods", importedK8sFunctions.getPods);
 app.get("/api/deployments", importedK8sFunctions.getDeployments);
 app.get("/api/services", importedK8sFunctions.getServices);
+app.get("/api/grafana/link", importedK8sFunctions.getGrafanaLink);
 
 app.delete("/api/kubeconfig", importedK8sFunctions.deleteKubeconfig);
 app.delete("/api/deployments/:namespace/:name", importedK8sFunctions.deleteDeployment);

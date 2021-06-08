@@ -740,9 +740,9 @@ export default {
         this.selectedDeployment.spec.replicas
       );
       // Add new labels to replicas
-      this.selectedDeployment.spec.selector.matchLabels[
+      /*this.selectedDeployment.spec.selector.matchLabels[
         this.replicas_labels.new
-      ] = this.replicas_labels.new;
+      ] = this.replicas_labels.new;*/
       // Add new labels to deployment
       this.selectedDeployment.metadata.labels[
         this.deployments_labels.new
