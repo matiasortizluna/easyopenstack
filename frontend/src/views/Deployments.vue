@@ -14,7 +14,7 @@
       <br />
 
       <div class="mt-4">
-        <div
+        <div  
           v-if="errorMessage"
           class="alert alert-danger text-center"
           role="alert"
@@ -187,7 +187,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="updateDeploymentLabel">
-              Deployment update
+              Deployment Update
             </h5>
             <button
               type="button"
@@ -276,7 +276,7 @@
                   id="strategy"
                   class="form-control"
                 >
-                  <option value="Canary">Canary</option>
+                  <option value="Recreate">Recreate</option>
                   <option value="RollingUpdate">Rolling Update</option>
                 </select>
                 <br />
@@ -297,20 +297,11 @@
                     type="checkbox"
                     id="inlineCheckbox1"
                     v-model="replicas_labels.new"
+                    disabled
                   />
                   <label class="form-check-label" for="inlineCheckbox1">{{
                     label
                   }}</label>
-                </div>
-                <div>
-                  <input
-                    v-model="replicas_labels.new"
-                    type="text"
-                    class="form-control"
-                    id="replicas-label"
-                    placeholder="New Replicas Label"
-                    disabled
-                  />
                 </div>
               </div>
               <div class="col">
@@ -475,7 +466,7 @@
                   id="strategy_deployment"
                   class="form-control"
                 >
-                  <option value="Canary">Canary</option>
+                  <option value="Recreate">Recreate</option>
                   <option value="RollingUpdate">Rolling Update</option>
                 </select>
                 <br />
@@ -660,6 +651,7 @@ export default {
         this.selectedDeployment = deployment;
         this.deployments_labels.before = deployment.metadata.labels;
         this.replicas_labels.before = deployment.spec.selector.matchLabels;
+        console.log(deployment);
       }
       $("#updateDeploymentModal").modal("toggle");
       this.messageModal = "";
@@ -749,19 +741,6 @@ export default {
       this.selectedDeployment.spec.replicas = parseInt(
         this.selectedDeployment.spec.replicas
       );
-
-      // Add new labels to replicas
-      /*this.selectedDeployment.spec.selector.matchLabels[
-        this.replicas_labels.new
-      ] = this.replicas_labels.new;*/
-      if (this.replicas_labels.new.length > 1) {
-        this.selectedDeployment.spec.selector.matchLabels[
-          this.replicas_labels.new
-        ] = this.replicas_labels.new;
-        this.selectedDeployment.spec.selector.template.metadata.labels[
-          this.replicas_labels.new
-        ] = this.replicas_labels.new;
-      }
 
       // Add new labels to deployment
       if (this.deployments_labels.new.length > 1) {
