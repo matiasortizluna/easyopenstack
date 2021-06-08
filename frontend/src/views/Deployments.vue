@@ -187,7 +187,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="updateDeploymentLabel">
-              Deployment fast creation
+              Deployment update
             </h5>
             <button
               type="button"
