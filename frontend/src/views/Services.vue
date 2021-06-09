@@ -61,17 +61,15 @@
                   }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Type: </strong
-                  >{{
-                    service.spec.type
-                  }}
+                  <strong>Type: </strong>{{ service.spec.type }}
                 </p>
                 <div class="text-gray-700">
                   <strong>Selectors: </strong>
-                  <p v-for="selector,key in service.spec.selector" :key="selector">
-                    &nbsp;&nbsp;&nbsp;&nbsp;{{
-                      key+ ": " + selector
-                    }}
+                  <p
+                    v-for="(selector, key) in service.spec.selector"
+                    :key="selector"
+                  >
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ key + ": " + selector }}
                   </p>
                 </div>
                 <p class="text-gray-700">
@@ -79,10 +77,20 @@
                 </p>
                 <div class="text-gray-700">
                   <strong>Ports:</strong>
-                  <div class="ml-10" v-for="port in service.spec.ports" :key="port.port">
-                      <p>Containers: {{port.targetPort}}, {{port.protocol}} </p>
-                      <p>Internal (Cluster): {{port.port}}, {{port.protocol}} </p>
-                      <p v-show="port.nodePort">External (Node): {{ port.nodePort }}, {{port.protocol}} </p>
+                  <div
+                    class="ml-10"
+                    v-for="port in service.spec.ports"
+                    :key="port.port"
+                  >
+                    <p>
+                      Containers: {{ port.targetPort }}, {{ port.protocol }}
+                    </p>
+                    <p>
+                      Internal (Cluster): {{ port.port }}, {{ port.protocol }}
+                    </p>
+                    <p v-show="port.nodePort">
+                      External (Node): {{ port.nodePort }}, {{ port.protocol }}
+                    </p>
                   </div>
                 </div>
                 <p class="text-gray-700">
@@ -93,7 +101,7 @@
               <div class="card-footer">
                 <div class="row">
                   <div class="col">
-                   <!-- <button type="button" class="btn btn-warning">Edit</button
+                    <!-- <button type="button" class="btn btn-warning">Edit</button
                     >&nbsp;&nbsp;-->
                     <button
                       type="button"
@@ -122,7 +130,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="createServiceLabel">create Service</h5>
+            <h5 class="modal-title" id="createServiceLabel">Create Service</h5>
             <button
               type="button"
               class="close"
@@ -158,6 +166,9 @@
                 @change="selectFile($event)"
               />
             </div>
+            <div>
+              <img :src="service_examplePNG" width="400" />
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -167,7 +178,11 @@
             >
               Close
             </button>
-            <button type="button" @click="createService()" class="btn btn-primary">
+            <button
+              type="button"
+              @click="createService()"
+              class="btn btn-primary"
+            >
               create
             </button>
           </div>
@@ -178,9 +193,11 @@
 </template>
 <script>
 import services from "../assets/images/services.png";
+import service_example from "../assets/images/service_example.png";
 export default {
   data() {
     return {
+      service_examplePNG: service_example,
       servicesPNG: services,
       services: [],
       errorMessage: "",
@@ -195,7 +212,7 @@ export default {
       axios
         .get("http://localhost:3000/api/services")
         .then((resp) => {
-          console.log(resp.data)
+          console.log(resp.data);
           this.message = "";
           this.services = resp.data;
         })
@@ -211,7 +228,11 @@ export default {
     toggleModal() {
       this.messageModal = "";
       this.errorMessageModal = "";
-      this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
+      this.volumeName =
+        this.volumeDescription =
+        this.volumeSource =
+        this.volumeSize =
+          null;
       $("#createServiceModal").modal("toggle");
     },
     selectFile(event) {

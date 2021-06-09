@@ -208,9 +208,6 @@ module.exports.deleteService = (req, res) => {
 
 
 module.exports.createService = (req, res) => {
-    console.log(req.body)
-    console.log(req.files)
-
     var configFile = req.files.service_configfile;
     if (configFile.name.split(".")[1] != "yml" && configFile.name.split(".")[1] != "yaml")
         return res.status(400).send({ "message": "It's not an YAML file!" });
@@ -222,7 +219,6 @@ module.exports.createService = (req, res) => {
         console.log(serviceConfig)
         if (!serviceConfig.metadata.namespace)
             serviceConfig.metadata.namespace = "default"
-
         k8sApi.createNamespacedService(serviceConfig.metadata.namespace, serviceConfig)
             .then((resp) => {
                 fs.unlink("serviceconfig.yml", () => {
@@ -271,7 +267,7 @@ module.exports.createDeployment = (req, res) => {
 module.exports.updateDeployment = (req, res) => {
     let deployment = req.body.depoyment_to_update;
     console.log(deployment)
-    const options = { "headers": { "Content-type": k8s.PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH}};
+    const options = { "headers": { "Content-type": k8s.PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
     k8sApiBeta.patchNamespacedDeployment(req.params.name, req.params.namespace, deployment, undefined, undefined, undefined, undefined, options).then((resp) => {
         res.send(resp.body);
     })
@@ -325,17 +321,17 @@ function fastCreateService(res, label, serviceInfo, namespace) {
 
 module.exports.getGrafanaLink = (req, res) => {
     k8sApi.readNamespacedService('grafana', 'ingress-nginx')
-    .then((resp) => {
-        fs.readFile("k8s_config", 'utf8', (err, data) => {
-            if (err)
-                return res.status(500).send({ "message": "Error while reading file. Try again." });
-            var k8sConfig = yaml.load(data);
-            var server = k8sConfig.clusters[0].cluster.server;
-            var serverIp = server.split("/")[2].split(":")[0];
-            var grafanaIp = "http://"+serverIp+":"+resp.body.spec.ports[0].nodePort;
-            res.send(grafanaIp);
-        });
-    })
-    .catch((err) => res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message }))
-    
+        .then((resp) => {
+            fs.readFile("k8s_config", 'utf8', (err, data) => {
+                if (err)
+                    return res.status(500).send({ "message": "Error while reading file. Try again." });
+                var k8sConfig = yaml.load(data);
+                var server = k8sConfig.clusters[0].cluster.server;
+                var serverIp = server.split("/")[2].split(":")[0];
+                var grafanaIp = "http://" + serverIp + ":" + resp.body.spec.ports[0].nodePort;
+                res.send(grafanaIp);
+            });
+        })
+        .catch((err) => res.status(err.response.request.response.body.code).send({ "message": err.response.request.response.body.message }))
+
 }

@@ -43,9 +43,13 @@
                   <strong>On node: </strong>{{ pod.spec.nodeName }}
                 </p>
                 <p class="text-gray-700">
-                  <strong>Label: </strong>{{ pod.metadata.labels
-                      ? pod.metadata.labels["k8s-app"] ?? pod.metadata.labels["app"]
-                      : "---" }}
+                  <strong>Label: </strong
+                  >{{
+                    pod.metadata.labels
+                      ? pod.metadata.labels["k8s-app"] ??
+                        pod.metadata.labels["app"]
+                      : "---"
+                  }}
                 </p>
                 <p class="text-gray-700">
                   <strong>Containers: </strong>{{ pod.spec.containers.length }}
@@ -96,7 +100,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="createPodModalLabel">create Pod</h5>
+            <h5 class="modal-title" id="createPodModalLabel">Create Pod</h5>
             <button
               type="button"
               class="close"
@@ -122,6 +126,7 @@
               {{ messageModal }}
             </div>
             <p>Select the YAML file that contains the pod configuration</p>
+            <br />
             <div class="input-group mb-3">
               <input
                 type="file"
@@ -130,6 +135,9 @@
                 required
                 @change="selectFile($event)"
               />
+            </div>
+            <div>
+              <img :src="pod_examplePNG" width="400" />
             </div>
           </div>
           <div class="modal-footer">
@@ -151,9 +159,11 @@
 </template>
 <script>
 import pods from "../assets/images/pods.png";
+import pod_example from "../assets/images/pod_example.png";
 export default {
   data() {
     return {
+      pod_examplePNG: pod_example,
       podsPNG: pods,
       pods: [],
       errorMessage: "",
@@ -168,7 +178,7 @@ export default {
       axios
         .get("http://localhost:3000/api/pods")
         .then((resp) => {
-          console.log(resp.data)
+          console.log(resp.data);
           this.message = "";
           this.pods = resp.data;
         })
