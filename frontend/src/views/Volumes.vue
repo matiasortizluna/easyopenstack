@@ -204,20 +204,14 @@ export default {
           },
         })
         .then((response) => {
-          console.log("RESPONSE" + response);
-          let volumeDeleted = volume;
-          let index = this.volumes.indexOf(volumeDeleted);
-          console.log(index + this.volumes);
-          if (index > -1) {
-            this.volumes.splice(index, 1);
-            if (this.volumes.length == 0) {
-              this.message = "There are no Images  created.";
-            }
-          }
-          console.log(index + this.volumes);
+          this.message = "Deleted Volume Successfully.";
+          setTimeout(() => {
+            this.getInfoVolumes();
+          }, 2000);
         })
         .catch((error) => {
           this.error = error.response.data.message;
+          this.errorMessage = "Error in deleting Volume.";
           console.log(error);
         });
     },
@@ -238,6 +232,8 @@ export default {
         .catch((error) => {
           this.error = error.response.data.message;
           console.log(error);
+          this.errorMessage =
+            "Error in Getting information about Volumes, try again.";
         });
     },
     addVolume() {
@@ -264,9 +260,11 @@ export default {
             }
           )
           .then((response) => {
-            this.message = "Volume created!";
-            this.getInfoVolumes();
             this.toggleModal();
+            this.message = "Volume created Successfully!";
+            setTimeout(() => {
+              this.getInfoVolumes();
+            }, 2000);
           })
           .catch((error) => {
             this.messageModal = "";

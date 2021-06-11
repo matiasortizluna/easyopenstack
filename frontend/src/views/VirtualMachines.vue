@@ -423,6 +423,16 @@ export default {
         security_groups: [],
       },
       for_MachineFloatingip: {},
+      rules: [],
+      security_group_rule: {
+        direction: "",
+        port_range_min: "",
+        ethertype: "",
+        port_range_max: "",
+        protocol: "",
+        security_group_id: "",
+        remote_ip_prefix: "0.0.0.0/0",
+      },
     };
   },
   methods: {
@@ -438,21 +448,10 @@ export default {
       }, 1000);
     },
     toggleModal(machine) {
-      //console.log(this.machineEditing.project);
       this.message = "Waiting for verify information ... ";
       this.getForEditing(machine);
       setTimeout(() => {
-        //this.getForDeploy();
         if (this.errorMessage == "" && this.errorMessageModal == "") {
-          //console.log(this.flavors);
-          //console.log(this.volumes);
-          //console.log(this.networks);
-          //console.log(this.securityGroups);
-          //console.log(this.keyPairs);
-          //console.log(this.machineEditing);
-          //this.messageModal = "";
-          //this.errorMessageModal = "";
-          //this.volumeName = this.volumeDescription = this.volumeSource = this.volumeSize = null;
           $("#modalCreate").modal("toggle");
         }
       }, 1000);
@@ -511,7 +510,6 @@ export default {
           },
         })
         .then((response) => {
-          //console.log(response.data.server);
           this.machineEditing.project = "";
           this.machineEditing.name = response.data.server.name;
           this.machineEditing.image_file = response.data.server.image;
@@ -521,17 +519,14 @@ export default {
           this.machineEditing.key_pair = response.data.server.key_name;
           this.machineEditing.security_groups =
             response.data.server.security_groups;
-          //console.log(this.machineEditing);
+
           this.machineEditing.networks = response.data.server.addresses;
-          //this.machineEditing.description = response.data.server.description;
         })
         .catch((error) => {
-          //this.errorMessage = error.response.data.message;
           this.errorMessage = "Error in Getting + information about Instances";
         });
     },
     deleteMachine(machine) {
-      //console.log(machine);
       axios
         .delete("http://localhost:3000/api/instances/" + machine.id, {
           headers: {
@@ -541,20 +536,18 @@ export default {
         })
         .then((response) => {
           //console.log("RESPONSE" + response);
-          let deletedMachine = machine;
-          let index = this.machines.indexOf(deletedMachine);
-          //console.log(index + this.machines);
-          if (index > -1) {
-            this.machines.splice(index, 1);
-            if (this.machines.length == 0) {
-              this.message = "There are no Virtual Machines created.";
-            }
-          }
-          //console.log(index + this.machines);
+          let deletedMachine = response.data.server;
+          this.message =
+            "Deleted Machine" + deletedMachine.name + "Successfully.";
+          setTimeout(() => {
+            this.getInfoMachines();
+          }, 2000);
         })
         .catch((error) => {
-          this.error = error.response.data.message;
-          //console.log(error);
+          //this.error = error.response.data.message;
+          this.errorMessage =
+            "Error in Deleting Machine. Try again or refresh :)";
+          console.log(error);
         });
     },
     getFlavor(machine) {
@@ -588,7 +581,6 @@ export default {
         })
         .catch((error) => {
           this.error = error.response.data.message;
-          //console.log(error);
         });
     },
     formatDate(date) {
@@ -743,41 +735,15 @@ export default {
         })
         .catch((err) => console.log(err.response));
     },
-    createFloatingIP() {
-      let network_id = this.networks.find(
-        (network) => network["router:external"] == true
-      );
-
-      axios
-        .post(
-          "http://localhost:3000/api/floating",
-          {
-            floatingip: {
-              floating_network_id: network_id,
-              project_id: this.$store.state.selectedProject,
-            },
-          },
-          {
-            headers: {
-              "x-token": this.$store.state.authToken,
-              "x-server-address": this.$store.state.url,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          this.error = error.response.data.message;
-          //console.log(error);
-        });
-    },
     createConnection(machine) {
       //console.log(machine);
       this.getNetworks();
       setTimeout(() => {
+        this.getRules();
+      }, 1000);
+      setTimeout(() => {
         this.getPortsFromMachine(machine);
-      }, 2000);
+      }, 1000);
     },
     createFloatingIP(machine) {
       //console.log(this.networks);
@@ -803,17 +769,20 @@ export default {
         )
         .then((response) => {
           //console.log(response.data);
+          this.message = "Created Floating IP Successfully. Now associating";
           machine.floatingip = response.data.floatingip;
 
           setTimeout(() => {
             this.associate(machine);
-          }, 1000);
+          }, 2000);
         })
         .catch((error) => {
-          this.error = error.response.data.message;
+          this.errorMessage = "Error in creating new Floating IP";
+          //this.error = error.response.data.message;
         });
     },
     getPortsFromMachine(machine) {
+      console.log(machine);
       let machine_id = machine.id;
       axios
         .get("http://localhost:3000/api/ports/machine", {
@@ -826,22 +795,33 @@ export default {
         .then((response) => {
           //response.data.ports.find(port => port.)
           machine.ports = response.data.ports;
+          console.log(machine.ports);
           this.createFloatingIP(machine);
         })
         .catch((error) => {
           //this.errorMessage = error.response.data.message;
           //console.log(error);
           this.errorMessage =
-            "Error in Getting information about Floating Points";
+            "Error in Getting information about Floating Points. Can't create Floating Point. Try again :)";
         });
     },
     associate(machine) {
+      console.log(machine.ports);
+      var index = 0;
+      var count = 0;
+      machine.ports.forEach((port) => {
+        if (port.fixed_ips.length > 1) {
+          index = count;
+        }
+        count++;
+      });
+
       axios
         .put(
           "http://localhost:3000/api/floating/port",
           {
             floatingip_id: machine.floatingip.id,
-            port_id: machine.ports[0].id,
+            port_id: machine.ports[index].id,
           },
           {
             headers: {
@@ -852,12 +832,117 @@ export default {
         )
         .then((response) => {
           //console.log(response);
-          this.getInfoMachines();
+          this.message = "Associated Floating IP with Machine Successfully :)";
+
+          setTimeout(() => {
+            this.getInfoMachines();
+          }, 2000);
         })
         .catch((error) => {
           console.log(error);
           //this.errorMessage = error.response.data.message;
-          this.errorMessage = "Error in Getting information about Machines";
+          this.errorMessage = "Error in Associating Floating IP to Machine";
+        });
+    },
+    getRules() {
+      axios
+        .get("http://localhost:3000/api/security-groups/rules", {
+          headers: {
+            "X-Token": this.$store.state.authToken,
+            "X-Server-Address": this.address,
+          },
+        })
+        .then((response) => {
+          //console.log(response);
+          this.rules = response.data.security_group_rules;
+          this.security_group_rule.security_group_id = this.rules[0].security_group_id;
+
+          var do_it = true;
+          var ruleAlready = this.rules.find(
+            (rule) => rule.protocol == "tcp" && rule.port_range_min == 22
+          );
+          if (ruleAlready) {
+            do_it = false;
+          }
+
+          if (do_it) {
+            this.easyConnect();
+          } else {
+            this.message =
+              "Already Configured SSH & ICMP Security Group Rules, Skipiing ...";
+          }
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage =
+            "Error in Getting information about Security Group Rules";
+        });
+    },
+    easyConnect() {
+      axios
+        .post(
+          "http://localhost:3000/api/security-groups/rules",
+          {
+            security_group_rule: {
+              direction: "ingress",
+              port_range_min: "22",
+              ethertype: "ipv4",
+              port_range_max: "22",
+              protocol: "tcp",
+              security_group_id: this.security_group_rule.security_group_id,
+              remote_ip_prefix: "0.0.0.0/0",
+            },
+          },
+          {
+            headers: {
+              "X-Token": this.$store.state.authToken,
+              "X-Server-Address": this.address,
+            },
+          }
+        )
+        .then((response) => {
+          this.message = "Created SSH Security Group Rule Successfully";
+          //console.log(response);
+          //console.log("almost");
+
+          setTimeout(() => {
+            axios
+              .post(
+                "http://localhost:3000/api/security-groups/rules",
+                {
+                  security_group_rule: {
+                    direction: "ingress",
+                    port_range_min: "8",
+                    ethertype: "ipv4",
+                    port_range_max: "0",
+                    protocol: "icmp",
+                    security_group_id: this.security_group_rule
+                      .security_group_id,
+                    remote_ip_prefix: "0.0.0.0/0",
+                  },
+                },
+                {
+                  headers: {
+                    "X-Token": this.$store.state.authToken,
+                    "X-Server-Address": this.address,
+                  },
+                }
+              )
+              .then((response) => {
+                console.log(response);
+                this.message = "Created ICMP Security Group Rule Successfully";
+                //console.log("The End");
+              })
+              .catch((error) => {
+                console.log(error.response);
+                this.errorMessage = error.response.data.message;
+                this.errorMessage = "Error in Creating Rule";
+              });
+          }, 1000);
+        })
+        .catch((error) => {
+          //this.errorMessage = error.response.data.message;
+          this.errorMessage = "Error in Creating Rule";
         });
     },
   },
